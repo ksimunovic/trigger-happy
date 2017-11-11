@@ -1,42 +1,42 @@
 import axios from 'axios';
 export const editNode = ( node, type ) => {
-  return {
-    type: 'EDIT_NODE',
-    node: node,
-    editType: type || ''
-  };
+	return {
+		type: 'EDIT_NODE',
+		node: node,
+		editType: type || ''
+	};
 };
 export const setErrorMessage = ( nodeId, fieldName, error ) => {
-    return {
-      type: 'SET_ERROR_MESSAGE',
-      nodeId,
-      fieldName,
-      message: error
+	return {
+		type: 'SET_ERROR_MESSAGE',
+		nodeId,
+		fieldName,
+		message: error
   };
 };
 export const clearErrorMessage = ( nodeId, fieldName ) => {
-    return {
-      type: 'SET_ERROR_MESSAGE',
-      nodeId,
-      fieldName,
-      message: ''
-    };
+	return {
+		type: 'SET_ERROR_MESSAGE',
+		nodeId,
+		fieldName,
+		message: ''
+	};
 };
 export const setFieldType = ( nodeId, fieldName, fieldType ) => {
-  return {
-    type: 'SET_FIELD_TYPE',
-    nodeId,
-    fieldName,
-    fieldType
-  };
+	return {
+		type: 'SET_FIELD_TYPE',
+		nodeId,
+		fieldName,
+		fieldType
+	};
 };
 
 export const setNodeTitle = ( nodeId, nodeTitle ) => {
-  return {
-    type: 'SET_NODE_TITLE',
-    nodeId,
-    nodeTitle
-  };
+	return {
+		type: 'SET_NODE_TITLE',
+		nodeId,
+		nodeTitle
+	};
 };
 
 
@@ -58,21 +58,21 @@ export const loadDataType = dataTypeId => {
 			}
 			return response.json();
 		}).then( json => dispatch( loadedDataType( dataTypeId, json ) ) );
-    };
+	};
 };
 
 export const testNode = node => {
-  return {
-    type: 'TEST_NODE',
-    node
-  };
+	return {
+		type: 'TEST_NODE',
+		node
+	};
 };
 export const navigate = ( page, options ) => {
-    return {
-      type: 'NAVIGATE',
-      page,
-      options
-    };
+	return {
+		type: 'NAVIGATE',
+		page,
+		options
+	};
 };
 export const nextStep = () => ( dispatch, getState ) => {
 	let state = getState();
@@ -104,12 +104,12 @@ export const addNode = ( node, nid ) => ( dispatch, getState ) => {
 
 return new Promise( ( resolve, reject ) => {
 
-    let state = getState();
+	let state = getState();
 
-    let nId = nid || Object.values( state.nodes ).reduce( function( acc, next ) {
+	let nId = nid || Object.values( state.nodes ).reduce( function( acc, next ) {
 		return next.nid > acc ? next.nid : acc;
 	}, 0 ) + 1;
-    let newNode =   {
+	let newNode =   {
 		cat: node.cat || '',
 		description: node.description || '',
 		name: node.name,
@@ -152,28 +152,28 @@ return new Promise( ( resolve, reject ) => {
 		}
 	}
 	if ( node.filters ) {
-	    dispatch({
+		dispatch({
 			type: 'SET_NODE_FILTERS',
 			nodeId: newNode.nid,
 			filters: node.filters
-	    });
+		});
 	}
 	if ( newNode.fields.return !== undefined ) {
 		dispatch({
-		    type: 'ADD_STEP',
-		    nodeId: newNode.nid,
+			type: 'ADD_STEP',
+			nodeId: newNode.nid,
 
-		    step: {
-		        isReturn: true,
-		            text: 'Edit Value',
-		            icon: 'fa-pencil',
-		        page: 'NodeSettings',
-		        options: {
-		            editType: 'return',
-		            title: 'Edit Value',
-		            node: newNode.nid
-		        }
-		    }
+			step: {
+				isReturn: true,
+					text: 'Edit Value',
+					icon: 'fa-pencil',
+				page: 'NodeSettings',
+				options: {
+					editType: 'return',
+					title: 'Edit Value',
+					node: newNode.nid
+				}
+			}
 		});
 	}
 
@@ -198,10 +198,10 @@ return new Promise( ( resolve, reject ) => {
 	}
 	if ( node.allowFilters ) {
 		dispatch({
-		    type: 'ADD_STEP',
-		    nodeId: newNode.nid,
+			type: 'ADD_STEP',
+			nodeId: newNode.nid,
 
-		    step: {
+			step: {
 				text: 'Edit filters',
 				icon: 'fa-filter',
 				page: 'NodeFilters',
@@ -223,109 +223,105 @@ return new Promise( ( resolve, reject ) => {
 		dispatch( navigate( nextStep.page, nextStep.options ) );
 	}
 
-        resolve();
-    });
+		resolve();
+	});
 };
 
 
 export const showCreateNew = () => {
-  return {
-    type: 'SHOW_CREATE_NEW'
-
-  };
+	return {
+		type: 'SHOW_CREATE_NEW'
+	};
 };
 
 export const resetUI = () => {
-  return {
-    type: 'RESET_UI'
-
-  };
+	return {
+		type: 'RESET_UI'
+	};
 };
 
 export const showSelectPluginActions = ( plugin ) => {
 
-  return {
-    type: 'SHOW_SELECT_ACTION',
-    plugin
-
-  };
+	return {
+		type: 'SHOW_SELECT_ACTION',
+		plugin
+	};
 };
 
 export const setExpression = ( nodeId, connectorId, expr ) => {
 
-  return dispatch=> {
+	return dispatch=> {
 
-    dispatch({
-        type: 'SET_NODE_EXPRESSION',
-        nodeId,
-        connectorId,
-        expr
-    });
-};
+		dispatch({
+			type: 'SET_NODE_EXPRESSION',
+			nodeId,
+			connectorId,
+			expr
+		});
+	};
 };
 export const setFilters = ( nodeId, filters ) => {
 
-  return {
-    type: 'SET_NODE_FILTERS',
-    filters,
-    nodeId
-
-  };
+	return {
+		type: 'SET_NODE_FILTERS',
+		filters,
+		nodeId
+	};
 };
 
 export function fetchActions( plugin ) {
-    if ( ! plugin ) {
-plugin = '';
-}
+	if ( ! plugin ) {
+		plugin = '';
+	}
 
-    return dispatch => {
-    dispatch( requestActions() );
+	return dispatch => {
+		dispatch( requestActions() );
 
-    return fetch( '/wp-json/wpflow/v1/nodes/?plugin=' + plugin + '&_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, { credentials: 'same-origin' })
-      .then( response => response.json() )
-      .then( json => dispatch( receiveActions( json ) ) );
-  };
+		return fetch( '/wp-json/wpflow/v1/nodes/?plugin=' + plugin + '&_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, { credentials: 'same-origin' })
+			.then( response => response.json() )
+			.then( json => dispatch( receiveActions( json ) ) );
+	};
 }
 export function fetchPlugins() {
-    return dispatch => {
-    dispatch( requestPlugins() );
+	return dispatch => {
+	dispatch( requestPlugins() );
 
-    return fetch( '/wp-json/wpflow/v1/plugins' + '?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, { credentials: 'same-origin' })
-      .then( response => response.json() )
-      .then( json => dispatch( receivePlugins( json ) ) );
-  };
+	return fetch( '/wp-json/wpflow/v1/plugins' + '?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, { credentials: 'same-origin' })
+		.then( response => response.json() )
+		.then( json => dispatch( receivePlugins( json ) ) );
+	};
 }
 export function requestPlugins() {
 
-    return {
-        type: 'REQUEST_PLUGINS'
-    };
+	return {
+		type: 'REQUEST_PLUGINS'
+	};
 }
 
 export const selectTrigger = ()=> ( dispatch, getState ) => {
-    dispatch({ type: 'ADD_TRIGGER' });
+	dispatch({ type: 'ADD_TRIGGER' });
 
 };
 
 export function receivePlugins( plugins ) {
 
-    return {
-        type: 'RECEIVED_PLUGINS',
-        plugins
-    };
+	return {
+		type: 'RECEIVED_PLUGINS',
+		plugins
+	};
 }
 
 export function requestActions() {
 
-    return {
-        type: 'REQUEST_ACTIONS'
-    };
+	return {
+		type: 'REQUEST_ACTIONS'
+	};
 }
 
 export function receiveActions( actions ) {
 
-    return {
-        type: 'RECEIVED_ACTIONS',
-        actions
-    };
+	return {
+		type: 'RECEIVED_ACTIONS',
+		actions
+	};
 }

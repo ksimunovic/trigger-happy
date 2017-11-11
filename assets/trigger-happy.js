@@ -1618,14 +1618,12 @@ var addNode = exports.addNode = function addNode(node, nid) {
 var showCreateNew = exports.showCreateNew = function showCreateNew() {
 	return {
 		type: 'SHOW_CREATE_NEW'
-
 	};
 };
 
 var resetUI = exports.resetUI = function resetUI() {
 	return {
 		type: 'RESET_UI'
-
 	};
 };
 
@@ -1634,7 +1632,6 @@ var showSelectPluginActions = exports.showSelectPluginActions = function showSel
 	return {
 		type: 'SHOW_SELECT_ACTION',
 		plugin: plugin
-
 	};
 };
 
@@ -1656,7 +1653,6 @@ var setFilters = exports.setFilters = function setFilters(nodeId, filters) {
 		type: 'SET_NODE_FILTERS',
 		filters: filters,
 		nodeId: nodeId
-
 	};
 };
 
@@ -2991,7 +2987,7 @@ module.exports = keyOf;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -3012,204 +3008,204 @@ var _jsep2 = _interopRequireDefault(_jsep);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function checkNodeTag(fetchConnectingNode, name, prop) {
-    if (name && prop) {
-        var match = name.match(/_N([0-9]*)/);
-        if (null != match) {
-            var matchingNode = fetchConnectingNode(match[1]);
-            return {
-                node: matchingNode,
-                pinId: prop.join('.'),
-                nodeId: match[1],
-                nodeLabel: matchingNode.type,
-                pinLabel: prop.join('.')
-            };
-        }
-    }
-    return false;
+	if (name && prop) {
+		var match = name.match(/_N([0-9]*)/);
+		if (null != match) {
+			var matchingNode = fetchConnectingNode(match[1]);
+			return {
+				node: matchingNode,
+				pinId: prop.join('.'),
+				nodeId: match[1],
+				nodeLabel: matchingNode.type,
+				pinLabel: prop.join('.')
+			};
+		}
+	}
+	return false;
 }
 
 function rebuildExpressionFromMustache(fetchConnectingNode, replaceExpressionNodeTag, val, isString) {
-    if (!val) {
-        return val;
-    }
-    return val.replace(/{{(.*)}}/g, function (match, p1) {
-        p1 = p1.replace('}}', '');
-        var matches = p1.match(/_N([0-9]*)\.(.*)/);
-        if (null != matches) {
-            var expr = (0, _jsep2.default)(p1);
-            return rebuildExpressionFromAST(fetchConnectingNode, replaceExpressionNodeTag, expr, true);
-        }
-        return p1;
-    });
+	if (!val) {
+		return val;
+	}
+	return val.replace(/{{(.*)}}/g, function (match, p1) {
+		p1 = p1.replace('}}', '');
+		var matches = p1.match(/_N([0-9]*)\.(.*)/);
+		if (null != matches) {
+			var expr = (0, _jsep2.default)(p1);
+			return rebuildExpressionFromAST(fetchConnectingNode, replaceExpressionNodeTag, expr, true);
+		}
+		return p1;
+	});
 }
 
 function getRootObjectFromMemberExpression(obj) {
-    if (obj.type && 'MemberExpression' == obj.type) {
-        return getRootObjectFromMemberExpression(obj.object);
-    }
-    return obj;
+	if (obj.type && 'MemberExpression' == obj.type) {
+		return getRootObjectFromMemberExpression(obj.object);
+	}
+	return obj;
 }
 
 function walkExpression(ast, callback) {
-    if (ast == undefined) {
-        return;
-    }
-    callback(ast);
-    switch (ast.type) {
-        case 'BinaryExpression':
-            walkExpression(ast.left, callback);
-            walkExpression(ast.right, callback);
-            walkExpression(ast.operator, callback);
-        case 'Literal':
-            walkExpression(ast.value, callback);
-        case 'Identifier':
-            walkExpression(ast.name, callback);
-    }
+	if (ast == undefined) {
+		return;
+	}
+	callback(ast);
+	switch (ast.type) {
+		case 'BinaryExpression':
+			walkExpression(ast.left, callback);
+			walkExpression(ast.right, callback);
+			walkExpression(ast.operator, callback);
+		case 'Literal':
+			walkExpression(ast.value, callback);
+		case 'Identifier':
+			walkExpression(ast.name, callback);
+	}
 }
 
 function rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, ast, isString) {
-    switch (ast.type) {
-        case 'BinaryExpression':
-            return rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, ast.left) + ' ' + ast.operator + ' ' + rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, ast.right);
-        case 'Literal':
-            return ast.value;
-        case 'Identifier':
-            var match = ast.name.match(/_N([0-9]*)/);
-            if (false) {
-                var matchingNode = getNodeById(match[1]);
-                return matchingNode.type;
-            }
-            return ast.name;
-        case 'MemberExpression':
-            var rootMemberObj = getRootObjectFromMemberExpression(ast);
-            var rootMemberExpr = rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, rootMemberObj);
-            var isNodeMatch = rootMemberExpr.match(/_N([0-9]*)/);
-            if (false) {
-                var current = ast;
-                var stack = [];
-                while (current && current.type && 'MemberExpression' == current.type) {
-                    stack.push(rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, current.property));
-                    current = current.object;
-                }
-                stack.reverse();
-                var nodeTag = checkNodeTag(getNodeById, rootMemberExpr, stack);
-                if (nodeTag) {
-                    return replaceExpressionNodeTag(nodeTag, isString);
-                }
-            }
-            return rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, ast.object) + '.' + rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, ast.property);
-        case 'CallExpression':
-            var args = '';
-            for (var i in ast.arguments) {
-                if ('' != args) {
-                    args += ',';
-                }
-                args += rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, ast.arguments[i]);
-            }
-            return rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, ast.callee) + '(' + args + ')';
-    }
-    return false;
+	switch (ast.type) {
+		case 'BinaryExpression':
+			return rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, ast.left) + ' ' + ast.operator + ' ' + rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, ast.right);
+		case 'Literal':
+			return ast.value;
+		case 'Identifier':
+			var match = ast.name.match(/_N([0-9]*)/);
+			if (false) {
+				var matchingNode = getNodeById(match[1]);
+				return matchingNode.type;
+			}
+			return ast.name;
+		case 'MemberExpression':
+			var rootMemberObj = getRootObjectFromMemberExpression(ast);
+			var rootMemberExpr = rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, rootMemberObj);
+			var isNodeMatch = rootMemberExpr.match(/_N([0-9]*)/);
+			if (false) {
+				var current = ast;
+				var stack = [];
+				while (current && current.type && 'MemberExpression' == current.type) {
+					stack.push(rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, current.property));
+					current = current.object;
+				}
+				stack.reverse();
+				var nodeTag = checkNodeTag(getNodeById, rootMemberExpr, stack);
+				if (nodeTag) {
+					return replaceExpressionNodeTag(nodeTag, isString);
+				}
+			}
+			return rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, ast.object) + '.' + rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, ast.property);
+		case 'CallExpression':
+			var args = '';
+			for (var i in ast.arguments) {
+				if ('' != args) {
+					args += ',';
+				}
+				args += rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, ast.arguments[i]);
+			}
+			return rebuildExpressionFromAST(getNodeById, replaceExpressionNodeTag, ast.callee) + '(' + args + ')';
+	}
+	return false;
 }
 function buildExpressionFromValue(expression, fetchNodeById, replaceExpressionNodeTag, isString) {
-    if ('string' == typeof expression) {
-        return rebuildExpressionFromMustache(fetchNodeById, replaceExpressionNodeTag, expression.replace(/(_N[0-9]*\.[A-Za-z0-9\-_]*)/, function (match, p1, p2) {
-            return '{{' + p1 + '}}';
-        }).replace('{{{{', '{{').replace('}}}}', '}}'));
-    }
-    return rebuildExpressionFromAST(fetchNodeById, replaceExpressionNodeTag, expression, isString);
+	if ('string' == typeof expression) {
+		return rebuildExpressionFromMustache(fetchNodeById, replaceExpressionNodeTag, expression.replace(/(_N[0-9]*\.[A-Za-z0-9\-_]*)/, function (match, p1, p2) {
+			return '{{' + p1 + '}}';
+		}).replace('{{{{', '{{').replace('}}}}', '}}'));
+	}
+	return rebuildExpressionFromAST(fetchNodeById, replaceExpressionNodeTag, expression, isString);
 }
 function buildExpression(value, fetchConnectingNode, fieldType, node, pinId, replaceExpressionNodeTag) {
-    var expression = value;
-    var expr = expression;
-    var isString = 0 <= fieldType.split('|').indexOf('string');
-    if ('string' == typeof expression) {
-        return rebuildExpressionFromMustache(fetchConnectingNode, replaceExpressionNodeTag, expr.replace(/(_N[0-9]*\.[A-Za-z0-9\-_]*)/, function (match, p1, p2) {
-            return '{{' + p1 + '}}';
-        }).replace('{{{{', '{{').replace('}}}}', '}}'));
-    }
-    var rebuilt = rebuildExpressionFromAST(fetchConnectingNode, replaceExpressionNodeTag, expr, isString);
-    if (false == rebuilt) {
-        return expression;
-    }
-    return rebuilt;
+	var expression = value;
+	var expr = expression;
+	var isString = 0 <= fieldType.split('|').indexOf('string');
+	if ('string' == typeof expression) {
+		return rebuildExpressionFromMustache(fetchConnectingNode, replaceExpressionNodeTag, expr.replace(/(_N[0-9]*\.[A-Za-z0-9\-_]*)/, function (match, p1, p2) {
+			return '{{' + p1 + '}}';
+		}).replace('{{{{', '{{').replace('}}}}', '}}'));
+	}
+	var rebuilt = rebuildExpressionFromAST(fetchConnectingNode, replaceExpressionNodeTag, expr, isString);
+	if (false == rebuilt) {
+		return expression;
+	}
+	return rebuilt;
 }
 function parseExpression(expression) {
-    var nodeId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-    var fieldName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-    var type = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-    var store = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+	var nodeId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+	var fieldName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+	var type = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+	var store = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 
-    if (expression.replace) {
-        expression = expression.replace(/\{\{(_N[^\}]*)\}\}/i, function (match, p1) {
-            return p1;
-        });
-    }
-    try {
-        var expr = (0, _jsep2.default)(expression);
-        if (null != type && null != store) {
-            if ('number' == type) {
-                // No Compound
-                var errorMessage = '';
-                var allowedStrings = ['+', '-', '/', '*', '(', ')'];
-                var isNumeric = function isNumeric(n) {
-                    return !isNaN(parseFloat(n)) && isFinite(n);
-                };
-                walkExpression(expr, function (ast) {
-                    if ('string' === typeof ast && !isNumeric(ast) && -1 === allowedStrings.indexOf(ast) && 0 != ast.indexOf('{{_N')) {
-                        debugger;
-                        errorMessage = 'The expression is invalid';
-                    } else if ('Compound' == ast.type) {
-                        errorMessage = 'The expression is invalid';
-                    }
-                });
-                var state = store.getState();
-                if (!state.ui.errors || !state.ui.errors[nodeId] || state.ui.errors[nodeId][fieldName] !== errorMessage) {
-                    debugger;
-                    store.dispatch({
-                        type: 'SET_ERROR_MESSAGE',
-                        nodeId: nodeId,
-                        fieldName: fieldName,
-                        message: errorMessage
-                    });
-                }
-            }
-        }
-        return expr;
-    } catch (e) {
-        var _state = store.getState();
-        var _errorMessage = 'The expression is invalid';
-        if (null != nodeId && null != fieldName && !_state.ui.errors || !_state.ui.errors[nodeId] || _state.ui.errors[nodeId][fieldName] !== _errorMessage) {
-            store.dispatch({
-                type: 'SET_ERROR_MESSAGE',
-                nodeId: nodeId,
-                fieldName: fieldName,
-                message: _errorMessage
-            });
-        }
-        return expression;
-    }
+	if (expression.replace) {
+		expression = expression.replace(/\{\{(_N[^\}]*)\}\}/i, function (match, p1) {
+			return p1;
+		});
+	}
+	try {
+		var expr = (0, _jsep2.default)(expression);
+		if (null != type && null != store) {
+			if ('number' == type) {
+				// No Compound
+				var errorMessage = '';
+				var allowedStrings = ['+', '-', '/', '*', '(', ')'];
+				var isNumeric = function isNumeric(n) {
+					return !isNaN(parseFloat(n)) && isFinite(n);
+				};
+				walkExpression(expr, function (ast) {
+					if ('string' === typeof ast && !isNumeric(ast) && -1 === allowedStrings.indexOf(ast) && 0 != ast.indexOf('{{_N')) {
+						debugger;
+						errorMessage = 'The expression is invalid';
+					} else if ('Compound' == ast.type) {
+						errorMessage = 'The expression is invalid';
+					}
+				});
+				var state = store.getState();
+				if (!state.ui.errors || !state.ui.errors[nodeId] || state.ui.errors[nodeId][fieldName] !== errorMessage) {
+					debugger;
+					store.dispatch({
+						type: 'SET_ERROR_MESSAGE',
+						nodeId: nodeId,
+						fieldName: fieldName,
+						message: errorMessage
+					});
+				}
+			}
+		}
+		return expr;
+	} catch (e) {
+		var _state = store.getState();
+		var _errorMessage = 'The expression is invalid';
+		if (null != nodeId && null != fieldName && !_state.ui.errors || !_state.ui.errors[nodeId] || _state.ui.errors[nodeId][fieldName] !== _errorMessage) {
+			store.dispatch({
+				type: 'SET_ERROR_MESSAGE',
+				nodeId: nodeId,
+				fieldName: fieldName,
+				message: _errorMessage
+			});
+		}
+		return expression;
+	}
 }
 
 function stringifyExpression(expression) {
-    if (null == expression) {
-        return null;
-    }
-    if ('string' === typeof expression || 'boolean' === typeof expression || 'number' === typeof expression) {
-        return expression;
-    }
-    if ('object' === (typeof expression === 'undefined' ? 'undefined' : _typeof(expression)) && expression.id) {
-        return expression.id;
-    }
-    var rebuiltExpression = rebuildExpressionFromAST(null, null, expression, true);
-    if (!rebuiltExpression) {
-        return expression;
-    }
-    if (rebuiltExpression.replace) {
-        rebuiltExpression = rebuiltExpression.replace(/(_N[0-9]*\.[A-Za-z0-9\-_\.\(\)\'.]*)/, function (match, p1, p2) {
-            return '{{' + p1 + '}}';
-        }).replace('{{{{', '{{').replace('}}}}', '}}');
-    }
-    return rebuiltExpression;
+	if (null == expression) {
+		return null;
+	}
+	if ('string' === typeof expression || 'boolean' === typeof expression || 'number' === typeof expression) {
+		return expression;
+	}
+	if ('object' === (typeof expression === 'undefined' ? 'undefined' : _typeof(expression)) && expression.id) {
+		return expression.id;
+	}
+	var rebuiltExpression = rebuildExpressionFromAST(null, null, expression, true);
+	if (!rebuiltExpression) {
+		return expression;
+	}
+	if (rebuiltExpression.replace) {
+		rebuiltExpression = rebuiltExpression.replace(/(_N[0-9]*\.[A-Za-z0-9\-_\.\(\)\'.]*)/, function (match, p1, p2) {
+			return '{{' + p1 + '}}';
+		}).replace('{{{{', '{{').replace('}}}}', '}}');
+	}
+	return rebuiltExpression;
 }
 
 /***/ }),
@@ -22186,7 +22182,7 @@ exports.default = NodeFieldList;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -22204,250 +22200,250 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var QuickSearch = function (_React$Component) {
-    _inherits(QuickSearch, _React$Component);
+	_inherits(QuickSearch, _React$Component);
 
-    function QuickSearch(props) {
-        _classCallCheck(this, QuickSearch);
+	function QuickSearch(props) {
+		_classCallCheck(this, QuickSearch);
 
-        var _this = _possibleConstructorReturn(this, (QuickSearch.__proto__ || Object.getPrototypeOf(QuickSearch)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (QuickSearch.__proto__ || Object.getPrototypeOf(QuickSearch)).call(this, props));
 
-        _this.state = {};
-        return _this;
-    }
+		_this.state = {};
+		return _this;
+	}
 
-    _createClass(QuickSearch, [{
-        key: 'getTypeIcon',
-        value: function getTypeIcon(node) {
+	_createClass(QuickSearch, [{
+		key: 'getTypeIcon',
+		value: function getTypeIcon(node) {
 
-            var pluginIcon = this.props.getNodeIcon(node.nid);
+			var pluginIcon = this.props.getNodeIcon(node.nid);
 
-            if (pluginIcon) {
-                return _react2.default.createElement(
-                    'div',
-                    { className: 'node-icon node-icon--' + node.cat },
-                    _react2.default.createElement('img', { src: 'pluginIcon' })
-                );
-            }
-            if (!pluginIcon && 'trigger' == node.nodeType) {
+			if (pluginIcon) {
+				return _react2.default.createElement(
+					'div',
+					{ className: 'node-icon node-icon--' + node.cat },
+					_react2.default.createElement('img', { src: 'pluginIcon' })
+				);
+			}
+			if (!pluginIcon && 'trigger' == node.nodeType) {
 
-                return _react2.default.createElement(
-                    'div',
-                    { className: 'node-icon node-icon--' + node.nodeType },
-                    _react2.default.createElement('i', { className: 'fa fa-bolt' })
-                );
-            }
-            if (!pluginIcon && 'action' == node.nodeType) {
-                return _react2.default.createElement(
-                    'div',
-                    { className: 'node-icon node-icon--' + node.nodeType },
-                    _react2.default.createElement('i', { className: 'fa fa-tasks' })
-                );
-            }
-        }
-    }, {
-        key: 'canUseField',
-        value: function canUseField(f, n) {
-            if (this.props.canUseField) {
-                return this.props.canUseField(f, n);
-            }
-            return true;
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var _this2 = this;
+				return _react2.default.createElement(
+					'div',
+					{ className: 'node-icon node-icon--' + node.nodeType },
+					_react2.default.createElement('i', { className: 'fa fa-bolt' })
+				);
+			}
+			if (!pluginIcon && 'action' == node.nodeType) {
+				return _react2.default.createElement(
+					'div',
+					{ className: 'node-icon node-icon--' + node.nodeType },
+					_react2.default.createElement('i', { className: 'fa fa-tasks' })
+				);
+			}
+		}
+	}, {
+		key: 'canUseField',
+		value: function canUseField(f, n) {
+			if (this.props.canUseField) {
+				return this.props.canUseField(f, n);
+			}
+			return true;
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this2 = this;
 
-            var fields = this.props.availableFields.filter(function (n, i) {
-                var innerFields = (n.fields || []).filter(function (f) {
-                    return !_this2.state.quickSearchText || 0 <= (f.label || f.name).indexOf(_this2.state.quickSearchText) || _this2.filterSchema(f.type);
-                });
-                innerFields = innerFields.filter(function (f) {
-                    return _this2.canUseField(f, n);
-                });
-                return 0 < innerFields.length;
-            });
-            var getLabel = function getLabel(n) {
-                if (n.nid) {
-                    return n.nid + '. ' + (n.label || n.name2);
-                }
-                return 'Global';
-            };
-            return _react2.default.createElement(
-                'div',
-                { className: this.props.className, style: { display: this.props.show ? 'block' : 'none' } },
-                _react2.default.createElement(
-                    'div',
-                    { className: 'node-quick-search__search' },
-                    _react2.default.createElement('input', { type: 'text', className: 'node-quick-search__search-input', placeholder: 'search...', value: this.state.quickSearchText, onChange: function onChange(e) {
-                            return _this2.setState({ quickSearchText: e.target.value });
-                        } })
-                ),
-                _react2.default.createElement(
-                    'div',
-                    { className: 'quick-search-container' },
-                    0 == fields.length && _react2.default.createElement(
-                        'div',
-                        null,
-                        _react2.default.createElement(
-                            'div',
-                            { className: 'node-quick-search__group' },
-                            'No fields available'
-                        )
-                    ),
-                    fields.map(function (n, i) {
-                        return _react2.default.createElement(
-                            'div',
-                            null,
-                            _react2.default.createElement(
-                                'div',
-                                { className: 'node-quick-search__group' },
-                                _this2.getTypeIcon(n),
-                                getLabel(n)
-                            ),
-                            _react2.default.createElement(
-                                'ul',
-                                null,
-                                (n.fields || []).filter(function (f) {
-                                    return !_this2.state.quickSearchText || 0 <= (f.label || f.name).indexOf(_this2.state.quickSearchText) || _this2.filterSchema(f.type);
-                                }).filter(function (f) {
-                                    return _this2.canUseField(f, n);
-                                }).map(function (f) {
-                                    var schemaList = _this2.renderSchema(n, f, f.type);
+			var fields = this.props.availableFields.filter(function (n, i) {
+				var innerFields = (n.fields || []).filter(function (f) {
+					return !_this2.state.quickSearchText || 0 <= (f.label || f.name).indexOf(_this2.state.quickSearchText) || _this2.filterSchema(f.type);
+				});
+				innerFields = innerFields.filter(function (f) {
+					return _this2.canUseField(f, n);
+				});
+				return 0 < innerFields.length;
+			});
+			var getLabel = function getLabel(n) {
+				if (n.nid) {
+					return n.nid + '. ' + (n.label || n.name2);
+				}
+				return 'Global';
+			};
+			return _react2.default.createElement(
+				'div',
+				{ className: this.props.className, style: { display: this.props.show ? 'block' : 'none' } },
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-quick-search__search' },
+					_react2.default.createElement('input', { type: 'text', className: 'node-quick-search__search-input', placeholder: 'search...', value: this.state.quickSearchText, onChange: function onChange(e) {
+							return _this2.setState({ quickSearchText: e.target.value });
+						} })
+				),
+				_react2.default.createElement(
+					'div',
+					{ className: 'quick-search-container' },
+					0 == fields.length && _react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement(
+							'div',
+							{ className: 'node-quick-search__group' },
+							'No fields available'
+						)
+					),
+					fields.map(function (n, i) {
+						return _react2.default.createElement(
+							'div',
+							null,
+							_react2.default.createElement(
+								'div',
+								{ className: 'node-quick-search__group' },
+								_this2.getTypeIcon(n),
+								getLabel(n)
+							),
+							_react2.default.createElement(
+								'ul',
+								null,
+								(n.fields || []).filter(function (f) {
+									return !_this2.state.quickSearchText || 0 <= (f.label || f.name).indexOf(_this2.state.quickSearchText) || _this2.filterSchema(f.type);
+								}).filter(function (f) {
+									return _this2.canUseField(f, n);
+								}).map(function (f) {
+									var schemaList = _this2.renderSchema(n, f, f.type);
 
-                                    return _react2.default.createElement(
-                                        'li',
-                                        { className: 'node-quick-search__item' },
-                                        _react2.default.createElement(
-                                            'a',
-                                            { href: 'javascript:void(0);', onClick: function onClick(e) {
-                                                    return _this2.props.insertField(n, f);
-                                                } },
-                                            _react2.default.createElement(
-                                                'strong',
-                                                null,
-                                                f.label || f.name
-                                            ),
-                                            schemaList && _react2.default.createElement('i', { onClick: function onClick(e) {
-                                                    return _this2.toggleList(n, f, e);
-                                                }, className: _this2.canShowList(n, f) ? 'fa fa-chevron-up' : 'fa fa-chevron-down' })
-                                        ),
-                                        _this2.renderSchemaDesc(f.type),
-                                        _this2.canShowList(n, f) && schemaList
-                                    );
-                                })
-                            )
-                        );
-                    })
-                ),
-                this.props.controlTypeOverrideText && _react2.default.createElement(
-                    'div',
-                    null,
-                    _react2.default.createElement('hr', null),
-                    _react2.default.createElement(
-                        'ul',
-                        null,
-                        _react2.default.createElement(
-                            'li',
-                            null,
-                            _react2.default.createElement(
-                                'a',
-                                { href: 'javascript:void(0);', onClick: function onClick() {
-                                        return _this2.props.resetControlTypeClicked();
-                                    } },
-                                ' ',
-                                this.props.controlTypeOverrideText,
-                                ' '
-                            )
-                        )
-                    )
-                )
-            );
-        }
-    }, {
-        key: 'canShowList',
-        value: function canShowList(n, f, type) {
-            return this.state && this.state.showSchema && this.state.showSchema[n.nid + '-' + f.name];
-        }
-    }, {
-        key: 'toggleList',
-        value: function toggleList(n, f, e) {
+									return _react2.default.createElement(
+										'li',
+										{ className: 'node-quick-search__item' },
+										_react2.default.createElement(
+											'a',
+											{ href: 'javascript:void(0);', onClick: function onClick(e) {
+													return _this2.props.insertField(n, f);
+												} },
+											_react2.default.createElement(
+												'strong',
+												null,
+												f.label || f.name
+											),
+											schemaList && _react2.default.createElement('i', { onClick: function onClick(e) {
+													return _this2.toggleList(n, f, e);
+												}, className: _this2.canShowList(n, f) ? 'fa fa-chevron-up' : 'fa fa-chevron-down' })
+										),
+										_this2.renderSchemaDesc(f.type),
+										_this2.canShowList(n, f) && schemaList
+									);
+								})
+							)
+						);
+					})
+				),
+				this.props.controlTypeOverrideText && _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement('hr', null),
+					_react2.default.createElement(
+						'ul',
+						null,
+						_react2.default.createElement(
+							'li',
+							null,
+							_react2.default.createElement(
+								'a',
+								{ href: 'javascript:void(0);', onClick: function onClick() {
+										return _this2.props.resetControlTypeClicked();
+									} },
+								' ',
+								this.props.controlTypeOverrideText,
+								' '
+							)
+						)
+					)
+				)
+			);
+		}
+	}, {
+		key: 'canShowList',
+		value: function canShowList(n, f, type) {
+			return this.state && this.state.showSchema && this.state.showSchema[n.nid + '-' + f.name];
+		}
+	}, {
+		key: 'toggleList',
+		value: function toggleList(n, f, e) {
 
-            e.stopPropagation();
-            var showSchemaList = this.state.showSchema || {};
-            showSchemaList[n.nid + '-' + f.name] = !showSchemaList[n.nid + '-' + f.name];
-            this.setState({
-                showSchema: showSchemaList
-            });
-        }
-    }, {
-        key: 'filterSchema',
-        value: function filterSchema(type) {
-            var _this3 = this;
+			e.stopPropagation();
+			var showSchemaList = this.state.showSchema || {};
+			showSchemaList[n.nid + '-' + f.name] = !showSchemaList[n.nid + '-' + f.name];
+			this.setState({
+				showSchema: showSchemaList
+			});
+		}
+	}, {
+		key: 'filterSchema',
+		value: function filterSchema(type) {
+			var _this3 = this;
 
-            if (type && this.props.schemas && this.props.schemas[type]) {
-                return 0 < Object.keys(this.props.schemas[type].properties).filter(function (f) {
-                    return !_this3.state.quickSearchText || 0 <= f.indexOf(_this3.state.quickSearchText) || 0 <= _this3.props.schemas[type].properties[f].description.indexOf(_this3.state.quickSearchText);
-                }).length;
-            }
-            return false;
-        }
-    }, {
-        key: 'renderSchemaDesc',
-        value: function renderSchemaDesc(type) {
-            if (type && this.props.schemas && this.props.schemas[type]) {
-                return _react2.default.createElement(
-                    'em',
-                    { className: 'quick-search__desc' },
-                    this.props.schemas[type].description
-                );
-            }
-            return null;
-        }
-    }, {
-        key: 'renderSchema',
-        value: function renderSchema(n, f, type) {
-            var _this4 = this;
+			if (type && this.props.schemas && this.props.schemas[type]) {
+				return 0 < Object.keys(this.props.schemas[type].properties).filter(function (f) {
+					return !_this3.state.quickSearchText || 0 <= f.indexOf(_this3.state.quickSearchText) || 0 <= _this3.props.schemas[type].properties[f].description.indexOf(_this3.state.quickSearchText);
+				}).length;
+			}
+			return false;
+		}
+	}, {
+		key: 'renderSchemaDesc',
+		value: function renderSchemaDesc(type) {
+			if (type && this.props.schemas && this.props.schemas[type]) {
+				return _react2.default.createElement(
+					'em',
+					{ className: 'quick-search__desc' },
+					this.props.schemas[type].description
+				);
+			}
+			return null;
+		}
+	}, {
+		key: 'renderSchema',
+		value: function renderSchema(n, f, type) {
+			var _this4 = this;
 
-            var prefix = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+			var prefix = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
 
 
-            if (type && this.props.schemas && this.props.schemas[type]) {
+			if (type && this.props.schemas && this.props.schemas[type]) {
 
-                return _react2.default.createElement(
-                    'ul',
-                    { className: 'quick-search-sub' },
-                    this.props.schemas[type].properties && Object.keys(this.props.schemas[type].properties).filter(function (f) {
-                        return !_this4.state.quickSearchText || 0 <= f.indexOf(_this4.state.quickSearchText) || 0 <= _this4.props.schemas[type].properties[f].description.indexOf(_this4.state.quickSearchText);
-                    }).map(function (k) {
-                        return _react2.default.createElement(
-                            'li',
-                            { className: 'node-quick-search__item', 'data-type': _this4.props.schemas[type].properties[k].type },
-                            _react2.default.createElement(
-                                'a',
-                                { href: 'javascript:void(0);', onClick: function onClick() {
-                                        return _this4.props.insertField(n, f, prefix + k, _this4.props.schemas[type].properties[k].type);
-                                    }, 'data-type': _this4.props.schemas[type].properties[k].type },
-                                _react2.default.createElement(
-                                    'strong',
-                                    { className: 'quick-search__name' },
-                                    k
-                                ),
-                                _react2.default.createElement(
-                                    'em',
-                                    { className: 'quick-search__desc' },
-                                    _this4.props.schemas[type].properties[k].description
-                                )
-                            ),
-                            _this4.renderSchema(n, f, _this4.props.schemas[type].properties[k].type, k + '.')
-                        );
-                    })
-                );
-            }
-            return null;
-        }
-    }]);
+				return _react2.default.createElement(
+					'ul',
+					{ className: 'quick-search-sub' },
+					this.props.schemas[type].properties && Object.keys(this.props.schemas[type].properties).filter(function (f) {
+						return !_this4.state.quickSearchText || 0 <= f.indexOf(_this4.state.quickSearchText) || 0 <= _this4.props.schemas[type].properties[f].description.indexOf(_this4.state.quickSearchText);
+					}).map(function (k) {
+						return _react2.default.createElement(
+							'li',
+							{ className: 'node-quick-search__item', 'data-type': _this4.props.schemas[type].properties[k].type },
+							_react2.default.createElement(
+								'a',
+								{ href: 'javascript:void(0);', onClick: function onClick() {
+										return _this4.props.insertField(n, f, prefix + k, _this4.props.schemas[type].properties[k].type);
+									}, 'data-type': _this4.props.schemas[type].properties[k].type },
+								_react2.default.createElement(
+									'strong',
+									{ className: 'quick-search__name' },
+									k
+								),
+								_react2.default.createElement(
+									'em',
+									{ className: 'quick-search__desc' },
+									_this4.props.schemas[type].properties[k].description
+								)
+							),
+							_this4.renderSchema(n, f, _this4.props.schemas[type].properties[k].type, k + '.')
+						);
+					})
+				);
+			}
+			return null;
+		}
+	}]);
 
-    return QuickSearch;
+	return QuickSearch;
 }(_react2.default.Component);
 
 exports.default = QuickSearch;
@@ -35769,7 +35765,7 @@ module.exports = function bind(fn, thisArg) {
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -35807,115 +35803,115 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var _ = __webpack_require__(24);
 
 var OperationsPanel = function (_React$Component) {
-    _inherits(OperationsPanel, _React$Component);
+	_inherits(OperationsPanel, _React$Component);
 
-    function OperationsPanel() {
-        _classCallCheck(this, OperationsPanel);
+	function OperationsPanel() {
+		_classCallCheck(this, OperationsPanel);
 
-        return _possibleConstructorReturn(this, (OperationsPanel.__proto__ || Object.getPrototypeOf(OperationsPanel)).apply(this, arguments));
-    }
+		return _possibleConstructorReturn(this, (OperationsPanel.__proto__ || Object.getPrototypeOf(OperationsPanel)).apply(this, arguments));
+	}
 
-    _createClass(OperationsPanel, [{
-        key: 'render',
-        value: function render() {
-            var _this2 = this;
+	_createClass(OperationsPanel, [{
+		key: 'render',
+		value: function render() {
+			var _this2 = this;
 
-            var fieldTypeMethods = this.props.schemas[this.props.fieldType] && this.props.schemas[this.props.fieldType].methods;
+			var fieldTypeMethods = this.props.schemas[this.props.fieldType] && this.props.schemas[this.props.fieldType].methods;
 
-            var style = {};
-            if (0 < this.props.operationX || 0 < this.props.operationY) {
-                this.style = {
-                    left: this.props.operationX,
-                    top: this.props.operationY + 30
-                };
-            }
-            return _react2.default.createElement(
-                'div',
-                { className: 'triggerhappy-operations', style: style, onClick: function onClick(e) {
-                        return e.stopPropagation();
-                    } },
-                _react2.default.createElement(
-                    'label',
-                    null,
-                    'Operation Type'
-                ),
-                _react2.default.createElement(
-                    'select',
-                    { onChange: function onChange(e) {
-                            return _this2.props.updateSelectedOperation(e.target.value);
-                        } },
-                    _react2.default.createElement(
-                        'option',
-                        { value: '' },
-                        'None'
-                    ),
-                    Object.keys(fieldTypeMethods).map(function (m) {
-                        return _this2.props.selectedOperation == m ? _react2.default.createElement(
-                            'option',
-                            { selected: 'selected', value: m },
-                            fieldTypeMethods[m].description
-                        ) : _react2.default.createElement(
-                            'option',
-                            { value: m },
-                            fieldTypeMethods[m].description
-                        );
-                    })
-                ),
-                this.props.selectedOperation && null != this.props.selectedOperation && fieldTypeMethods[this.props.selectedOperation] && _react2.default.createElement(
-                    'div',
-                    null,
-                    Object.keys(fieldTypeMethods[this.props.selectedOperation].fields).length ? _react2.default.createElement('hr', null) : null,
-                    Object.keys(fieldTypeMethods[this.props.selectedOperation].fields).map(function (f) {
-                        return _this2.renderOperationField(f, fieldTypeMethods[_this2.props.selectedOperation].fields[f].description);
-                    })
-                )
-            );
-        }
-    }, {
-        key: 'renderOperationField',
-        value: function renderOperationField(f, desc) {
-            var _this3 = this;
+			var style = {};
+			if (0 < this.props.operationX || 0 < this.props.operationY) {
+				this.style = {
+					left: this.props.operationX,
+					top: this.props.operationY + 30
+				};
+			}
+			return _react2.default.createElement(
+				'div',
+				{ className: 'triggerhappy-operations', style: style, onClick: function onClick(e) {
+						return e.stopPropagation();
+					} },
+				_react2.default.createElement(
+					'label',
+					null,
+					'Operation Type'
+				),
+				_react2.default.createElement(
+					'select',
+					{ onChange: function onChange(e) {
+							return _this2.props.updateSelectedOperation(e.target.value);
+						} },
+					_react2.default.createElement(
+						'option',
+						{ value: '' },
+						'None'
+					),
+					Object.keys(fieldTypeMethods).map(function (m) {
+						return _this2.props.selectedOperation == m ? _react2.default.createElement(
+							'option',
+							{ selected: 'selected', value: m },
+							fieldTypeMethods[m].description
+						) : _react2.default.createElement(
+							'option',
+							{ value: m },
+							fieldTypeMethods[m].description
+						);
+					})
+				),
+				this.props.selectedOperation && null != this.props.selectedOperation && fieldTypeMethods[this.props.selectedOperation] && _react2.default.createElement(
+					'div',
+					null,
+					Object.keys(fieldTypeMethods[this.props.selectedOperation].fields).length ? _react2.default.createElement('hr', null) : null,
+					Object.keys(fieldTypeMethods[this.props.selectedOperation].fields).map(function (f) {
+						return _this2.renderOperationField(f, fieldTypeMethods[_this2.props.selectedOperation].fields[f].description);
+					})
+				)
+			);
+		}
+	}, {
+		key: 'renderOperationField',
+		value: function renderOperationField(f, desc) {
+			var _this3 = this;
 
-            return _react2.default.createElement(
-                'div',
-                null,
-                _react2.default.createElement(
-                    'label',
-                    null,
-                    f
-                ),
-                _react2.default.createElement('input', { type: 'text', onChange: function onChange(e) {
-                        return _this3.props.setOperationValue(f, e.target.value);
-                    }, value: this.props.operationValues[f] || '' }),
-                _react2.default.createElement(
-                    'div',
-                    { className: 'desc' },
-                    desc
-                )
-            );
-        }
-    }]);
+			return _react2.default.createElement(
+				'div',
+				null,
+				_react2.default.createElement(
+					'label',
+					null,
+					f
+				),
+				_react2.default.createElement('input', { type: 'text', onChange: function onChange(e) {
+						return _this3.props.setOperationValue(f, e.target.value);
+					}, value: this.props.operationValues[f] || '' }),
+				_react2.default.createElement(
+					'div',
+					{ className: 'desc' },
+					desc
+				)
+			);
+		}
+	}]);
 
-    return OperationsPanel;
+	return OperationsPanel;
 }(_react2.default.Component);
 
 var mapStateToProps = function mapStateToProps(state, ownProps) {
-    var schemas = {};
-    for (var type in state.datatypes) {
+	var schemas = {};
+	for (var type in state.datatypes) {
 
-        schemas[type] = state.datatypes[type] && state.datatypes[type].schema || null;
-    }
+		schemas[type] = state.datatypes[type] && state.datatypes[type].schema || null;
+	}
 
-    return {
+	return {
 
-        schemas: schemas
-    };
+		schemas: schemas
+	};
 };
 var mapDispatchToProps = function mapDispatchToProps() {
-    return {};
+	return {};
 };
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps, null, {
-    withRef: true
+	withRef: true
 })(OperationsPanel);
 
 /***/ }),
@@ -42415,7 +42411,7 @@ _reactDom2.default.render(_react2.default.createElement(
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -42451,290 +42447,290 @@ var Entities = __webpack_require__(171).AllHtmlEntities;
 __webpack_require__(175);
 
 var CreateNewPanel = function (_React$Component) {
-    _inherits(CreateNewPanel, _React$Component);
+	_inherits(CreateNewPanel, _React$Component);
 
-    function CreateNewPanel(props) {
-        _classCallCheck(this, CreateNewPanel);
+	function CreateNewPanel(props) {
+		_classCallCheck(this, CreateNewPanel);
 
-        var _this = _possibleConstructorReturn(this, (CreateNewPanel.__proto__ || Object.getPrototypeOf(CreateNewPanel)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (CreateNewPanel.__proto__ || Object.getPrototypeOf(CreateNewPanel)).call(this, props));
 
-        _this.state = {
-            selectedPlugin: null,
-            showAll: false
-        };
-        return _this;
-    }
+		_this.state = {
+			selectedPlugin: null,
+			showAll: false
+		};
+		return _this;
+	}
 
-    _createClass(CreateNewPanel, [{
-        key: 'selectPlugin',
-        value: function selectPlugin(plugin) {
-            this.setState({
-                'selectedPlugin': plugin
-            });
-            this.props.loadActions(plugin);
-        }
-    }, {
-        key: 'renderActionList',
-        value: function renderActionList(actions) {
-            var _this2 = this;
+	_createClass(CreateNewPanel, [{
+		key: 'selectPlugin',
+		value: function selectPlugin(plugin) {
+			this.setState({
+				'selectedPlugin': plugin
+			});
+			this.props.loadActions(plugin);
+		}
+	}, {
+		key: 'renderActionList',
+		value: function renderActionList(actions) {
+			var _this2 = this;
 
-            var selectAction = function selectAction(p) {
-                _this2.setState({
-                    'selectedPlugin': null,
-                    search: ''
-                });
-                var id = null;
-                if ('trigger' == p.nodeType) {
-                    id = 1;
-                }
-                _this2.props.selectAction(p, id);
-            };
-            return _react2.default.createElement(
-                'div',
-                { className: 'action-list' },
-                ' ',
-                _lodash2.default.sortBy(actions, function (i) {
-                    return i.name;
-                }).map(function (p) {
-                    return _react2.default.createElement(
-                        'div',
-                        { className: 'action-item', onClick: function onClick() {
-                                return selectAction(p);
-                            } },
-                        ' ',
-                        'condition' == p.nodeType && _react2.default.createElement(
-                            'div',
-                            { className: 'action-tag' },
-                            p.nodeType
-                        ),
-                        ' ',
-                        _react2.default.createElement(
-                            'strong',
-                            null,
-                            p.name
-                        ),
-                        ' ',
-                        _react2.default.createElement(
-                            'div',
-                            null,
-                            p.description
-                        ),
-                        ' '
-                    );
-                }),
-                ' '
-            );
-        }
-    }, {
-        key: 'renderBrowseByPlugin',
-        value: function renderBrowseByPlugin() {
-            if (this.state.search || 0 == this.props.plugins.length) {
-                return null;
-            }
-            var selectPlugin = this.selectPlugin.bind(this);
-            return _react2.default.createElement(
-                'div',
-                null,
-                _react2.default.createElement(
-                    'h5',
-                    null,
-                    'Browse by plugin'
-                ),
-                ' ',
-                _react2.default.createElement(
-                    'div',
-                    { className: 'create-new-list' },
-                    ' ',
-                    this.props.plugins.map(function (p) {
-                        return _react2.default.createElement(
-                            'div',
-                            { className: 'create-new-item', onClick: function onClick() {
-                                    return selectPlugin(p.name);
-                                } },
-                            ' ',
-                            _react2.default.createElement('img', { src: p.icon, className: 'create-new-item__image' }),
-                            ' ',
-                            _react2.default.createElement(
-                                'p',
-                                null,
-                                Entities.decode(p.label)
-                            ),
-                            ' '
-                        );
-                    }),
-                    ' '
-                )
-            );
-        }
-    }, {
-        key: 'checkIfCanShow',
-        value: function checkIfCanShow(action) {
-            if ('condition' == action.nodeType && false !== this.props.preferredNodeTypes) {
-                return !action.conditionType || false !== this.props.preferredNodeTypes && false !== this.props.preferredNodeTypes.indexOf(action.conditionType);
-            } else if ('action' == action.nodeType && (action.actionType || this.props.preferredNodeTypes) && !this.state.showAll) {
-                var nodeTypes = this.props.preferredNodeTypes;
-                return action.actionType && false !== this.props.preferredNodeTypes && false !== this.props.preferredNodeTypes.indexOf(action.actionType);
-            }
-            return true;
-        }
-    }, {
-        key: 'catParts',
-        value: function catParts() {
-            var _this3 = this;
+			var selectAction = function selectAction(p) {
+				_this2.setState({
+					'selectedPlugin': null,
+					search: ''
+				});
+				var id = null;
+				if ('trigger' == p.nodeType) {
+					id = 1;
+				}
+				_this2.props.selectAction(p, id);
+			};
+			return _react2.default.createElement(
+				'div',
+				{ className: 'action-list' },
+				' ',
+				_lodash2.default.sortBy(actions, function (i) {
+					return i.name;
+				}).map(function (p) {
+					return _react2.default.createElement(
+						'div',
+						{ className: 'action-item', onClick: function onClick() {
+								return selectAction(p);
+							} },
+						' ',
+						'condition' == p.nodeType && _react2.default.createElement(
+							'div',
+							{ className: 'action-tag' },
+							p.nodeType
+						),
+						' ',
+						_react2.default.createElement(
+							'strong',
+							null,
+							p.name
+						),
+						' ',
+						_react2.default.createElement(
+							'div',
+							null,
+							p.description
+						),
+						' '
+					);
+				}),
+				' '
+			);
+		}
+	}, {
+		key: 'renderBrowseByPlugin',
+		value: function renderBrowseByPlugin() {
+			if (this.state.search || 0 == this.props.plugins.length) {
+				return null;
+			}
+			var selectPlugin = this.selectPlugin.bind(this);
+			return _react2.default.createElement(
+				'div',
+				null,
+				_react2.default.createElement(
+					'h5',
+					null,
+					'Browse by plugin'
+				),
+				' ',
+				_react2.default.createElement(
+					'div',
+					{ className: 'create-new-list' },
+					' ',
+					this.props.plugins.map(function (p) {
+						return _react2.default.createElement(
+							'div',
+							{ className: 'create-new-item', onClick: function onClick() {
+									return selectPlugin(p.name);
+								} },
+							' ',
+							_react2.default.createElement('img', { src: p.icon, className: 'create-new-item__image' }),
+							' ',
+							_react2.default.createElement(
+								'p',
+								null,
+								Entities.decode(p.label)
+							),
+							' '
+						);
+					}),
+					' '
+				)
+			);
+		}
+	}, {
+		key: 'checkIfCanShow',
+		value: function checkIfCanShow(action) {
+			if ('condition' == action.nodeType && false !== this.props.preferredNodeTypes) {
+				return !action.conditionType || false !== this.props.preferredNodeTypes && false !== this.props.preferredNodeTypes.indexOf(action.conditionType);
+			} else if ('action' == action.nodeType && (action.actionType || this.props.preferredNodeTypes) && !this.state.showAll) {
+				var nodeTypes = this.props.preferredNodeTypes;
+				return action.actionType && false !== this.props.preferredNodeTypes && false !== this.props.preferredNodeTypes.indexOf(action.actionType);
+			}
+			return true;
+		}
+	}, {
+		key: 'catParts',
+		value: function catParts() {
+			var _this3 = this;
 
-            if (this.props.categories) {
-                var vals = Object.values(this.props.categories);
-                return _lodash2.default.sortBy(vals, function (i) {
-                    return i.name;
-                }).filter(function (c) {
-                    return 0 < c.actions.length;
-                }).map(function (c) {
-                    var actions = c.actions.filter(function (i) {
-                        return 0 <= _this3.props.allowTypes.indexOf(i.nodeType) && (!_this3.state.search || 0 <= i.name.toLowerCase().indexOf(_this3.state.search.toLowerCase()) || 0 <= i.description.toLowerCase().indexOf(_this3.state.search.toLowerCase())) && _this3.checkIfCanShow(i);
-                    });
-                    if (0 == actions.length) {
-                        return null;
-                    }
-                    return _react2.default.createElement(
-                        'div',
-                        null,
-                        _react2.default.createElement(
-                            'h5',
-                            null,
-                            'Category: ',
-                            c.name
-                        ),
-                        _this3.renderActionList(actions)
-                    );
-                });
-            }
-            return [];
-        }
-    }, {
-        key: 'setSearch',
-        value: function setSearch(value) {
-            this.setState({
-                search: value
-            });
-        }
-    }, {
-        key: 'renderFilterPanel',
-        value: function renderFilterPanel() {
-            var _this4 = this;
+			if (this.props.categories) {
+				var vals = Object.values(this.props.categories);
+				return _lodash2.default.sortBy(vals, function (i) {
+					return i.name;
+				}).filter(function (c) {
+					return 0 < c.actions.length;
+				}).map(function (c) {
+					var actions = c.actions.filter(function (i) {
+						return 0 <= _this3.props.allowTypes.indexOf(i.nodeType) && (!_this3.state.search || 0 <= i.name.toLowerCase().indexOf(_this3.state.search.toLowerCase()) || 0 <= i.description.toLowerCase().indexOf(_this3.state.search.toLowerCase())) && _this3.checkIfCanShow(i);
+					});
+					if (0 == actions.length) {
+						return null;
+					}
+					return _react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement(
+							'h5',
+							null,
+							'Category: ',
+							c.name
+						),
+						_this3.renderActionList(actions)
+					);
+				});
+			}
+			return [];
+		}
+	}, {
+		key: 'setSearch',
+		value: function setSearch(value) {
+			this.setState({
+				search: value
+			});
+		}
+	}, {
+		key: 'renderFilterPanel',
+		value: function renderFilterPanel() {
+			var _this4 = this;
 
-            return _react2.default.createElement(
-                'div',
-                { className: 'node-filter-panel' },
-                _react2.default.createElement('input', { type: 'text', className: 'node-search-bar', value: this.state.search, placeholder: 'Search available actions...', onChange: function onChange(e) {
-                        return _this4.setSearch(e.target.value);
-                    } })
-            );
-        }
-    }, {
-        key: 'renderParts',
-        value: function renderParts() {
-            if (this.state && this.state.selectedPlugin) {
-                return this.renderActionList(this.props.actions);
-            }
-            var cats = this.catParts();
-            return [this.renderFilterPanel(), this.renderBrowseByPlugin()].concat(_toConsumableArray(cats));
-        }
-    }, {
-        key: 'showAllNodes',
-        value: function showAllNodes() {
-            this.setState({
-                showAll: true
-            });
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var _this5 = this;
+			return _react2.default.createElement(
+				'div',
+				{ className: 'node-filter-panel' },
+				_react2.default.createElement('input', { type: 'text', className: 'node-search-bar', value: this.state.search, placeholder: 'Search available actions...', onChange: function onChange(e) {
+						return _this4.setSearch(e.target.value);
+					} })
+			);
+		}
+	}, {
+		key: 'renderParts',
+		value: function renderParts() {
+			if (this.state && this.state.selectedPlugin) {
+				return this.renderActionList(this.props.actions);
+			}
+			var cats = this.catParts();
+			return [this.renderFilterPanel(), this.renderBrowseByPlugin()].concat(_toConsumableArray(cats));
+		}
+	}, {
+		key: 'showAllNodes',
+		value: function showAllNodes() {
+			this.setState({
+				showAll: true
+			});
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this5 = this;
 
-            var selectPlugin = this.selectPlugin;
-            return _react2.default.createElement(
-                'div',
-                null,
-                ' ',
-                _react2.default.createElement(
-                    'div',
-                    { className: 'node-settings-plugin' },
-                    'Add New'
-                ),
-                ' ',
-                _react2.default.createElement(
-                    'h4',
-                    { className: 'node-settings-title' },
-                    this.props.title
-                ),
-                ' ',
-                this.renderParts(),
-                ' ',
-                this.props.preferredNodeTypes && _react2.default.createElement(
-                    'a',
-                    { href: 'javascript:void(0)', onClick: function onClick() {
-                            return _this5.showAllNodes();
-                        } },
-                    'Show All Actions'
-                ),
-                ' '
-            );
-        }
-    }]);
+			var selectPlugin = this.selectPlugin;
+			return _react2.default.createElement(
+				'div',
+				null,
+				' ',
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-settings-plugin' },
+					'Add New'
+				),
+				' ',
+				_react2.default.createElement(
+					'h4',
+					{ className: 'node-settings-title' },
+					this.props.title
+				),
+				' ',
+				this.renderParts(),
+				' ',
+				this.props.preferredNodeTypes && _react2.default.createElement(
+					'a',
+					{ href: 'javascript:void(0)', onClick: function onClick() {
+							return _this5.showAllNodes();
+						} },
+					'Show All Actions'
+				),
+				' '
+			);
+		}
+	}]);
 
-    return CreateNewPanel;
+	return CreateNewPanel;
 }(_react2.default.Component);
 
 function getDefinitionsByCategory(definitions) {
-    var ret = {};
-    for (var d in definitions) {
-        var def = definitions[d];
-        if (def.cat) {
-            if (!ret[def.cat]) {
-                ret[def.cat] = {
-                    name: def.cat,
-                    actions: []
-                };
-            }
-            ret[def.cat].actions.push(def);
-        }
-    }
-    return ret;
+	var ret = {};
+	for (var d in definitions) {
+		var def = definitions[d];
+		if (def.cat) {
+			if (!ret[def.cat]) {
+				ret[def.cat] = {
+					name: def.cat,
+					actions: []
+				};
+			}
+			ret[def.cat].actions.push(def);
+		}
+	}
+	return ret;
 }
 var mapStateToProps = function mapStateToProps(state) {
-    var isTrigger = state.ui.addTrigger || 0 == Object.keys(state.nodes).filter(function (r) {
-        return 'trigger' == state.nodes[r].nodeType;
-    }).length;
-    var preferredNodeTypes = Object.keys(state.nodes).filter(function (r) {
-        return state.definitions[state.nodes[r].type].triggerType || state.definitions[state.nodes[r].type].actionType;
-    });
-    if (0 < preferredNodeTypes.length) {
-        preferredNodeTypes = preferredNodeTypes.map(function (r) {
-            return state.definitions[state.nodes[r].type].triggerType || state.definitions[state.nodes[r].type].actionType;
-        });
-    } else {
-        preferredNodeTypes = false;
-    }
+	var isTrigger = state.ui.addTrigger || 0 == Object.keys(state.nodes).filter(function (r) {
+		return 'trigger' == state.nodes[r].nodeType;
+	}).length;
+	var preferredNodeTypes = Object.keys(state.nodes).filter(function (r) {
+		return state.definitions[state.nodes[r].type].triggerType || state.definitions[state.nodes[r].type].actionType;
+	});
+	if (0 < preferredNodeTypes.length) {
+		preferredNodeTypes = preferredNodeTypes.map(function (r) {
+			return state.definitions[state.nodes[r].type].triggerType || state.definitions[state.nodes[r].type].actionType;
+		});
+	} else {
+		preferredNodeTypes = false;
+	}
 
-    return {
-        title: isTrigger ? 'Select a trigger' : 'Add an action',
-        preferredNodeTypes: preferredNodeTypes,
-        allowTypes: isTrigger ? ['trigger'] : ['action', 'condition'],
-        plugins: state.plugins && state.plugins.plugins || [],
-        actions: state.actions && state.actions.actions || [],
-        categories: state.definitions && getDefinitionsByCategory(state.definitions) || []
-    };
+	return {
+		title: isTrigger ? 'Select a trigger' : 'Add an action',
+		preferredNodeTypes: preferredNodeTypes,
+		allowTypes: isTrigger ? ['trigger'] : ['action', 'condition'],
+		plugins: state.plugins && state.plugins.plugins || [],
+		actions: state.actions && state.actions.actions || [],
+		categories: state.definitions && getDefinitionsByCategory(state.definitions) || []
+	};
 };
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-    return {
-        selectAction: function selectAction(action, id) {
-            return dispatch((0, _actions.addNode)(action, id));
-        },
-        loadActions: function loadActions(plugin) {
-            return dispatch((0, _actions.fetchActions)(plugin));
-        }
-    };
+	return {
+		selectAction: function selectAction(action, id) {
+			return dispatch((0, _actions.addNode)(action, id));
+		},
+		loadActions: function loadActions(plugin) {
+			return dispatch((0, _actions.fetchActions)(plugin));
+		}
+	};
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(CreateNewPanel);
@@ -42747,7 +42743,7 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -42777,368 +42773,368 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var valueTypes = ['number', 'string', 'boolean', 'date', 'datetime'];
 
 var NodeInputListItem = function (_React$Component) {
-    _inherits(NodeInputListItem, _React$Component);
+	_inherits(NodeInputListItem, _React$Component);
 
-    function NodeInputListItem(props) {
-        _classCallCheck(this, NodeInputListItem);
+	function NodeInputListItem(props) {
+		_classCallCheck(this, NodeInputListItem);
 
-        var _this = _possibleConstructorReturn(this, (NodeInputListItem.__proto__ || Object.getPrototypeOf(NodeInputListItem)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (NodeInputListItem.__proto__ || Object.getPrototypeOf(NodeInputListItem)).call(this, props));
 
-        var value = _this.props.value;
-        if (false == Array.isArray(value)) {
-            value = [value];
-        }
-        _this.state = {
-            hover: false,
-            edit: !!_this.props.item.value,
-            value: _this.props.value
-        };
-        return _this;
-    }
+		var value = _this.props.value;
+		if (false == Array.isArray(value)) {
+			value = [value];
+		}
+		_this.state = {
+			hover: false,
+			edit: !!_this.props.item.value,
+			value: _this.props.value
+		};
+		return _this;
+	}
 
-    _createClass(NodeInputListItem, [{
-        key: 'onMouseUp',
-        value: function onMouseUp(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            this.props.onMouseUp(this.props.index);
-        }
-    }, {
-        key: 'onMouseDown',
-        value: function onMouseDown(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            this.props.onMouseDown(this.props.index);
-        }
-    }, {
-        key: 'onMouseOver',
-        value: function onMouseOver() {
-            this.setState({
-                hover: true
-            });
-        }
-    }, {
-        key: 'onMouseOut',
-        value: function onMouseOut() {
-            this.setState({
-                hover: false
-            });
-        }
-    }, {
-        key: 'noop',
-        value: function noop(e) {
-            e.stopPropagation();
-            e.preventDefault();
-        }
-    }, {
-        key: 'isConnected',
-        value: function isConnected() {
-            return false;
-        }
-    }, {
-        key: 'getTypeIcon',
-        value: function getTypeIcon() {
-            if (this.state.edit) {
-                return 'fa-pencil-square';
-            }
-            if (this.props.item.type) {
-                switch (this.props.item.type) {
-                    case 'flow':
-                        return 'fa-sign-in';
-                        return this.isConnected() ? 'fa-square ' : 'fa-square-o ';
-                    default:
-                }
-            }
-            if (this.isConnected()) {
-                return 'fa-circle';
-            }
-            return 'fa-circle-o';
-        }
-    }, {
-        key: 'edit',
-        value: function edit() {
-            this.setState({
-                'edit': true
-            });
-        }
-    }, {
-        key: 'updateValue',
-        value: function updateValue(index, e) {
-            var value = e.target.value;
-            var valState = this.state.value;
-            valState[index] = e.target.value;
-            this.setState({
-                value: valState
-            });
-        }
-    }, {
-        key: 'addValueOption',
-        value: function addValueOption() {
-            if (Array.isArray(this.state.value)) {
-                var newValues = this.state.value;
-                newValues.push('');
-                this.setState({
-                    value: newValues
-                });
-            } else {
-                var _newValues = [this.state.value];
-                _newValues.push('');
-                this.setState({
-                    value: _newValues
-                });
-            }
-        }
-    }, {
-        key: 'renderInputs',
-        value: function renderInputs() {
-            var values = [''];
-            if (Array.isArray(this.state.value)) {
-                values = this.state.value;
-            } else {
-                values = [this.state.value];
-            }
-            var inputs = [];
-            for (var v in values) {
-                var value = values[v];
-                inputs.push(_react2.default.createElement(
-                    'div',
-                    null,
-                    _react2.default.createElement('input', { value: value, onChange: this.updateValue.bind(this, v), type: 'text', style: { fontSize: 10, width: '100%' } }),
-                    ' ',
-                    _react2.default.createElement('i', { onClick: this.addValueOption.bind(this), className: 'fa fa-plus flow-add-array-element-icon' })
-                ));
-            }
-            return inputs;
-        }
-    }, {
-        key: 'getControl',
-        value: function getControl(type) {
-            if (this.state.controlTypeOverride) {
-                type = this.state.controlTypeOverride;
-            }
+	_createClass(NodeInputListItem, [{
+		key: 'onMouseUp',
+		value: function onMouseUp(e) {
+			e.stopPropagation();
+			e.preventDefault();
+			this.props.onMouseUp(this.props.index);
+		}
+	}, {
+		key: 'onMouseDown',
+		value: function onMouseDown(e) {
+			e.stopPropagation();
+			e.preventDefault();
+			this.props.onMouseDown(this.props.index);
+		}
+	}, {
+		key: 'onMouseOver',
+		value: function onMouseOver() {
+			this.setState({
+				hover: true
+			});
+		}
+	}, {
+		key: 'onMouseOut',
+		value: function onMouseOut() {
+			this.setState({
+				hover: false
+			});
+		}
+	}, {
+		key: 'noop',
+		value: function noop(e) {
+			e.stopPropagation();
+			e.preventDefault();
+		}
+	}, {
+		key: 'isConnected',
+		value: function isConnected() {
+			return false;
+		}
+	}, {
+		key: 'getTypeIcon',
+		value: function getTypeIcon() {
+			if (this.state.edit) {
+				return 'fa-pencil-square';
+			}
+			if (this.props.item.type) {
+				switch (this.props.item.type) {
+					case 'flow':
+						return 'fa-sign-in';
+						return this.isConnected() ? 'fa-square ' : 'fa-square-o ';
+					default:
+				}
+			}
+			if (this.isConnected()) {
+				return 'fa-circle';
+			}
+			return 'fa-circle-o';
+		}
+	}, {
+		key: 'edit',
+		value: function edit() {
+			this.setState({
+				'edit': true
+			});
+		}
+	}, {
+		key: 'updateValue',
+		value: function updateValue(index, e) {
+			var value = e.target.value;
+			var valState = this.state.value;
+			valState[index] = e.target.value;
+			this.setState({
+				value: valState
+			});
+		}
+	}, {
+		key: 'addValueOption',
+		value: function addValueOption() {
+			if (Array.isArray(this.state.value)) {
+				var newValues = this.state.value;
+				newValues.push('');
+				this.setState({
+					value: newValues
+				});
+			} else {
+				var _newValues = [this.state.value];
+				_newValues.push('');
+				this.setState({
+					value: _newValues
+				});
+			}
+		}
+	}, {
+		key: 'renderInputs',
+		value: function renderInputs() {
+			var values = [''];
+			if (Array.isArray(this.state.value)) {
+				values = this.state.value;
+			} else {
+				values = [this.state.value];
+			}
+			var inputs = [];
+			for (var v in values) {
+				var value = values[v];
+				inputs.push(_react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement('input', { value: value, onChange: this.updateValue.bind(this, v), type: 'text', style: { fontSize: 10, width: '100%' } }),
+					' ',
+					_react2.default.createElement('i', { onClick: this.addValueOption.bind(this), className: 'fa fa-plus flow-add-array-element-icon' })
+				));
+			}
+			return inputs;
+		}
+	}, {
+		key: 'getControl',
+		value: function getControl(type) {
+			if (this.state.controlTypeOverride) {
+				type = this.state.controlTypeOverride;
+			}
 
-            if (0 == type.indexOf('@')) {
-                this.lookupOnly = true;
-                type = type.substring(1);
-                return _controls.ExpressionSelectBox;
-            } else {
-                this.lookupOnly = false;
-            }
+			if (0 == type.indexOf('@')) {
+				this.lookupOnly = true;
+				type = type.substring(1);
+				return _controls.ExpressionSelectBox;
+			} else {
+				this.lookupOnly = false;
+			}
 
-            if (this.props.item.choices) {
-                return _controls.SelectBox;
-            }
-            switch (type) {
-                case 'string':
-                    return _controls.ExpressionEditor;
-                case 'html':
-                    return _controls.RichEditor;
-                case 'number':
-                    return _controls.ExpressionEditor;
-                case 'array':
-                    return _controls.ExpressionEditor;
-            }
-            return _controls.SelectBox;
-        }
-    }, {
-        key: 'getType',
-        value: function getType() {
-            var derivedType = this.props.itemType;
-            if (0 == this.props.itemType.indexOf('$')) {
-                debugger;
-                derivedType = this.props.fieldTypes[this.props.nodeid + '.' + this.props.itemType.replace('$', '')] || this.props.itemType;
-            }
-            return derivedType;
-        }
-    }, {
-        key: 'useControlType',
-        value: function useControlType(type) {
-            this.setState({
-                controlTypeOverride: type,
-                controlTypeOverrideText: null == type ? null : 'Use lookup value'
-            });
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var _this2 = this;
+			if (this.props.item.choices) {
+				return _controls.SelectBox;
+			}
+			switch (type) {
+				case 'string':
+					return _controls.ExpressionEditor;
+				case 'html':
+					return _controls.RichEditor;
+				case 'number':
+					return _controls.ExpressionEditor;
+				case 'array':
+					return _controls.ExpressionEditor;
+			}
+			return _controls.SelectBox;
+		}
+	}, {
+		key: 'getType',
+		value: function getType() {
+			var derivedType = this.props.itemType;
+			if (0 == this.props.itemType.indexOf('$')) {
+				debugger;
+				derivedType = this.props.fieldTypes[this.props.nodeid + '.' + this.props.itemType.replace('$', '')] || this.props.itemType;
+			}
+			return derivedType;
+		}
+	}, {
+		key: 'useControlType',
+		value: function useControlType(type) {
+			this.setState({
+				controlTypeOverride: type,
+				controlTypeOverrideText: null == type ? null : 'Use lookup value'
+			});
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this2 = this;
 
-            var name = this.props.item.name;
+			var name = this.props.item.name;
 
-            if ('flow' == this.props.item.type) {
-                name = '';
-            }
-            var hover = this.state.hover;
+			if ('flow' == this.props.item.type) {
+				name = '';
+			}
+			var hover = this.state.hover;
 
-            var type = this.props.itemType;
-            var Control = this.getControl(type);
+			var type = this.props.itemType;
+			var Control = this.getControl(type);
 
-            var allowExpressions = Control == _controls.ExpressionEditor;
-            var errorMessage = this.props.getErrorMessageFor(this.props.nodeid, this.props.item.name);
-            return _react2.default.createElement(
-                'li',
-                null,
-                _react2.default.createElement(
-                    'a',
-                    { onClick: function onClick(e) {
-                            return _this2.edit(e);
-                        }, onMouseUp: function onMouseUp(e) {
-                            return _this2.onMouseUp(e);
-                        }, onMouseDown: function onMouseDown(e) {
-                            return _this2.onMouseDown(e);
-                        }, href: 'javascript:void(0)', className: 'node-connector node-connector--' + (this.props.item.type || 'basic') },
-                    _react2.default.createElement(
-                        'span',
-                        null,
-                        _react2.default.createElement(
-                            'strong',
-                            null,
-                            this.props.item.label || this.props.item.name
-                        )
-                    )
-                ),
-                _react2.default.createElement(
-                    'p',
-                    { className: 'node-connector-description' },
-                    this.props.item.description
-                ),
-                _react2.default.createElement(Control, {
-                    errorMessage: errorMessage,
-                    onSetFieldType: function onSetFieldType(type) {
-                        _this2.props.setFieldType(_this2.props.nodeid, _this2.props.item.name, type);
-                    },
-                    controlTypeOverrideText: this.state.controlTypeOverrideText,
-                    customValueControlTypeClicked: function customValueControlTypeClicked() {
-                        return _this2.useControlType('string');
-                    },
-                    resetControlTypeClicked: function resetControlTypeClicked() {
-                        return _this2.useControlType(null);
-                    },
-                    availableFields: this.props.availableFields,
-                    lookupOnly: this.lookupOnly,
-                    fetchNode: this.props.fetchNode,
-                    nodeId: this.props.nodeid,
-                    name: this.props.item.name,
-                    key: this.props.nodeid + '---' + this.props.item.name,
-                    id: this.props.nodeid + '---' + this.props.item.name,
-                    onChange: function onChange(v) {
-                        return _this2.setValue(v);
-                    },
-                    dataTypeChoices: this.getItemChoices(),
-                    type: this.props.itemType,
-                    value: this.props.value,
-                    ref: function ref(control) {
-                        return _this2.control = control;
-                    }
-                }),
-                errorMessage && _react2.default.createElement(
-                    'div',
-                    { className: 'node-error-text' },
-                    errorMessage
-                )
-            );
-        }
-    }, {
-        key: 'getItemChoices',
-        value: function getItemChoices() {
-            var dataTypeChoices = this.props.dataTypes[this.props.itemType];
-            if (dataTypeChoices && dataTypeChoices.choices) {
-                dataTypeChoices = dataTypeChoices.choices;
-            } else {
-                dataTypeChoices = [];
-            }
-            var initialChoices = this.props.item.choices || [];
-            var additionalFields = [];
-            var af = this.props.availableFields;
-            for (var i in af) {
-                var node = af[i];
-                for (var x in node.fields) {
-                    var field = node.fields[x];
-                    if (field.type == this.props.itemType) {
-                        additionalFields.push({
-                            id: '{{_N' + node.nid + '.' + field.name + '}}',
-                            text: '#' + node.nid + ' - ' + field.name
-                        });
-                    }
-                }
-            }
-            return [].concat(_toConsumableArray(initialChoices), _toConsumableArray(dataTypeChoices), additionalFields);
-        }
-    }, {
-        key: 'setValue',
-        value: function setValue(v) {
-            this.props.setExpression(this.props.nodeid, this.props.item.name, v);
-        }
-    }, {
-        key: 'insertField',
-        value: function insertField(node, field) {
-            this.setState({
-                quickSearch: false
-            });
-            if (this.control) {
-                this.control.getWrappedInstance().insertField('{{_N' + node.nid + '.' + field.name + '}}');
-            }
-        }
-    }]);
+			var allowExpressions = Control == _controls.ExpressionEditor;
+			var errorMessage = this.props.getErrorMessageFor(this.props.nodeid, this.props.item.name);
+			return _react2.default.createElement(
+				'li',
+				null,
+				_react2.default.createElement(
+					'a',
+					{ onClick: function onClick(e) {
+							return _this2.edit(e);
+						}, onMouseUp: function onMouseUp(e) {
+							return _this2.onMouseUp(e);
+						}, onMouseDown: function onMouseDown(e) {
+							return _this2.onMouseDown(e);
+						}, href: 'javascript:void(0)', className: 'node-connector node-connector--' + (this.props.item.type || 'basic') },
+					_react2.default.createElement(
+						'span',
+						null,
+						_react2.default.createElement(
+							'strong',
+							null,
+							this.props.item.label || this.props.item.name
+						)
+					)
+				),
+				_react2.default.createElement(
+					'p',
+					{ className: 'node-connector-description' },
+					this.props.item.description
+				),
+				_react2.default.createElement(Control, {
+					errorMessage: errorMessage,
+					onSetFieldType: function onSetFieldType(type) {
+						_this2.props.setFieldType(_this2.props.nodeid, _this2.props.item.name, type);
+					},
+					controlTypeOverrideText: this.state.controlTypeOverrideText,
+					customValueControlTypeClicked: function customValueControlTypeClicked() {
+						return _this2.useControlType('string');
+					},
+					resetControlTypeClicked: function resetControlTypeClicked() {
+						return _this2.useControlType(null);
+					},
+					availableFields: this.props.availableFields,
+					lookupOnly: this.lookupOnly,
+					fetchNode: this.props.fetchNode,
+					nodeId: this.props.nodeid,
+					name: this.props.item.name,
+					key: this.props.nodeid + '---' + this.props.item.name,
+					id: this.props.nodeid + '---' + this.props.item.name,
+					onChange: function onChange(v) {
+						return _this2.setValue(v);
+					},
+					dataTypeChoices: this.getItemChoices(),
+					type: this.props.itemType,
+					value: this.props.value,
+					ref: function ref(control) {
+						return _this2.control = control;
+					}
+				}),
+				errorMessage && _react2.default.createElement(
+					'div',
+					{ className: 'node-error-text' },
+					errorMessage
+				)
+			);
+		}
+	}, {
+		key: 'getItemChoices',
+		value: function getItemChoices() {
+			var dataTypeChoices = this.props.dataTypes[this.props.itemType];
+			if (dataTypeChoices && dataTypeChoices.choices) {
+				dataTypeChoices = dataTypeChoices.choices;
+			} else {
+				dataTypeChoices = [];
+			}
+			var initialChoices = this.props.item.choices || [];
+			var additionalFields = [];
+			var af = this.props.availableFields;
+			for (var i in af) {
+				var node = af[i];
+				for (var x in node.fields) {
+					var field = node.fields[x];
+					if (field.type == this.props.itemType) {
+						additionalFields.push({
+							id: '{{_N' + node.nid + '.' + field.name + '}}',
+							text: '#' + node.nid + ' - ' + field.name
+						});
+					}
+				}
+			}
+			return [].concat(_toConsumableArray(initialChoices), _toConsumableArray(dataTypeChoices), additionalFields);
+		}
+	}, {
+		key: 'setValue',
+		value: function setValue(v) {
+			this.props.setExpression(this.props.nodeid, this.props.item.name, v);
+		}
+	}, {
+		key: 'insertField',
+		value: function insertField(node, field) {
+			this.setState({
+				quickSearch: false
+			});
+			if (this.control) {
+				this.control.getWrappedInstance().insertField('{{_N' + node.nid + '.' + field.name + '}}');
+			}
+		}
+	}]);
 
-    return NodeInputListItem;
+	return NodeInputListItem;
 }(_react2.default.Component);
 
 var mapStateToProps = function mapStateToProps(state, ownProps) {
-    var dataTypeChoices = false;
-    var availableFields = Object.values(state.nodes).filter(function (el, i) {
-        var def = state.definitions[el.type];
+	var dataTypeChoices = false;
+	var availableFields = Object.values(state.nodes).filter(function (el, i) {
+		var def = state.definitions[el.type];
 
-        return i < ownProps.nodeIndex || def.fields && def.fields.filter(function (r) {
-            return 'start' == r.dir;
-        }).length || true;
-    }).map(function (n, i) {
-        var def = state.definitions[n.type];
-        var allFields = [];
-        if (def && def.fields) {
-            allFields = def.fields && def.fields.filter(function (f) {
-                return 'flow' !== f.type && ('out' == f.dir || 'start' == f.dir);
-            });
-        }
-        return {
-            nid: n.nid,
-            name: n.type,
-            name2: def.name,
-            plugin: def.plugin,
-            fields: allFields
-        };
-    });
-    var globalFields = Object.values(state.globals);
-    availableFields.push({
-        nid: '',
-        name: '',
-        name2: '',
-        plugin: '',
-        fields: globalFields,
-        type: 'start'
-    });
+		return i < ownProps.nodeIndex || def.fields && def.fields.filter(function (r) {
+			return 'start' == r.dir;
+		}).length || true;
+	}).map(function (n, i) {
+		var def = state.definitions[n.type];
+		var allFields = [];
+		if (def && def.fields) {
+			allFields = def.fields && def.fields.filter(function (f) {
+				return 'flow' !== f.type && ('out' == f.dir || 'start' == f.dir);
+			});
+		}
+		return {
+			nid: n.nid,
+			name: n.type,
+			name2: def.name,
+			plugin: def.plugin,
+			fields: allFields
+		};
+	});
+	var globalFields = Object.values(state.globals);
+	availableFields.push({
+		nid: '',
+		name: '',
+		name2: '',
+		plugin: '',
+		fields: globalFields,
+		type: 'start'
+	});
 
-    var node = state.nodes[ownProps.nodeid];
+	var node = state.nodes[ownProps.nodeid];
 
-    return {
-        dataTypes: state.datatypes,
-        fieldTypes: state.fieldTypes,
-        getErrorMessageFor: function getErrorMessageFor(nodeid, fieldName) {
-            return state.ui.errors && state.ui.errors[nodeid] && state.ui.errors[nodeid][fieldName];
-        },
-        dataTypeChoicesLoading: state.ui.loadingDataTypes || false,
-        value: state.nodes[ownProps.nodeid].expressions && state.nodes[ownProps.nodeid].expressions[ownProps.item.name] || '',
-        availableFields: availableFields
+	return {
+		dataTypes: state.datatypes,
+		fieldTypes: state.fieldTypes,
+		getErrorMessageFor: function getErrorMessageFor(nodeid, fieldName) {
+			return state.ui.errors && state.ui.errors[nodeid] && state.ui.errors[nodeid][fieldName];
+		},
+		dataTypeChoicesLoading: state.ui.loadingDataTypes || false,
+		value: state.nodes[ownProps.nodeid].expressions && state.nodes[ownProps.nodeid].expressions[ownProps.item.name] || '',
+		availableFields: availableFields
 
-    };
+	};
 };
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-    return {
-        setFieldType: function setFieldType(nodeId, fieldName, fieldType) {
-            return dispatch((0, _actions.setFieldType)(nodeId, fieldName, fieldType));
-        }
-    };
+	return {
+		setFieldType: function setFieldType(nodeId, fieldName, fieldType) {
+			return dispatch((0, _actions.setFieldType)(nodeId, fieldName, fieldType));
+		}
+	};
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(NodeInputListItem);
@@ -43151,7 +43147,7 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -43181,218 +43177,218 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var NodeSettings = function (_React$Component) {
-    _inherits(NodeSettings, _React$Component);
+	_inherits(NodeSettings, _React$Component);
 
-    function NodeSettings(props) {
-        _classCallCheck(this, NodeSettings);
+	function NodeSettings(props) {
+		_classCallCheck(this, NodeSettings);
 
-        var _this = _possibleConstructorReturn(this, (NodeSettings.__proto__ || Object.getPrototypeOf(NodeSettings)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (NodeSettings.__proto__ || Object.getPrototypeOf(NodeSettings)).call(this, props));
 
-        _this.state = {
-            filterGroups: props.filters || [['']]
-        };
-        return _this;
-    }
+		_this.state = {
+			filterGroups: props.filters || [['']]
+		};
+		return _this;
+	}
 
-    _createClass(NodeSettings, [{
-        key: 'componentWillReceiveProps',
-        value: function componentWillReceiveProps(props) {
-            if (props.filters) {
-                this.setState({
-                    filterGroups: props.filters
-                });
-            }
-        }
-    }, {
-        key: 'getCaption',
-        value: function getCaption() {
-            var _this2 = this;
+	_createClass(NodeSettings, [{
+		key: 'componentWillReceiveProps',
+		value: function componentWillReceiveProps(props) {
+			if (props.filters) {
+				this.setState({
+					filterGroups: props.filters
+				});
+			}
+		}
+	}, {
+		key: 'getCaption',
+		value: function getCaption() {
+			var _this2 = this;
 
-            return this.props.selectedNode.name.replace(/\$[0-9]\|.*\$/, function (v) {
-                return _this2.getInputValue(v);
-            }).trim();
-        }
-    }, {
-        key: 'getPlugin',
-        value: function getPlugin() {
-            var pluginPrefix = this.props.selectedNode.plugin ? this.props.selectedNode.plugin : '';
-            return pluginPrefix;
-        }
-    }, {
-        key: 'selectLeftValue',
-        value: function selectLeftValue(n, v, e) {}
-    }, {
-        key: 'setFilter',
-        value: function setFilter(group, row, filterData) {
-            var newState = [].concat(_toConsumableArray(this.state.filterGroups));
-            newState[group][row] = filterData;
-            this.setState({
-                filterGroups: newState
-            });
-            this.props.setFilters(this.props.selectedNode.nid, newState);
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var _this3 = this;
+			return this.props.selectedNode.name.replace(/\$[0-9]\|.*\$/, function (v) {
+				return _this2.getInputValue(v);
+			}).trim();
+		}
+	}, {
+		key: 'getPlugin',
+		value: function getPlugin() {
+			var pluginPrefix = this.props.selectedNode.plugin ? this.props.selectedNode.plugin : '';
+			return pluginPrefix;
+		}
+	}, {
+		key: 'selectLeftValue',
+		value: function selectLeftValue(n, v, e) {}
+	}, {
+		key: 'setFilter',
+		value: function setFilter(group, row, filterData) {
+			var newState = [].concat(_toConsumableArray(this.state.filterGroups));
+			newState[group][row] = filterData;
+			this.setState({
+				filterGroups: newState
+			});
+			this.props.setFilters(this.props.selectedNode.nid, newState);
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this3 = this;
 
-            return _react2.default.createElement(
-                'div',
-                null,
-                ' ',
-                _react2.default.createElement(
-                    'h5',
-                    null,
-                    'Execute this flow if:'
-                ),
-                ' ',
-                _react2.default.createElement(
-                    'div',
-                    { className: 'node-filter-container' },
-                    ' ',
-                    this.state.filterGroups.map(function (group, i) {
-                        return _react2.default.createElement(
-                            'div',
-                            { className: 'node-filter-group' },
-                            ' ',
-                            group.map(function (row, i2) {
-                                return _react2.default.createElement(
-                                    'div',
-                                    null,
-                                    ' ',
-                                    0 < i2 && _react2.default.createElement(
-                                        'span',
-                                        { className: 'node-filter-label--and' },
-                                        'AND'
-                                    ),
-                                    ' ',
-                                    0 == i2 && 0 < i && _react2.default.createElement(
-                                        'span',
-                                        { className: 'node-filter-label-or' },
-                                        'OR'
-                                    ),
-                                    ' ',
-                                    _react2.default.createElement(NodeFilter, _defineProperty({ filter: row, availableFields: _this3.props.availableFields, onChange: function onChange(data) {
-                                            return _this3.setFilter(i, i2, data);
-                                        }, fetchNode: _this3.props.fetchNode }, 'filter', _this3.state.filterGroups[i][i2])),
-                                    ' '
-                                );
-                            }),
-                            ' ',
-                            _react2.default.createElement(
-                                'a',
-                                { style: { marginLeft: 20 }, className: 'button button-small', onClick: function onClick() {
-                                        return _this3.addAndFilter(i);
-                                    } },
-                                '+ And'
-                            ),
-                            ' '
-                        );
-                    }),
-                    ' ',
-                    _react2.default.createElement(
-                        'a',
-                        { className: 'button button-small', onClick: function onClick() {
-                                return _this3.addOrFilter();
-                            } },
-                        '+ Or'
-                    ),
-                    ' '
-                ),
-                ' '
-            );
-        }
-    }, {
-        key: 'addAndFilter',
-        value: function addAndFilter(groupindex) {
-            var groups = [].concat(_toConsumableArray(this.state.filterGroups));
-            groups[groupindex].push({});
-            this.setState({
-                filterGroups: groups
-            });
-        }
-    }, {
-        key: 'addOrFilter',
-        value: function addOrFilter() {
-            var groups = [].concat(_toConsumableArray(this.state.filterGroups), [[{}]]);
-            this.setState({
-                filterGroups: groups
-            });
-        }
-    }]);
+			return _react2.default.createElement(
+				'div',
+				null,
+				' ',
+				_react2.default.createElement(
+					'h5',
+					null,
+					'Execute this flow if:'
+				),
+				' ',
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-filter-container' },
+					' ',
+					this.state.filterGroups.map(function (group, i) {
+						return _react2.default.createElement(
+							'div',
+							{ className: 'node-filter-group' },
+							' ',
+							group.map(function (row, i2) {
+								return _react2.default.createElement(
+									'div',
+									null,
+									' ',
+									0 < i2 && _react2.default.createElement(
+										'span',
+										{ className: 'node-filter-label--and' },
+										'AND'
+									),
+									' ',
+									0 == i2 && 0 < i && _react2.default.createElement(
+										'span',
+										{ className: 'node-filter-label-or' },
+										'OR'
+									),
+									' ',
+									_react2.default.createElement(NodeFilter, _defineProperty({ filter: row, availableFields: _this3.props.availableFields, onChange: function onChange(data) {
+											return _this3.setFilter(i, i2, data);
+										}, fetchNode: _this3.props.fetchNode }, 'filter', _this3.state.filterGroups[i][i2])),
+									' '
+								);
+							}),
+							' ',
+							_react2.default.createElement(
+								'a',
+								{ style: { marginLeft: 20 }, className: 'button button-small', onClick: function onClick() {
+										return _this3.addAndFilter(i);
+									} },
+								'+ And'
+							),
+							' '
+						);
+					}),
+					' ',
+					_react2.default.createElement(
+						'a',
+						{ className: 'button button-small', onClick: function onClick() {
+								return _this3.addOrFilter();
+							} },
+						'+ Or'
+					),
+					' '
+				),
+				' '
+			);
+		}
+	}, {
+		key: 'addAndFilter',
+		value: function addAndFilter(groupindex) {
+			var groups = [].concat(_toConsumableArray(this.state.filterGroups));
+			groups[groupindex].push({});
+			this.setState({
+				filterGroups: groups
+			});
+		}
+	}, {
+		key: 'addOrFilter',
+		value: function addOrFilter() {
+			var groups = [].concat(_toConsumableArray(this.state.filterGroups), [[{}]]);
+			this.setState({
+				filterGroups: groups
+			});
+		}
+	}]);
 
-    return NodeSettings;
+	return NodeSettings;
 }(_react2.default.Component);
 
 var mapStateToProps = function mapStateToProps(state, ownProps) {
-    var node = state.nodes[ownProps.node];
-    if (!node) {
-        return {
-            availableFields: []
-        };
-    }
-    var nodeIndex = Object.values(state.nodes).indexOf(node);
-    var availableFields = Object.values(state.nodes).filter(function (el, i) {
-        var def = state.definitions[el.type];
-        return i <= nodeIndex;
-    }).map(function (n, i) {
-        var def = state.definitions[n.type];
-        var allFields = [];
-        if (def && def.fields) {
-            allFields = def.fields && def.fields.filter(function (f) {
-                return 'flow' !== f.type && ('out' == f.dir || 'start' == f.dir);
-            });
-        }
-        return {
-            nid: n.nid,
-            name: n.type,
-            name2: def.name,
-            plugin: def.plugin,
-            fields: allFields
-        };
-    });
-    var globalFields = Object.values(state.globals);
-    availableFields.push({
-        nid: 'Global',
-        name: '',
-        name2: '',
-        plugin: '',
-        fields: globalFields,
-        type: 'start'
-    });
+	var node = state.nodes[ownProps.node];
+	if (!node) {
+		return {
+			availableFields: []
+		};
+	}
+	var nodeIndex = Object.values(state.nodes).indexOf(node);
+	var availableFields = Object.values(state.nodes).filter(function (el, i) {
+		var def = state.definitions[el.type];
+		return i <= nodeIndex;
+	}).map(function (n, i) {
+		var def = state.definitions[n.type];
+		var allFields = [];
+		if (def && def.fields) {
+			allFields = def.fields && def.fields.filter(function (f) {
+				return 'flow' !== f.type && ('out' == f.dir || 'start' == f.dir);
+			});
+		}
+		return {
+			nid: n.nid,
+			name: n.type,
+			name2: def.name,
+			plugin: def.plugin,
+			fields: allFields
+		};
+	});
+	var globalFields = Object.values(state.globals);
+	availableFields.push({
+		nid: 'Global',
+		name: '',
+		name2: '',
+		plugin: '',
+		fields: globalFields,
+		type: 'start'
+	});
 
-    return {
-        availableFields: availableFields,
-        fetchNode: function fetchNode(nid) {
-            var nodes = state.nodes[nid];
-            if (nodes && nodes.length) {
-                return nodes[0];
-            }
-            return null;
-        },
-        filters: node.filters,
-        nodeIndex: nodeIndex,
-        selectedNode: node,
-        settings: (node.fields || []).filter(function (n) {
-            return 'flow' != n.type && 'start' == n.dir;
-        }),
-        value: {}
-    };
+	return {
+		availableFields: availableFields,
+		fetchNode: function fetchNode(nid) {
+			var nodes = state.nodes[nid];
+			if (nodes && nodes.length) {
+				return nodes[0];
+			}
+			return null;
+		},
+		filters: node.filters,
+		nodeIndex: nodeIndex,
+		selectedNode: node,
+		settings: (node.fields || []).filter(function (n) {
+			return 'flow' != n.type && 'start' == n.dir;
+		}),
+		value: {}
+	};
 };
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-    return {
-        setExpression: function setExpression(nodeId, pinId, value) {
-            dispatch((0, _actions.setExpression)(nodeId, pinId, value));
-        },
-        onNodeEdit: function onNodeEdit(id) {
+	return {
+		setExpression: function setExpression(nodeId, pinId, value) {
+			dispatch((0, _actions.setExpression)(nodeId, pinId, value));
+		},
+		onNodeEdit: function onNodeEdit(id) {
 
-            dispatch(editNode(id));
-        },
-        setFilters: function setFilters(nodeId, filters) {
-            dispatch((0, _actions.setFilters)(nodeId, filters));
-        }
-    };
+			dispatch(editNode(id));
+		},
+		setFilters: function setFilters(nodeId, filters) {
+			dispatch((0, _actions.setFilters)(nodeId, filters));
+		}
+	};
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(NodeSettings);
@@ -43405,7 +43401,7 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _react = __webpack_require__(4);
@@ -43423,145 +43419,145 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function renderAddPlaceholder(createNewClick) {
-    return _react2.default.createElement(
-        'div',
-        { onClick: createNewClick },
-        _react2.default.createElement(
-            'section',
-            { className: 'node node--add-new' },
-            _react2.default.createElement(
-                'span',
-                { className: 'button node-title button-large' },
-                _react2.default.createElement('i', { className: 'fa fa-plus' }),
-                ' \xA0 Add new Action'
-            )
-        )
-    );
+	return _react2.default.createElement(
+		'div',
+		{ onClick: createNewClick },
+		_react2.default.createElement(
+			'section',
+			{ className: 'node node--add-new' },
+			_react2.default.createElement(
+				'span',
+				{ className: 'button node-title button-large' },
+				_react2.default.createElement('i', { className: 'fa fa-plus' }),
+				' \xA0 Add new Action'
+			)
+		)
+	);
 }
 
 function isCurrentStep() {
-    return false;
+	return false;
 }
 
 function renderNode(node, i, onSelect, onTest, fetchNode, steps) {
-    var _React$createElement;
+	var _React$createElement;
 
-    var totalOutputNonFlowPins = (node.fields.out || []).filter(function (p) {
-        return 'flow' !== p.type;
-    }).length;
-    var totalInputNonFlowPins = (node.fields.in || []).filter(function (p) {
-        return 'flow' !== p.type;
-    }).length;
-    var autocollapse = 0 == totalInputNonFlowPins && 0 == totalOutputNonFlowPins;
+	var totalOutputNonFlowPins = (node.fields.out || []).filter(function (p) {
+		return 'flow' !== p.type;
+	}).length;
+	var totalInputNonFlowPins = (node.fields.in || []).filter(function (p) {
+		return 'flow' !== p.type;
+	}).length;
+	var autocollapse = 0 == totalInputNonFlowPins && 0 == totalOutputNonFlowPins;
 
-    return _react2.default.createElement(_SimpleNode2.default, (_React$createElement = {
-        index: i,
-        nodeId: node.nid,
-        fetchNode: fetchNode,
-        selectNode: function selectNode(nid, type) {
-            return onSelect(nid, type);
-        }
-    }, _defineProperty(_React$createElement, 'index', i++), _defineProperty(_React$createElement, 'nid', node.nid), _defineProperty(_React$createElement, 'color', '#000000'), _defineProperty(_React$createElement, 'title', node.type), _defineProperty(_React$createElement, 'inputs', node.fields.in), _defineProperty(_React$createElement, 'outputs', node.fields.out), _defineProperty(_React$createElement, 'pos', { x: node.x, y: node.y }), _defineProperty(_React$createElement, 'key', node.nid), _defineProperty(_React$createElement, 'node', node), _React$createElement));
+	return _react2.default.createElement(_SimpleNode2.default, (_React$createElement = {
+		index: i,
+		nodeId: node.nid,
+		fetchNode: fetchNode,
+		selectNode: function selectNode(nid, type) {
+			return onSelect(nid, type);
+		}
+	}, _defineProperty(_React$createElement, 'index', i++), _defineProperty(_React$createElement, 'nid', node.nid), _defineProperty(_React$createElement, 'color', '#000000'), _defineProperty(_React$createElement, 'title', node.type), _defineProperty(_React$createElement, 'inputs', node.fields.in), _defineProperty(_React$createElement, 'outputs', node.fields.out), _defineProperty(_React$createElement, 'pos', { x: node.x, y: node.y }), _defineProperty(_React$createElement, 'key', node.nid), _defineProperty(_React$createElement, 'node', node), _React$createElement));
 }
 
 var NodeList = function NodeList(_ref) {
-    var dataNodes = _ref.dataNodes,
-        fetchNode = _ref.fetchNode,
-        navigate = _ref.navigate,
-        nodeDefinitions = _ref.nodeDefinitions,
-        triggerNodes = _ref.triggerNodes,
-        actionNodes = _ref.actionNodes,
-        resultNode = _ref.resultNode,
-        onNodeEdit = _ref.onNodeEdit,
-        onNodeTest = _ref.onNodeTest,
-        showCreateNew = _ref.showCreateNew,
-        steps = _ref.steps;
+	var dataNodes = _ref.dataNodes,
+	    fetchNode = _ref.fetchNode,
+	    navigate = _ref.navigate,
+	    nodeDefinitions = _ref.nodeDefinitions,
+	    triggerNodes = _ref.triggerNodes,
+	    actionNodes = _ref.actionNodes,
+	    resultNode = _ref.resultNode,
+	    onNodeEdit = _ref.onNodeEdit,
+	    onNodeTest = _ref.onNodeTest,
+	    showCreateNew = _ref.showCreateNew,
+	    steps = _ref.steps;
 
-    return _react2.default.createElement(
-        'div',
-        { className: 'node-list' },
-        _react2.default.createElement(
-            'div',
-            { className: 'node-wrapper' },
-            triggerNodes && triggerNodes.map(function (node, i) {
-                return renderNode(node, i, onNodeEdit, onNodeTest, fetchNode, steps);
-            }),
-            actionNodes && actionNodes.map(function (node, i) {
-                return renderNode(node, i, onNodeEdit, onNodeTest, fetchNode, steps);
-            })
-        ),
-        renderAddPlaceholder(showCreateNew)
-    );
+	return _react2.default.createElement(
+		'div',
+		{ className: 'node-list' },
+		_react2.default.createElement(
+			'div',
+			{ className: 'node-wrapper' },
+			triggerNodes && triggerNodes.map(function (node, i) {
+				return renderNode(node, i, onNodeEdit, onNodeTest, fetchNode, steps);
+			}),
+			actionNodes && actionNodes.map(function (node, i) {
+				return renderNode(node, i, onNodeEdit, onNodeTest, fetchNode, steps);
+			})
+		),
+		renderAddPlaceholder(showCreateNew)
+	);
 };
 
 var mapStateToProps = function mapStateToProps(state) {
-    var defs = state.definitions;
+	var defs = state.definitions;
 
-    var resultNodes = Object.values(state.nodes).filter(function (n) {
-        return defs && defs[n.type] && defs[n.type].resultLabel && '' !== defs[n.type].resultLabel;
-    }).map(function (n) {
-        return Object.assign({
-            nodeType: 'result'
-        }, n, state.definitions[n.type], {
-            nodeType: 'result',
-            name: defs[n.type].resultLabel,
-            description: defs[n.type].resultDesc
-        });
-    });
-    return {
-        steps: state.steps,
-        fetchNode: function fetchNode(nid) {
-            return state.nodes.filter(function (n) {
-                return n.nid == nid;
-            }).pop();
-        },
-        triggerNodes: Object.values(state.nodes).map(function (n) {
-            return Object.assign({}, n, state.definitions[n.type]);
-        }).filter(function (n) {
-            return 'trigger' == n.nodeType;
-        }),
-        actionNodes: Object.values(state.nodes).map(function (n) {
-            return Object.assign({}, n, state.definitions[n.type]);
-        }).filter(function (n) {
-            return 'action' == n.nodeType || 'condition' == n.nodeType;
-        }),
-        dataNodes: Object.values(state.nodes).map(function (n) {
-            return Object.assign({}, n, state.definitions[n.type]);
-        }).filter(function (n) {
-            return 'data' == n.nodeType;
-        }),
-        resultNode: 0 < resultNodes.length ? resultNodes[0] : null
-    };
+	var resultNodes = Object.values(state.nodes).filter(function (n) {
+		return defs && defs[n.type] && defs[n.type].resultLabel && '' !== defs[n.type].resultLabel;
+	}).map(function (n) {
+		return Object.assign({
+			nodeType: 'result'
+		}, n, state.definitions[n.type], {
+			nodeType: 'result',
+			name: defs[n.type].resultLabel,
+			description: defs[n.type].resultDesc
+		});
+	});
+	return {
+		steps: state.steps,
+		fetchNode: function fetchNode(nid) {
+			return state.nodes.filter(function (n) {
+				return n.nid == nid;
+			}).pop();
+		},
+		triggerNodes: Object.values(state.nodes).map(function (n) {
+			return Object.assign({}, n, state.definitions[n.type]);
+		}).filter(function (n) {
+			return 'trigger' == n.nodeType;
+		}),
+		actionNodes: Object.values(state.nodes).map(function (n) {
+			return Object.assign({}, n, state.definitions[n.type]);
+		}).filter(function (n) {
+			return 'action' == n.nodeType || 'condition' == n.nodeType;
+		}),
+		dataNodes: Object.values(state.nodes).map(function (n) {
+			return Object.assign({}, n, state.definitions[n.type]);
+		}).filter(function (n) {
+			return 'data' == n.nodeType;
+		}),
+		resultNode: 0 < resultNodes.length ? resultNodes[0] : null
+	};
 };
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-    return {
-        navigate: function (_navigate) {
-            function navigate(_x, _x2) {
-                return _navigate.apply(this, arguments);
-            }
+	return {
+		navigate: function (_navigate) {
+			function navigate(_x, _x2) {
+				return _navigate.apply(this, arguments);
+			}
 
-            navigate.toString = function () {
-                return _navigate.toString();
-            };
+			navigate.toString = function () {
+				return _navigate.toString();
+			};
 
-            return navigate;
-        }(function (step, options) {
-            return dispatch(navigate(step, options));
-        }),
-        onNodeEdit: function onNodeEdit(id, type) {
+			return navigate;
+		}(function (step, options) {
+			return dispatch(navigate(step, options));
+		}),
+		onNodeEdit: function onNodeEdit(id, type) {
 
-            dispatch(editNode(id, type));
-        },
-        onNodeTest: function onNodeTest(id) {
+			dispatch(editNode(id, type));
+		},
+		onNodeTest: function onNodeTest(id) {
 
-            dispatch(testNode(id));
-        },
-        showCreateNew: function showCreateNew() {
-            return dispatch(navigate('CreateNew'));
-        }
+			dispatch(testNode(id));
+		},
+		showCreateNew: function showCreateNew() {
+			return dispatch(navigate('CreateNew'));
+		}
 
-    };
+	};
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(NodeList);
@@ -43574,7 +43570,7 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -43600,123 +43596,123 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var NodeSettings = function (_React$Component) {
-    _inherits(NodeSettings, _React$Component);
+	_inherits(NodeSettings, _React$Component);
 
-    function NodeSettings(props) {
-        _classCallCheck(this, NodeSettings);
+	function NodeSettings(props) {
+		_classCallCheck(this, NodeSettings);
 
-        var _this = _possibleConstructorReturn(this, (NodeSettings.__proto__ || Object.getPrototypeOf(NodeSettings)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (NodeSettings.__proto__ || Object.getPrototypeOf(NodeSettings)).call(this, props));
 
-        _this.state = {};
-        return _this;
-    }
+		_this.state = {};
+		return _this;
+	}
 
-    _createClass(NodeSettings, [{
-        key: 'getCaption',
-        value: function getCaption() {
-            var _this2 = this;
+	_createClass(NodeSettings, [{
+		key: 'getCaption',
+		value: function getCaption() {
+			var _this2 = this;
 
-            return this.state.title || this.props.selectedNode.title || this.props.selectedNode.name.replace(/\$[0-9]\|.*\$/, function (v) {
-                return _this2.getInputValue(v);
-            }).trim();
-        }
-    }, {
-        key: 'getPlugin',
-        value: function getPlugin() {
-            var pluginPrefix = this.props.selectedNode.plugin ? this.props.selectedNode.plugin : '';
-            return pluginPrefix;
-        }
-    }, {
-        key: 'saveTitle',
-        value: function saveTitle() {
-            this.props.setNodeTitle(this.props.selectedNode.nid, this.state.title);
-            this.setState({
-                editTitle: false
-            });
-        }
-    }, {
-        key: 'setCaption',
-        value: function setCaption(val) {
-            this.setState({
-                title: val
-            });
-            this.props.setNodeTitle(this.props.selectedNode.nid, val);
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var _this3 = this;
+			return this.state.title || this.props.selectedNode.title || this.props.selectedNode.name.replace(/\$[0-9]\|.*\$/, function (v) {
+				return _this2.getInputValue(v);
+			}).trim();
+		}
+	}, {
+		key: 'getPlugin',
+		value: function getPlugin() {
+			var pluginPrefix = this.props.selectedNode.plugin ? this.props.selectedNode.plugin : '';
+			return pluginPrefix;
+		}
+	}, {
+		key: 'saveTitle',
+		value: function saveTitle() {
+			this.props.setNodeTitle(this.props.selectedNode.nid, this.state.title);
+			this.setState({
+				editTitle: false
+			});
+		}
+	}, {
+		key: 'setCaption',
+		value: function setCaption(val) {
+			this.setState({
+				title: val
+			});
+			this.props.setNodeTitle(this.props.selectedNode.nid, val);
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this3 = this;
 
-            return _react2.default.createElement(
-                'div',
-                null,
-                ' ',
-                _react2.default.createElement(
-                    'div',
-                    { className: 'node-settings-plugin' },
-                    this.getPlugin()
-                ),
-                ' ',
-                _react2.default.createElement(
-                    'h4',
-                    { className: 'node-settings-title' },
-                    ' ',
-                    _react2.default.createElement('input', { className: 'node-editable-title', value: this.getCaption(), onChange: function onChange(e) {
-                            return _this3.setCaption(e.target.value);
-                        } }),
-                    '  '
-                ),
-                '  ',
-                this.props.selectedNode.helpText && _react2.default.createElement(
-                    'p',
-                    { className: 'node-help-text' },
-                    this.props.selectedNode.helpText,
-                    '  '
-                ),
-                ' ',
-                _react2.default.createElement(_NodeFieldList2.default, { fieldTypes: this.props.fieldTypes, nodeIndex: this.props.nodeIndex, setExpression: this.props.setExpression, fetchNode: this.props.fetchNode, node: this.props.selectedNode, type: 'input', items: this.props.settings }),
-                ' '
-            );
-        }
-    }]);
+			return _react2.default.createElement(
+				'div',
+				null,
+				' ',
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-settings-plugin' },
+					this.getPlugin()
+				),
+				' ',
+				_react2.default.createElement(
+					'h4',
+					{ className: 'node-settings-title' },
+					' ',
+					_react2.default.createElement('input', { className: 'node-editable-title', value: this.getCaption(), onChange: function onChange(e) {
+							return _this3.setCaption(e.target.value);
+						} }),
+					'  '
+				),
+				'  ',
+				this.props.selectedNode.helpText && _react2.default.createElement(
+					'p',
+					{ className: 'node-help-text' },
+					this.props.selectedNode.helpText,
+					'  '
+				),
+				' ',
+				_react2.default.createElement(_NodeFieldList2.default, { fieldTypes: this.props.fieldTypes, nodeIndex: this.props.nodeIndex, setExpression: this.props.setExpression, fetchNode: this.props.fetchNode, node: this.props.selectedNode, type: 'input', items: this.props.settings }),
+				' '
+			);
+		}
+	}]);
 
-    return NodeSettings;
+	return NodeSettings;
 }(_react2.default.Component);
 
 var mapStateToProps = function mapStateToProps(state, ownProps) {
-    var node = state.nodes[ownProps.node];
-    var nodeIndex = Object.values(state.nodes).indexOf(node);
+	var node = state.nodes[ownProps.node];
+	var nodeIndex = Object.values(state.nodes).indexOf(node);
 
-    return {
-        fetchNode: function fetchNode(nid) {
-            var nodes = state.nodes[nid];
-            if (nodes && nodes.length) {
-                return nodes[0];
-            }
-            return null;
-        },
-        fieldTypes: state.fieldTypes,
-        nodeIndex: nodeIndex,
-        selectedNode: node,
-        settings: (node.fields || []).filter(function (n) {
-            return n.dir == ownProps.editType;
-        })
-    };
+	return {
+		fetchNode: function fetchNode(nid) {
+			var nodes = state.nodes[nid];
+			if (nodes && nodes.length) {
+				return nodes[0];
+			}
+			return null;
+		},
+		fieldTypes: state.fieldTypes,
+		nodeIndex: nodeIndex,
+		selectedNode: node,
+		settings: (node.fields || []).filter(function (n) {
+			return n.dir == ownProps.editType;
+		})
+	};
 };
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-    return {
-        setExpression: function setExpression(nodeId, pinId, value) {
-            dispatch((0, _actions.setExpression)(nodeId, pinId, value));
-        },
-        onNodeEdit: function onNodeEdit(id) {
+	return {
+		setExpression: function setExpression(nodeId, pinId, value) {
+			dispatch((0, _actions.setExpression)(nodeId, pinId, value));
+		},
+		onNodeEdit: function onNodeEdit(id) {
 
-            dispatch(editNode(id));
-        },
-        setNodeTitle: function setNodeTitle(nodeId, nodeTitle) {
-            return dispatch((0, _actions.setNodeTitle)(nodeId, nodeTitle));
-        }
-    };
+			dispatch(editNode(id));
+		},
+		setNodeTitle: function setNodeTitle(nodeId, nodeTitle) {
+			return dispatch((0, _actions.setNodeTitle)(nodeId, nodeTitle));
+		}
+	};
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(NodeSettings);
@@ -43729,7 +43725,7 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -43759,265 +43755,265 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var SimpleNode = function (_React$Component) {
-    _inherits(SimpleNode, _React$Component);
+	_inherits(SimpleNode, _React$Component);
 
-    function SimpleNode(props) {
-        _classCallCheck(this, SimpleNode);
+	function SimpleNode(props) {
+		_classCallCheck(this, SimpleNode);
 
-        var _this = _possibleConstructorReturn(this, (SimpleNode.__proto__ || Object.getPrototypeOf(SimpleNode)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (SimpleNode.__proto__ || Object.getPrototypeOf(SimpleNode)).call(this, props));
 
-        _this.state = {
-            selected: false,
-            collapsed: props.collapsed || false,
-            canCollapse: !props.collapsed
-        };
+		_this.state = {
+			selected: false,
+			collapsed: props.collapsed || false,
+			canCollapse: !props.collapsed
+		};
 
-        return _this;
-    }
+		return _this;
+	}
 
-    _createClass(SimpleNode, [{
-        key: 'handleClick',
-        value: function handleClick(e) {
-            this.setState({
-                selected: true
-            });
-            if (this.props.onNodeSelect) {
-                this.props.onNodeSelect(this.props.nid);
-            }
-        }
-    }, {
-        key: 'getInputValue',
-        value: function getInputValue(inputIndex) {
-            var inputIndexParts = inputIndex.toString().replace(/\$/gi, '').split('|');
+	_createClass(SimpleNode, [{
+		key: 'handleClick',
+		value: function handleClick(e) {
+			this.setState({
+				selected: true
+			});
+			if (this.props.onNodeSelect) {
+				this.props.onNodeSelect(this.props.nid);
+			}
+		}
+	}, {
+		key: 'getInputValue',
+		value: function getInputValue(inputIndex) {
+			var inputIndexParts = inputIndex.toString().replace(/\$/gi, '').split('|');
 
-            inputIndex = parseInt(inputIndexParts[0]);
-            if (this.props.inputs.length > inputIndex) {
-                return this.props.inputs[inputIndex].value || inputIndexParts[1] || '';
-            }
-            return inputIndexParts[1] || '';
-        }
-    }, {
-        key: 'getCaption',
-        value: function getCaption() {
-            var _this2 = this;
+			inputIndex = parseInt(inputIndexParts[0]);
+			if (this.props.inputs.length > inputIndex) {
+				return this.props.inputs[inputIndex].value || inputIndexParts[1] || '';
+			}
+			return inputIndexParts[1] || '';
+		}
+	}, {
+		key: 'getCaption',
+		value: function getCaption() {
+			var _this2 = this;
 
-            return this.props.node.title || this.props.node.name.replace(/\$[0-9]\|.*\$/, function (v) {
-                return _this2.getInputValue(v);
-            }).trim();
-        }
-    }, {
-        key: 'handleClickOutside',
-        value: function handleClickOutside() {
-            var selected = this.state.selected;
+			return this.props.node.title || this.props.node.name.replace(/\$[0-9]\|.*\$/, function (v) {
+				return _this2.getInputValue(v);
+			}).trim();
+		}
+	}, {
+		key: 'handleClickOutside',
+		value: function handleClickOutside() {
+			var selected = this.state.selected;
 
-            if (this.props.onNodeDeselect && selected) {
-                this.props.onNodeDeselect(this.props.nid);
-            }
-            this.setState({
-                selected: false
-            });
-        }
-    }, {
-        key: 'updateInputValue',
-        value: function updateInputValue(index, value) {
-            this.props.onInputValueUpdated(this.props.nid, index, value);
-            this.forceUpdate();
-        }
-    }, {
-        key: 'toggleCollapsed',
-        value: function toggleCollapsed(e) {
-            e.stopPropagation();
-            this.setState({
-                collapsed: !this.state.collapsed
-            });
-            this.forceUpdate();
-            if (this.props.onCollapsed) {
-                this.props.onCollapsed(!this.state.collapsed);
-            }
-        }
-    }, {
-        key: 'deleteNode',
-        value: function deleteNode() {
-            if (this.props.deleteNode) {
-                this.props.deleteNode(this.props.nid);
-            }
-        }
-    }, {
-        key: 'isCurrentStep',
-        value: function isCurrentStep(step) {
-            var _this3 = this;
+			if (this.props.onNodeDeselect && selected) {
+				this.props.onNodeDeselect(this.props.nid);
+			}
+			this.setState({
+				selected: false
+			});
+		}
+	}, {
+		key: 'updateInputValue',
+		value: function updateInputValue(index, value) {
+			this.props.onInputValueUpdated(this.props.nid, index, value);
+			this.forceUpdate();
+		}
+	}, {
+		key: 'toggleCollapsed',
+		value: function toggleCollapsed(e) {
+			e.stopPropagation();
+			this.setState({
+				collapsed: !this.state.collapsed
+			});
+			this.forceUpdate();
+			if (this.props.onCollapsed) {
+				this.props.onCollapsed(!this.state.collapsed);
+			}
+		}
+	}, {
+		key: 'deleteNode',
+		value: function deleteNode() {
+			if (this.props.deleteNode) {
+				this.props.deleteNode(this.props.nid);
+			}
+		}
+	}, {
+		key: 'isCurrentStep',
+		value: function isCurrentStep(step) {
+			var _this3 = this;
 
-            return this.props.panelType == step.page && Object.keys(this.props.panelOptions).reduce(function (p, k) {
-                return p && step.options[k] && _this3.props.panelOptions[k] == step.options[k];
-            }, true);
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var _this4 = this;
+			return this.props.panelType == step.page && Object.keys(this.props.panelOptions).reduce(function (p, k) {
+				return p && step.options[k] && _this3.props.panelOptions[k] == step.options[k];
+			}, true);
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this4 = this;
 
-            var selected = this.state.selected;
+			var selected = this.state.selected;
 
 
-            var nodeClass = 'node' + (selected ? ' selected' : '') + ' node--' + this.props.node.cat + ' node--type_' + this.props.node.nodeType;
-            if (!this.state.canCollapse) {
-                nodeClass += ' node--type_flow';
-            }
-            var pluginPrefix = this.props.node.plugin ? this.props.node.plugin : '';
-            var nodeContent = '';
+			var nodeClass = 'node' + (selected ? ' selected' : '') + ' node--' + this.props.node.cat + ' node--type_' + this.props.node.nodeType;
+			if (!this.state.canCollapse) {
+				nodeClass += ' node--type_flow';
+			}
+			var pluginPrefix = this.props.node.plugin ? this.props.node.plugin : '';
+			var nodeContent = '';
 
-            nodeContent = _react2.default.createElement(
-                'div',
-                { className: 'node-content' },
-                _react2.default.createElement(_NodeFieldList2.default, { fetchNode: this.props.fetchNode, node: this.props.node, type: 'output', isConnected: function isConnected(pinIndex) {
-                        return _this4.props.isConnected(_this4.props.nid, pinIndex, 'output');
-                    }, setPinRef: function setPinRef(i, r) {
-                        return _this4.props.setPinRef(r, _this4.props.nid, i, 'output');
-                    }, items: this.props.outputs || [], onStartConnector: function onStartConnector(index) {
-                        return _this4.onStartConnector(index);
-                    } })
-            );
-            nodeContent = '';
+			nodeContent = _react2.default.createElement(
+				'div',
+				{ className: 'node-content' },
+				_react2.default.createElement(_NodeFieldList2.default, { fetchNode: this.props.fetchNode, node: this.props.node, type: 'output', isConnected: function isConnected(pinIndex) {
+						return _this4.props.isConnected(_this4.props.nid, pinIndex, 'output');
+					}, setPinRef: function setPinRef(i, r) {
+						return _this4.props.setPinRef(r, _this4.props.nid, i, 'output');
+					}, items: this.props.outputs || [], onStartConnector: function onStartConnector(index) {
+						return _this4.onStartConnector(index);
+					} })
+			);
+			nodeContent = '';
 
-            var icon = this.state.canCollapse ? _react2.default.createElement('i', { className: 'collapse-icon fa  fa-chevron-circle-' + (this.state.collapsed ? 'down' : 'up'),
-                onClick: this.toggleCollapsed.bind(this) }) : '';
-            if (!this.state.canCollapse) {
-                icon = _react2.default.createElement('i', { className: 'collapse-icon fa fa-sign-out' });
-            }
-            var i = 0;
-            var pluginIcon = this.props.getNodeIcon(this.props.nid);
-            return _react2.default.createElement(
-                'div',
-                { onDoubleClick: function onDoubleClick(e) {
-                        _this4.handleClick(e);
-                    }, className: 'node-wrapper' },
-                _react2.default.createElement(
-                    'section',
-                    { className: nodeClass, style: { zIndex: 10 }, 'data-nid': this.props.nid },
-                    pluginIcon && _react2.default.createElement(
-                        'div',
-                        { className: 'node-icon node-icon--' + this.props.node.cat },
-                        _react2.default.createElement('img', { src: 'pluginIcon' })
-                    ),
-                    !pluginIcon && 'trigger' == this.props.node.nodeType && _react2.default.createElement(
-                        'div',
-                        { className: 'node-icon node-icon--' + this.props.node.nodeType },
-                        _react2.default.createElement('i', { className: 'fa fa-bolt' })
-                    ),
-                    !pluginIcon && 'action' == this.props.node.nodeType && _react2.default.createElement(
-                        'div',
-                        { className: 'node-icon node-icon--' + this.props.node.nodeType },
-                        _react2.default.createElement('i', { className: 'fa fa-tasks' })
-                    ),
-                    !pluginIcon && 'condition' == this.props.node.nodeType && _react2.default.createElement(
-                        'div',
-                        { className: 'node-icon node-icon--' + this.props.node.nodeType },
-                        _react2.default.createElement('i', { className: 'fa fa-question' })
-                    ),
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'node-details' },
-                        _react2.default.createElement(
-                            'header',
-                            { className: 'node-header' },
-                            _react2.default.createElement(
-                                'span',
-                                { className: 'node-tag' },
-                                this.props.node.nodeType
-                            ),
-                            _react2.default.createElement(
-                                'div',
-                                { className: 'node-header__top' },
-                                _react2.default.createElement(
-                                    'span',
-                                    { className: 'node-title' },
-                                    this.props.nid,
-                                    '. ',
-                                    this.getCaption()
-                                )
-                            ),
-                            _react2.default.createElement(
-                                'div',
-                                { className: 'node-plugin' },
-                                _react2.default.createElement(
-                                    'div',
-                                    { className: 'node-menu' },
-                                    this.props.node.description ? _react2.default.createElement(
-                                        'span',
-                                        { className: 'node-description' },
-                                        this.props.node.description
-                                    ) : '',
-                                    this.props.steps && this.props.steps.filter(function (s) {
-                                        return !s.isReturn;
-                                    }).map(function (step) {
+			var icon = this.state.canCollapse ? _react2.default.createElement('i', { className: 'collapse-icon fa  fa-chevron-circle-' + (this.state.collapsed ? 'down' : 'up'),
+				onClick: this.toggleCollapsed.bind(this) }) : '';
+			if (!this.state.canCollapse) {
+				icon = _react2.default.createElement('i', { className: 'collapse-icon fa fa-sign-out' });
+			}
+			var i = 0;
+			var pluginIcon = this.props.getNodeIcon(this.props.nid);
+			return _react2.default.createElement(
+				'div',
+				{ onDoubleClick: function onDoubleClick(e) {
+						_this4.handleClick(e);
+					}, className: 'node-wrapper' },
+				_react2.default.createElement(
+					'section',
+					{ className: nodeClass, style: { zIndex: 10 }, 'data-nid': this.props.nid },
+					pluginIcon && _react2.default.createElement(
+						'div',
+						{ className: 'node-icon node-icon--' + this.props.node.cat },
+						_react2.default.createElement('img', { src: 'pluginIcon' })
+					),
+					!pluginIcon && 'trigger' == this.props.node.nodeType && _react2.default.createElement(
+						'div',
+						{ className: 'node-icon node-icon--' + this.props.node.nodeType },
+						_react2.default.createElement('i', { className: 'fa fa-bolt' })
+					),
+					!pluginIcon && 'action' == this.props.node.nodeType && _react2.default.createElement(
+						'div',
+						{ className: 'node-icon node-icon--' + this.props.node.nodeType },
+						_react2.default.createElement('i', { className: 'fa fa-tasks' })
+					),
+					!pluginIcon && 'condition' == this.props.node.nodeType && _react2.default.createElement(
+						'div',
+						{ className: 'node-icon node-icon--' + this.props.node.nodeType },
+						_react2.default.createElement('i', { className: 'fa fa-question' })
+					),
+					_react2.default.createElement(
+						'div',
+						{ className: 'node-details' },
+						_react2.default.createElement(
+							'header',
+							{ className: 'node-header' },
+							_react2.default.createElement(
+								'span',
+								{ className: 'node-tag' },
+								this.props.node.nodeType
+							),
+							_react2.default.createElement(
+								'div',
+								{ className: 'node-header__top' },
+								_react2.default.createElement(
+									'span',
+									{ className: 'node-title' },
+									this.props.nid,
+									'. ',
+									this.getCaption()
+								)
+							),
+							_react2.default.createElement(
+								'div',
+								{ className: 'node-plugin' },
+								_react2.default.createElement(
+									'div',
+									{ className: 'node-menu' },
+									this.props.node.description ? _react2.default.createElement(
+										'span',
+										{ className: 'node-description' },
+										this.props.node.description
+									) : '',
+									this.props.steps && this.props.steps.filter(function (s) {
+										return !s.isReturn;
+									}).map(function (step) {
 
-                                        return _react2.default.createElement(
-                                            'a',
-                                            { key: 'step--' + _this4.props.node.nid + '--' + i++, onClick: function onClick() {
-                                                    return _this4.props.navigate(step.page, step.options);
-                                                }, href: 'javascript:void(0)', className: 'node-menu__item ' + (_this4.isCurrentStep(step) ? 'node-menu__item--selected' : '') },
-                                            _react2.default.createElement('i', { className: 'fa ' + step.icon }),
-                                            ' ',
-                                            step.text
-                                        );
-                                    }),
-                                    _react2.default.createElement('hr', null),
-                                    'trigger' !== this.props.node.nodeType ? _react2.default.createElement(
-                                        'a',
-                                        { key: 'step--' + this.props.node.nid + '--delete', onClick: function onClick() {
-                                                return _this4.props.deleteNode(_this4.props.node.nid);
-                                            }, href: 'javascript:void(0)', className: 'node-menu__item node-menu__item--delete ' },
-                                        _react2.default.createElement('i', { className: 'fa fa-trash' }),
-                                        ' Delete this ',
-                                        this.props.node.nodeType
-                                    ) : _react2.default.createElement(
-                                        'a',
-                                        { key: 'step--' + this.props.node.nid + '--delete', onClick: function onClick() {
-                                                return _this4.props.selectTrigger(_this4.props.node.nid);
-                                            }, href: 'javascript:void(0)', className: 'node-menu__item node-menu__item--delete ' + (this.props.triggerSelected ? 'node-menu__item--selected' : '') },
-                                        _react2.default.createElement('i', { className: 'fa fa-refresh' }),
-                                        ' Change Trigger'
-                                    )
-                                )
-                            )
-                        ),
-                        nodeContent
-                    )
-                )
-            );
-        }
-    }]);
+										return _react2.default.createElement(
+											'a',
+											{ key: 'step--' + _this4.props.node.nid + '--' + i++, onClick: function onClick() {
+													return _this4.props.navigate(step.page, step.options);
+												}, href: 'javascript:void(0)', className: 'node-menu__item ' + (_this4.isCurrentStep(step) ? 'node-menu__item--selected' : '') },
+											_react2.default.createElement('i', { className: 'fa ' + step.icon }),
+											' ',
+											step.text
+										);
+									}),
+									_react2.default.createElement('hr', null),
+									'trigger' !== this.props.node.nodeType ? _react2.default.createElement(
+										'a',
+										{ key: 'step--' + this.props.node.nid + '--delete', onClick: function onClick() {
+												return _this4.props.deleteNode(_this4.props.node.nid);
+											}, href: 'javascript:void(0)', className: 'node-menu__item node-menu__item--delete ' },
+										_react2.default.createElement('i', { className: 'fa fa-trash' }),
+										' Delete this ',
+										this.props.node.nodeType
+									) : _react2.default.createElement(
+										'a',
+										{ key: 'step--' + this.props.node.nid + '--delete', onClick: function onClick() {
+												return _this4.props.selectTrigger(_this4.props.node.nid);
+											}, href: 'javascript:void(0)', className: 'node-menu__item node-menu__item--delete ' + (this.props.triggerSelected ? 'node-menu__item--selected' : '') },
+										_react2.default.createElement('i', { className: 'fa fa-refresh' }),
+										' Change Trigger'
+									)
+								)
+							)
+						),
+						nodeContent
+					)
+				)
+			);
+		}
+	}]);
 
-    return SimpleNode;
+	return SimpleNode;
 }(_react2.default.Component);
 
 var mapStateToProps = function mapStateToProps(state, ownProps) {
-    return {
-        triggerSelected: state.ui.addTrigger,
-        panelType: state.ui.panelType,
-        panelOptions: state.ui.panelOptions,
-        steps: state.steps && state.steps[ownProps.nodeId],
-        getNodeIcon: function getNodeIcon(nid) {
-            if (!state.definitions[state.nodes[nid].type].plugin || !state.definitions[state.nodes[nid].type].plugin.icon) {
-                return '';
-            }
-            return state.definitions[state.nodes[nid].type].plugin.icon;
-        }
-    };
+	return {
+		triggerSelected: state.ui.addTrigger,
+		panelType: state.ui.panelType,
+		panelOptions: state.ui.panelOptions,
+		steps: state.steps && state.steps[ownProps.nodeId],
+		getNodeIcon: function getNodeIcon(nid) {
+			if (!state.definitions[state.nodes[nid].type].plugin || !state.definitions[state.nodes[nid].type].plugin.icon) {
+				return '';
+			}
+			return state.definitions[state.nodes[nid].type].plugin.icon;
+		}
+	};
 };
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-    return {
-        navigate: function navigate(step, options) {
-            return dispatch((0, _actions.navigate)(step, options));
-        },
-        deleteNode: function deleteNode(nid) {
-            return dispatch((0, _actions.deleteNode)(nid));
-        },
-        selectTrigger: function selectTrigger() {
-            return dispatch((0, _actions.selectTrigger)());
-        }
-    };
+	return {
+		navigate: function navigate(step, options) {
+			return dispatch((0, _actions.navigate)(step, options));
+		},
+		deleteNode: function deleteNode(nid) {
+			return dispatch((0, _actions.deleteNode)(nid));
+		},
+		selectTrigger: function selectTrigger() {
+			return dispatch((0, _actions.selectTrigger)());
+		}
+	};
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(SimpleNode);
@@ -44030,7 +44026,7 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(
 
 
 Object.defineProperty(exports, "__esModule", {
-				value: true
+	value: true
 });
 
 var _NodeFilters = __webpack_require__(148);
@@ -44052,10 +44048,10 @@ var _NodeList2 = _interopRequireDefault(_NodeList);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
-				NodeList: _NodeList2.default,
-				CreateNew: _CreateNewPanel2.default,
-				NodeSettings: _NodeSettings2.default,
-				NodeFilters: _NodeFilters2.default
+	NodeList: _NodeList2.default,
+	CreateNew: _CreateNewPanel2.default,
+	NodeSettings: _NodeSettings2.default,
+	NodeFilters: _NodeFilters2.default
 };
 
 /***/ }),
@@ -44066,7 +44062,7 @@ exports.default = {
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -44092,276 +44088,276 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var AutoSuggest = function (_React$Component) {
-    _inherits(AutoSuggest, _React$Component);
+	_inherits(AutoSuggest, _React$Component);
 
-    function AutoSuggest(props) {
-        _classCallCheck(this, AutoSuggest);
+	function AutoSuggest(props) {
+		_classCallCheck(this, AutoSuggest);
 
-        var _this = _possibleConstructorReturn(this, (AutoSuggest.__proto__ || Object.getPrototypeOf(AutoSuggest)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (AutoSuggest.__proto__ || Object.getPrototypeOf(AutoSuggest)).call(this, props));
 
-        _this.state = {
-            text: props.value && props.value.text,
-            id: props.value && props.value.id
-        };
-        return _this;
-    }
+		_this.state = {
+			text: props.value && props.value.text,
+			id: props.value && props.value.id
+		};
+		return _this;
+	}
 
-    _createClass(AutoSuggest, [{
-        key: 'componentWillReceiveProps',
-        value: function componentWillReceiveProps(props) {
-            if (props.value) {
-                this.setState({
-                    text: props.value.text,
-                    id: props.value.id
-                });
-            }
-        }
-    }, {
-        key: 'toggleSearch',
-        value: function toggleSearch(value) {
+	_createClass(AutoSuggest, [{
+		key: 'componentWillReceiveProps',
+		value: function componentWillReceiveProps(props) {
+			if (props.value) {
+				this.setState({
+					text: props.value.text,
+					id: props.value.id
+				});
+			}
+		}
+	}, {
+		key: 'toggleSearch',
+		value: function toggleSearch(value) {
 
-            this.setState({
-                quickSearchText: value
-            });
-            this.handleSearchDebounced();
-        }
-    }, {
-        key: 'componentWillMount',
-        value: function componentWillMount() {
-            var _this2 = this;
+			this.setState({
+				quickSearchText: value
+			});
+			this.handleSearchDebounced();
+		}
+	}, {
+		key: 'componentWillMount',
+		value: function componentWillMount() {
+			var _this2 = this;
 
-            this.handleSearchDebounced = _lodash2.default.debounce(function () {
-                _this2.handleSearch.apply(_this2, [_this2.state.quickSearchText]);
-            }, 500);
-        }
-    }, {
-        key: 'handleSearch',
-        value: function handleSearch(query) {
-            var _this3 = this;
+			this.handleSearchDebounced = _lodash2.default.debounce(function () {
+				_this2.handleSearch.apply(_this2, [_this2.state.quickSearchText]);
+			}, 500);
+		}
+	}, {
+		key: 'handleSearch',
+		value: function handleSearch(query) {
+			var _this3 = this;
 
-            this.setState({
-                result: query
-            });
-            fetch('/wp-json/wpflow/v1/types/' + this.props.type + '/values/' + query + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
-                credentials: 'same-origin'
-            }).then(function (response) {
-                if (200 != response.status) {
-                    return [];
-                }
-                return response.json();
-            }).then(function (data) {
-                return _this3.setState({
-                    quickSearch: true,
-                    choices: data
-                });
-            });
-        }
-    }, {
-        key: 'componentDidMount',
-        value: function componentDidMount() {
+			this.setState({
+				result: query
+			});
+			fetch('/wp-json/wpflow/v1/types/' + this.props.type + '/values/' + query + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
+				credentials: 'same-origin'
+			}).then(function (response) {
+				if (200 != response.status) {
+					return [];
+				}
+				return response.json();
+			}).then(function (data) {
+				return _this3.setState({
+					quickSearch: true,
+					choices: data
+				});
+			});
+		}
+	}, {
+		key: 'componentDidMount',
+		value: function componentDidMount() {
 
-            this.props.loadDataType(this.props.type);
-        }
-    }, {
-        key: 'insertField',
-        value: function insertField(data) {
+			this.props.loadDataType(this.props.type);
+		}
+	}, {
+		key: 'insertField',
+		value: function insertField(data) {
 
-            this.setState({
-                text: data.text,
-                id: data.id
-            });
-            this.props.onChange && this.props.onChange(data);
-        }
-    }, {
-        key: 'clearValue',
-        value: function clearValue() {
-            this.setState({
-                text: null,
-                id: null
-            });
-            this.props.onChange && this.props.onChange(null);
-        }
-    }, {
-        key: 'selectChoice',
-        value: function selectChoice(node, field) {
-            this.setState({
-                quickSearch: false
-            });
+			this.setState({
+				text: data.text,
+				id: data.id
+			});
+			this.props.onChange && this.props.onChange(data);
+		}
+	}, {
+		key: 'clearValue',
+		value: function clearValue() {
+			this.setState({
+				text: null,
+				id: null
+			});
+			this.props.onChange && this.props.onChange(null);
+		}
+	}, {
+		key: 'selectChoice',
+		value: function selectChoice(node, field) {
+			this.setState({
+				quickSearch: false
+			});
 
-            this.insertField(node);
-        }
-    }, {
-        key: 'toggleQuickSearch',
-        value: function toggleQuickSearch() {
-            this.loadOptions();
-            this.setState({
-                quickSearch: !this.state.quickSearch,
-                quickSearchFilter: null
-            });
-        }
-    }, {
-        key: 'loadOptions',
-        value: function loadOptions() {}
-    }, {
-        key: 'ensureSelected',
-        value: function ensureSelected() {
-            var _this4 = this;
+			this.insertField(node);
+		}
+	}, {
+		key: 'toggleQuickSearch',
+		value: function toggleQuickSearch() {
+			this.loadOptions();
+			this.setState({
+				quickSearch: !this.state.quickSearch,
+				quickSearchFilter: null
+			});
+		}
+	}, {
+		key: 'loadOptions',
+		value: function loadOptions() {}
+	}, {
+		key: 'ensureSelected',
+		value: function ensureSelected() {
+			var _this4 = this;
 
-            if (!this.props.dataTypeChoices) {
-                return;
-            }
-            var avail = this.props.dataTypeChoices.filter(function (n) {
-                return null == _this4.state.quickSearchFilter || 0 <= n.text.indexOf(_this4.state.quickSearchFilter);
-            });
-            if (0 < avail.length) {
-                this.selectChoice(avail[0]);
-            } else {
-                this.clearValue();
-            }
-            this.setState({
-                quickSearch: false,
-                quickSearchFilter: null
-            });
-        }
-    }, {
-        key: 'updateValue',
-        value: function updateValue(event) {
-            this.setState({
-                text: event.target.value,
-                quickSearch: true,
-                quickSearchFilter: event.target.value
-            });
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var _this5 = this;
+			if (!this.props.dataTypeChoices) {
+				return;
+			}
+			var avail = this.props.dataTypeChoices.filter(function (n) {
+				return null == _this4.state.quickSearchFilter || 0 <= n.text.indexOf(_this4.state.quickSearchFilter);
+			});
+			if (0 < avail.length) {
+				this.selectChoice(avail[0]);
+			} else {
+				this.clearValue();
+			}
+			this.setState({
+				quickSearch: false,
+				quickSearchFilter: null
+			});
+		}
+	}, {
+		key: 'updateValue',
+		value: function updateValue(event) {
+			this.setState({
+				text: event.target.value,
+				quickSearch: true,
+				quickSearchFilter: event.target.value
+			});
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this5 = this;
 
-            var allowExpressions = false;
-            var choices = this.state.choices || this.props.dataTypeChoices;
-            return _react2.default.createElement(
-                'div',
-                null,
-                _react2.default.createElement(
-                    'div',
-                    { className: 'node-control-container' },
-                    ' ',
-                    _react2.default.createElement(
-                        'div',
-                        { ref: function ref(el) {
-                                _this5.element = el;
-                            }, className: 'node-editable-setting' },
-                        _react2.default.createElement('input', { placeholder: 'Type to search...', type: 'text', value: this.state.text, className: 'node-editable-text', onBlur: function onBlur(v) {
-                                return _this5.ensureSelected();
-                            }, onChange: function onChange(v) {
-                                return _this5.toggleSearch(v.target.value);
-                            } }),
-                        ' '
-                    ),
-                    this.props.value && !this.props.notNull && _react2.default.createElement(
-                        'a',
-                        { href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
-                                return _this5.clearValue();
-                            } },
-                        _react2.default.createElement('i', { className: 'fa fa-trash' })
-                    ),
-                    allowExpressions && _react2.default.createElement(
-                        'a',
-                        { href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
-                                return _this5.toggleQuickSearch();
-                            } },
-                        _react2.default.createElement('i', { className: 'fa fa-crosshairs' })
-                    )
-                ),
-                _react2.default.createElement(
-                    'div',
-                    { className: 'node-quick-search', style: { display: this.state.quickSearch ? 'block' : 'none' } },
-                    this.props.dataTypeChoicesLoading && _react2.default.createElement(
-                        'ul',
-                        null,
-                        _react2.default.createElement(
-                            'li',
-                            null,
-                            'Loading Choices'
-                        )
-                    ),
-                    choices && _react2.default.createElement(
-                        'div',
-                        { className: 'quick-search-container' },
-                        _react2.default.createElement(
-                            'ul',
-                            null,
-                            choices.filter(function (n) {
-                                return null == _this5.state.quickSearchFilter || 0 <= n.text.indexOf(_this5.state.quickSearchFilter);
-                            }).map(function (n) {
-                                return _react2.default.createElement(
-                                    'li',
-                                    { className: 'node-quick-search__item' },
-                                    _react2.default.createElement(
-                                        'a',
-                                        { href: 'javascript:void(0);', onClick: function onClick() {
-                                                return _this5.selectChoice(n);
-                                            } },
-                                        _this5.props.showID && '#' + n.id + ' ',
-                                        n.text
-                                    )
-                                );
-                            })
-                        ),
-                        ' '
-                    ),
-                    '    ',
-                    this.props.allowCustomValue && _react2.default.createElement(
-                        'div',
-                        null,
-                        _react2.default.createElement('hr', null),
-                        _react2.default.createElement(
-                            'ul',
-                            null,
-                            _react2.default.createElement(
-                                'li',
-                                null,
-                                _react2.default.createElement(
-                                    'a',
-                                    { href: 'javascript:void(0);', onClick: function onClick() {
-                                            return _this5.props.customValueControlTypeClicked();
-                                        } },
-                                    ' Use custom value '
-                                )
-                            )
-                        )
-                    )
-                )
-            );
-        }
-    }]);
+			var allowExpressions = false;
+			var choices = this.state.choices || this.props.dataTypeChoices;
+			return _react2.default.createElement(
+				'div',
+				null,
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-control-container' },
+					' ',
+					_react2.default.createElement(
+						'div',
+						{ ref: function ref(el) {
+								_this5.element = el;
+							}, className: 'node-editable-setting' },
+						_react2.default.createElement('input', { placeholder: 'Type to search...', type: 'text', value: this.state.text, className: 'node-editable-text', onBlur: function onBlur(v) {
+								return _this5.ensureSelected();
+							}, onChange: function onChange(v) {
+								return _this5.toggleSearch(v.target.value);
+							} }),
+						' '
+					),
+					this.props.value && !this.props.notNull && _react2.default.createElement(
+						'a',
+						{ href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
+								return _this5.clearValue();
+							} },
+						_react2.default.createElement('i', { className: 'fa fa-trash' })
+					),
+					allowExpressions && _react2.default.createElement(
+						'a',
+						{ href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
+								return _this5.toggleQuickSearch();
+							} },
+						_react2.default.createElement('i', { className: 'fa fa-crosshairs' })
+					)
+				),
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-quick-search', style: { display: this.state.quickSearch ? 'block' : 'none' } },
+					this.props.dataTypeChoicesLoading && _react2.default.createElement(
+						'ul',
+						null,
+						_react2.default.createElement(
+							'li',
+							null,
+							'Loading Choices'
+						)
+					),
+					choices && _react2.default.createElement(
+						'div',
+						{ className: 'quick-search-container' },
+						_react2.default.createElement(
+							'ul',
+							null,
+							choices.filter(function (n) {
+								return null == _this5.state.quickSearchFilter || 0 <= n.text.indexOf(_this5.state.quickSearchFilter);
+							}).map(function (n) {
+								return _react2.default.createElement(
+									'li',
+									{ className: 'node-quick-search__item' },
+									_react2.default.createElement(
+										'a',
+										{ href: 'javascript:void(0);', onClick: function onClick() {
+												return _this5.selectChoice(n);
+											} },
+										_this5.props.showID && '#' + n.id + ' ',
+										n.text
+									)
+								);
+							})
+						),
+						' '
+					),
+					'    ',
+					this.props.allowCustomValue && _react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement('hr', null),
+						_react2.default.createElement(
+							'ul',
+							null,
+							_react2.default.createElement(
+								'li',
+								null,
+								_react2.default.createElement(
+									'a',
+									{ href: 'javascript:void(0);', onClick: function onClick() {
+											return _this5.props.customValueControlTypeClicked();
+										} },
+									' Use custom value '
+								)
+							)
+						)
+					)
+				)
+			);
+		}
+	}]);
 
-    return AutoSuggest;
+	return AutoSuggest;
 }(_react2.default.Component);
 
 var mapStateToProps = function mapStateToProps(state, ownProps) {
-    var dataTypeChoices = false;
-    if (!ownProps.dataTypeChoices && state.datatypes[ownProps.type] && state.datatypes[ownProps.type].choices) {
-        dataTypeChoices = state.datatypes[ownProps.type].choices;
-    }
-    return {
-        getNodeLabel: function getNodeLabel(nid) {
-            return state.nodes[nid].name;
-        },
-        dataTypeChoices: ownProps.dataTypeChoices || dataTypeChoices
-    };
+	var dataTypeChoices = false;
+	if (!ownProps.dataTypeChoices && state.datatypes[ownProps.type] && state.datatypes[ownProps.type].choices) {
+		dataTypeChoices = state.datatypes[ownProps.type].choices;
+	}
+	return {
+		getNodeLabel: function getNodeLabel(nid) {
+			return state.nodes[nid].name;
+		},
+		dataTypeChoices: ownProps.dataTypeChoices || dataTypeChoices
+	};
 };
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-    return {
-        loadDataType: function loadDataType(dataTypeId) {
-            return dispatch((0, _actions.loadDataType)(dataTypeId));
-        }
-    };
+	return {
+		loadDataType: function loadDataType(dataTypeId) {
+			return dispatch((0, _actions.loadDataType)(dataTypeId));
+		}
+	};
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps, null, {
-    withRef: true
+	withRef: true
 })(AutoSuggest);
 
 /***/ }),
@@ -44372,7 +44368,7 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps, 
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -44414,509 +44410,509 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var _ = __webpack_require__(24);
 
 var ExpressionEditor = function (_React$Component) {
-    _inherits(ExpressionEditor, _React$Component);
+	_inherits(ExpressionEditor, _React$Component);
 
-    function ExpressionEditor(props) {
-        _classCallCheck(this, ExpressionEditor);
+	function ExpressionEditor(props) {
+		_classCallCheck(this, ExpressionEditor);
 
-        var _this = _possibleConstructorReturn(this, (ExpressionEditor.__proto__ || Object.getPrototypeOf(ExpressionEditor)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (ExpressionEditor.__proto__ || Object.getPrototypeOf(ExpressionEditor)).call(this, props));
 
-        _this.nodeTags = {};
-        _this.charMap = {};
-        _this.nodeTagTypes = {};
-        _this.state = {
-            value: props.value
-        };
-        return _this;
-    }
+		_this.nodeTags = {};
+		_this.charMap = {};
+		_this.nodeTagTypes = {};
+		_this.state = {
+			value: props.value
+		};
+		return _this;
+	}
 
-    _createClass(ExpressionEditor, [{
-        key: 'replaceExpressionWithSpecialChars',
-        value: function replaceExpressionWithSpecialChars(text) {
-            var _this2 = this;
+	_createClass(ExpressionEditor, [{
+		key: 'replaceExpressionWithSpecialChars',
+		value: function replaceExpressionWithSpecialChars(text) {
+			var _this2 = this;
 
-            var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+			var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
-            if ('string' !== typeof text) {
-                if (text.id) {
-                    return text.id;
-                }
-                return '';
-            }
-            return text.replace(/\{\{_N([0-9]*)\.([^\}]*)\}\}/gi, function (m, nid, pin) {
+			if ('string' !== typeof text) {
+				if (text.id) {
+					return text.id;
+				}
+				return '';
+			}
+			return text.replace(/\{\{_N([0-9]*)\.([^\}]*)\}\}/gi, function (m, nid, pin) {
 
-                return _this2.replaceExpressionNodeTag({
-                    icon: _this2.props.getNodeIcon(nid),
-                    nodeId: nid,
-                    pinId: pin,
-                    nodeLabel: _this2.props.getNodeLabel(nid),
-                    pinLabel: pin,
-                    fieldType: type
-                }, true);
-            });
-        }
-    }, {
-        key: 'handleClickOutside',
-        value: function handleClickOutside() {
-            this.setState({
-                quickSearch: false,
-                showOperations: false
-            });
-        }
-    }, {
-        key: 'insertField',
-        value: function insertField(node, field, subprop, subType) {
+				return _this2.replaceExpressionNodeTag({
+					icon: _this2.props.getNodeIcon(nid),
+					nodeId: nid,
+					pinId: pin,
+					nodeLabel: _this2.props.getNodeLabel(nid),
+					pinLabel: pin,
+					fieldType: type
+				}, true);
+			});
+		}
+	}, {
+		key: 'handleClickOutside',
+		value: function handleClickOutside() {
+			this.setState({
+				quickSearch: false,
+				showOperations: false
+			});
+		}
+	}, {
+		key: 'insertField',
+		value: function insertField(node, field, subprop, subType) {
 
-            var expression = '{{_N' + node.nid + '.' + field.name;
-            if (subprop) {
-                if (!_.isArray(subprop)) {
-                    subprop = [subprop];
-                }
+			var expression = '{{_N' + node.nid + '.' + field.name;
+			if (subprop) {
+				if (!_.isArray(subprop)) {
+					subprop = [subprop];
+				}
 
-                expression += '.' + _.join(subprop, '.');
-            }
-            expression += '}}';
-            this.codeMirror.replaceSelection(this.replaceExpressionWithSpecialChars(expression, subType));
-            this.setState({
-                quickSearch: false
-            });
-        }
-    }, {
-        key: 'clearValue',
-        value: function clearValue() {
-            this.codeMirror.setValue('');
-        }
-    }, {
-        key: 'toggleQuickSearch',
-        value: function toggleQuickSearch(e) {
-            e.stopPropagation();
+				expression += '.' + _.join(subprop, '.');
+			}
+			expression += '}}';
+			this.codeMirror.replaceSelection(this.replaceExpressionWithSpecialChars(expression, subType));
+			this.setState({
+				quickSearch: false
+			});
+		}
+	}, {
+		key: 'clearValue',
+		value: function clearValue() {
+			this.codeMirror.setValue('');
+		}
+	}, {
+		key: 'toggleQuickSearch',
+		value: function toggleQuickSearch(e) {
+			e.stopPropagation();
 
-            this.setState({
-                quickSearch: !this.state.quickSearch
-            });
-        }
-    }, {
-        key: 'componentWillReceiveProps',
-        value: function componentWillReceiveProps(props) {
-            var expr = props.value;
-            this.setState({
-                value: expr
-            });
-            var cm = this.codeMirror;
+			this.setState({
+				quickSearch: !this.state.quickSearch
+			});
+		}
+	}, {
+		key: 'componentWillReceiveProps',
+		value: function componentWillReceiveProps(props) {
+			var expr = props.value;
+			this.setState({
+				value: expr
+			});
+			var cm = this.codeMirror;
 
-            if (this.codeMirror) {
-                var startCursor = cm.getCursor();
-                cm.setValue(this.replaceExpressionWithSpecialChars(expr));
-                var cursorLine = startCursor.line;
-                var cursorCh = startCursor.ch;
-                cm.setCursor({
-                    line: cursorLine,
-                    ch: cursorCh
-                }, null, {
-                    scroll: false
-                });
-            }
-        }
-    }, {
-        key: 'getExpression',
-        value: function getExpression() {
-            var val = this.codeMirror.getValue();
-            return this.replaceSpecialCharsWithExpression(val, true);
-        }
-    }, {
-        key: 'onCodeMirrorChange',
-        value: function onCodeMirrorChange(e) {
-            var newValue = this.getExpression();
-            if (newValue != this.props.value) {
-                if (this.props.onChange) {
-                    this.props.onChange(newValue);
-                }
-            }
-        }
-    }, {
-        key: 'createTagNode',
-        value: function createTagNode(char) {
-            var _this3 = this;
+			if (this.codeMirror) {
+				var startCursor = cm.getCursor();
+				cm.setValue(this.replaceExpressionWithSpecialChars(expr));
+				var cursorLine = startCursor.line;
+				var cursorCh = startCursor.ch;
+				cm.setCursor({
+					line: cursorLine,
+					ch: cursorCh
+				}, null, {
+					scroll: false
+				});
+			}
+		}
+	}, {
+		key: 'getExpression',
+		value: function getExpression() {
+			var val = this.codeMirror.getValue();
+			return this.replaceSpecialCharsWithExpression(val, true);
+		}
+	}, {
+		key: 'onCodeMirrorChange',
+		value: function onCodeMirrorChange(e) {
+			var newValue = this.getExpression();
+			if (newValue != this.props.value) {
+				if (this.props.onChange) {
+					this.props.onChange(newValue);
+				}
+			}
+		}
+	}, {
+		key: 'createTagNode',
+		value: function createTagNode(char) {
+			var _this3 = this;
 
-            var node = document.createElement('span');
-            var label = 'Custom Element';
-            var tagId = this.charMap[char];
-            var nodeTag = this.nodeTags[tagId];
-            var parts = nodeTag.pinLabel.split('.');
-            var showChevron = true;
-            if (!nodeTag.nodeId) {
-                showChevron = false;
-            }
-            _react2.default.render(_react2.default.createElement(
-                'span',
-                { 'data-tag': '', className: 'node-expression-data-tag' },
-                nodeTag.icon && _react2.default.createElement('img', { src: nodeTag.icon, className: 'expression-icon' }),
-                nodeTag.nodeId && _react2.default.createElement(
-                    'span',
-                    { className: 'node-expression-data-tag__node' },
-                    '#',
-                    nodeTag.nodeId
-                ),
-                parts.map(function (p) {
-                    var text = p;
-                    var seperator = showChevron && _react2.default.createElement('i', { className: 'fa fa-chevron-right' }) || null;
-                    showChevron = true;
-                    var result = text;
-                    if (-1 == result.indexOf('(')) {
-                        result = result.replace(/([A-Z])/g, ' $1');
+			var node = document.createElement('span');
+			var label = 'Custom Element';
+			var tagId = this.charMap[char];
+			var nodeTag = this.nodeTags[tagId];
+			var parts = nodeTag.pinLabel.split('.');
+			var showChevron = true;
+			if (!nodeTag.nodeId) {
+				showChevron = false;
+			}
+			_react2.default.render(_react2.default.createElement(
+				'span',
+				{ 'data-tag': '', className: 'node-expression-data-tag' },
+				nodeTag.icon && _react2.default.createElement('img', { src: nodeTag.icon, className: 'expression-icon' }),
+				nodeTag.nodeId && _react2.default.createElement(
+					'span',
+					{ className: 'node-expression-data-tag__node' },
+					'#',
+					nodeTag.nodeId
+				),
+				parts.map(function (p) {
+					var text = p;
+					var seperator = showChevron && _react2.default.createElement('i', { className: 'fa fa-chevron-right' }) || null;
+					showChevron = true;
+					var result = text;
+					if (-1 == result.indexOf('(')) {
+						result = result.replace(/([A-Z])/g, ' $1');
 
-                        result = result.replace(/_([a-z])/g, function (r, m) {
-                            return ' ' + m.toUpperCase();
-                        });
-                    }
-                    var finalResult = result.charAt(0).toUpperCase() + result.slice(1);
+						result = result.replace(/_([a-z])/g, function (r, m) {
+							return ' ' + m.toUpperCase();
+						});
+					}
+					var finalResult = result.charAt(0).toUpperCase() + result.slice(1);
 
-                    return _react2.default.createElement(
-                        'span',
-                        null,
-                        seperator,
-                        _react2.default.createElement(
-                            'span',
-                            { className: 'node-expression-data-tag__prop' },
-                            finalResult
-                        )
-                    );
-                }),
-                this.props.schemas[nodeTag.fieldType] && this.props.schemas[nodeTag.fieldType].methods && _react2.default.createElement(
-                    'span',
-                    { className: 'settings-button', onClick: function onClick(e) {
-                            return _this3.toggleOperations(e, tagId);
-                        } },
-                    _react2.default.createElement('i', { className: 'fa fa-cogs' })
-                )
-            ), node);
-            return node;
-        }
-    }, {
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            for (var i in this.props.availableFields) {
-                var field = this.props.availableFields[i];
-                for (var x in field.fields) {
-                    this.props.loadDataType(field.fields[x].type);
-                }
-            }
-            var specialCharsRegexp = /[\ue000-\uefff]/g;
-            var options = {
-                inputStyle: 'contenteditable',
-                specialChars: specialCharsRegexp,
-                specialCharPlaceholder: this.createTagNode.bind(this),
-                autoScrollCursorOnSet: false,
-                extraKeys: {
-                    Tab: false
-                }
-            };
-            this.codeMirror = _codemirror2.default.fromTextArea(this.textbox, options);
-            var editor = this.codeMirror;
-            this.codeMirror.on('change', this.onCodeMirrorChange.bind(this));
-            this.codeMirror.on('cursorActivity', function () {
-                var options = {
-                    hint: function hint() {
-                        return {
-                            from: editor.getDoc().getCursor(),
-                            to: editor.getDoc().getCursor(),
-                            list: ['foo', 'bar']
-                        };
-                    }
-                };
-            });
-        }
-    }, {
-        key: 'replaceSpecialCharsWithExpression',
-        value: function replaceSpecialCharsWithExpression(val, isString) {
-            return String(val).replace(/[\ue000-\uefff]/g, function (tag) {
-                if (!this.charMap[tag]) {
-                    return tag;
-                } else {
-                    var char = this.charMap[tag];
-                    var ntag = this.nodeTags[char];
-                    return '{{_N' + ntag.nodeId + '.' + ntag.pinId + '}}';
-                }
-            }.bind(this));
-        }
-    }, {
-        key: 'replaceExpressionNodeTag',
-        value: function replaceExpressionNodeTag(_ref, isString) {
-            var nodeId = _ref.nodeId,
-                pinId = _ref.pinId,
-                nodeLabel = _ref.nodeLabel,
-                pinLabel = _ref.pinLabel,
-                icon = _ref.icon,
-                fieldType = _ref.fieldType;
+					return _react2.default.createElement(
+						'span',
+						null,
+						seperator,
+						_react2.default.createElement(
+							'span',
+							{ className: 'node-expression-data-tag__prop' },
+							finalResult
+						)
+					);
+				}),
+				this.props.schemas[nodeTag.fieldType] && this.props.schemas[nodeTag.fieldType].methods && _react2.default.createElement(
+					'span',
+					{ className: 'settings-button', onClick: function onClick(e) {
+							return _this3.toggleOperations(e, tagId);
+						} },
+					_react2.default.createElement('i', { className: 'fa fa-cogs' })
+				)
+			), node);
+			return node;
+		}
+	}, {
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			for (var i in this.props.availableFields) {
+				var field = this.props.availableFields[i];
+				for (var x in field.fields) {
+					this.props.loadDataType(field.fields[x].type);
+				}
+			}
+			var specialCharsRegexp = /[\ue000-\uefff]/g;
+			var options = {
+				inputStyle: 'contenteditable',
+				specialChars: specialCharsRegexp,
+				specialCharPlaceholder: this.createTagNode.bind(this),
+				autoScrollCursorOnSet: false,
+				extraKeys: {
+					Tab: false
+				}
+			};
+			this.codeMirror = _codemirror2.default.fromTextArea(this.textbox, options);
+			var editor = this.codeMirror;
+			this.codeMirror.on('change', this.onCodeMirrorChange.bind(this));
+			this.codeMirror.on('cursorActivity', function () {
+				var options = {
+					hint: function hint() {
+						return {
+							from: editor.getDoc().getCursor(),
+							to: editor.getDoc().getCursor(),
+							list: ['foo', 'bar']
+						};
+					}
+				};
+			});
+		}
+	}, {
+		key: 'replaceSpecialCharsWithExpression',
+		value: function replaceSpecialCharsWithExpression(val, isString) {
+			return String(val).replace(/[\ue000-\uefff]/g, function (tag) {
+				if (!this.charMap[tag]) {
+					return tag;
+				} else {
+					var char = this.charMap[tag];
+					var ntag = this.nodeTags[char];
+					return '{{_N' + ntag.nodeId + '.' + ntag.pinId + '}}';
+				}
+			}.bind(this));
+		}
+	}, {
+		key: 'replaceExpressionNodeTag',
+		value: function replaceExpressionNodeTag(_ref, isString) {
+			var nodeId = _ref.nodeId,
+			    pinId = _ref.pinId,
+			    nodeLabel = _ref.nodeLabel,
+			    pinLabel = _ref.pinLabel,
+			    icon = _ref.icon,
+			    fieldType = _ref.fieldType;
 
-            var tags = this.nodeTags;
-            var tagMaps = this.tagMaps || {};
-            var tag = tagMaps[nodeId + '__' + pinId];
-            var charMap = this.charMap;
-            var tagId = 'UNKNOWN';
-            var currentLength = Object.keys(tags).length;
-            if (!tag) {
-                tagId = 0xe000 + currentLength;
-                if (!fieldType && tags[tagId]) {
-                    fieldType = tags[tagId].fieldType;
-                }
-                tags[tagId] = {
-                    id: 0xe000 + currentLength,
-                    nodeId: nodeId,
-                    pinId: pinId,
-                    nodeLabel: nodeLabel,
-                    pinLabel: pinLabel,
-                    icon: icon,
-                    fieldType: fieldType
-                };
-                charMap[String.fromCharCode(tagId)] = tagId;
-                tagMaps[nodeId + '__' + pinId] = tagId;
-                this.tagMaps = tagMaps;
-            } else {
-                tagId = tag;
-                if (!fieldType && tags[tagId]) {
-                    fieldType = tags[tagId].fieldType;
-                }
-                tags[tagId] = {
-                    id: tag,
-                    nodeId: nodeId,
-                    pinId: pinId,
-                    nodeLabel: nodeLabel,
-                    pinLabel: pinLabel,
-                    icon: icon,
-                    fieldType: fieldType,
-                    operationValues: tags[tagId].operationValues
-                };
-                charMap[String.fromCharCode(tagId)] = tagId;
-            }
-            this.nodeTags = tags;
-            this.charMap = charMap;
-            return String.fromCharCode(tagId);
-        }
-    }, {
-        key: 'getValue',
-        value: function getValue() {
-            return this.replaceExpressionWithSpecialChars(this.props.value);
-        }
-    }, {
-        key: 'toggleOperations',
-        value: function toggleOperations(e, tagId) {
-            e.stopPropagation();
-            this.setState({
-                operationTagId: tagId,
-                operationX: e.target.offsetLeft,
-                operationY: e.target.offsetTop,
-                operationFieldType: this.nodeTags[tagId].fieldType,
-                showOperations: !this.state.showOperations
-            });
-        }
-    }, {
-        key: 'updateSelectedOperation',
-        value: function updateSelectedOperation(v) {
-            this.setState({
-                selectedOperation: v
-            });
-            var tagId = this.state.operationTagId;
-            if ('' == v) {
-                v = null;
-            }
-            this.updateExpressionWithOperation(tagId, v, {});
-        }
-    }, {
-        key: 'setOperationValue',
-        value: function setOperationValue(key, value) {
-            var tagId = this.state.operationTagId;
-            var nodeTag = this.nodeTags[tagId];
+			var tags = this.nodeTags;
+			var tagMaps = this.tagMaps || {};
+			var tag = tagMaps[nodeId + '__' + pinId];
+			var charMap = this.charMap;
+			var tagId = 'UNKNOWN';
+			var currentLength = Object.keys(tags).length;
+			if (!tag) {
+				tagId = 0xe000 + currentLength;
+				if (!fieldType && tags[tagId]) {
+					fieldType = tags[tagId].fieldType;
+				}
+				tags[tagId] = {
+					id: 0xe000 + currentLength,
+					nodeId: nodeId,
+					pinId: pinId,
+					nodeLabel: nodeLabel,
+					pinLabel: pinLabel,
+					icon: icon,
+					fieldType: fieldType
+				};
+				charMap[String.fromCharCode(tagId)] = tagId;
+				tagMaps[nodeId + '__' + pinId] = tagId;
+				this.tagMaps = tagMaps;
+			} else {
+				tagId = tag;
+				if (!fieldType && tags[tagId]) {
+					fieldType = tags[tagId].fieldType;
+				}
+				tags[tagId] = {
+					id: tag,
+					nodeId: nodeId,
+					pinId: pinId,
+					nodeLabel: nodeLabel,
+					pinLabel: pinLabel,
+					icon: icon,
+					fieldType: fieldType,
+					operationValues: tags[tagId].operationValues
+				};
+				charMap[String.fromCharCode(tagId)] = tagId;
+			}
+			this.nodeTags = tags;
+			this.charMap = charMap;
+			return String.fromCharCode(tagId);
+		}
+	}, {
+		key: 'getValue',
+		value: function getValue() {
+			return this.replaceExpressionWithSpecialChars(this.props.value);
+		}
+	}, {
+		key: 'toggleOperations',
+		value: function toggleOperations(e, tagId) {
+			e.stopPropagation();
+			this.setState({
+				operationTagId: tagId,
+				operationX: e.target.offsetLeft,
+				operationY: e.target.offsetTop,
+				operationFieldType: this.nodeTags[tagId].fieldType,
+				showOperations: !this.state.showOperations
+			});
+		}
+	}, {
+		key: 'updateSelectedOperation',
+		value: function updateSelectedOperation(v) {
+			this.setState({
+				selectedOperation: v
+			});
+			var tagId = this.state.operationTagId;
+			if ('' == v) {
+				v = null;
+			}
+			this.updateExpressionWithOperation(tagId, v, {});
+		}
+	}, {
+		key: 'setOperationValue',
+		value: function setOperationValue(key, value) {
+			var tagId = this.state.operationTagId;
+			var nodeTag = this.nodeTags[tagId];
 
-            var operationValues = nodeTag.operationValues || {};
-            if (key) {
-                operationValues[key] = value;
-            }
-            this.updateExpressionWithOperation(tagId, this.state.selectedOperation, operationValues);
-        }
-    }, {
-        key: 'updateExpressionWithOperation',
-        value: function updateExpressionWithOperation(tagId, operationName, operationValues) {
+			var operationValues = nodeTag.operationValues || {};
+			if (key) {
+				operationValues[key] = value;
+			}
+			this.updateExpressionWithOperation(tagId, this.state.selectedOperation, operationValues);
+		}
+	}, {
+		key: 'updateExpressionWithOperation',
+		value: function updateExpressionWithOperation(tagId, operationName, operationValues) {
 
-            var nodeTag = this.nodeTags[tagId];
-            var fields = '';
-            var args = [];
-            for (var i in operationValues) {
-                var prefix = '' == fields ? '' : ',';
-                fields += prefix + '\'' + operationValues[i] + '\'';
-                args.push({
-                    raw: '\'' + operationValues[i] + '\'',
-                    type: 'Literal',
-                    value: operationValues[i]
-                });
-            }
+			var nodeTag = this.nodeTags[tagId];
+			var fields = '';
+			var args = [];
+			for (var i in operationValues) {
+				var prefix = '' == fields ? '' : ',';
+				fields += prefix + '\'' + operationValues[i] + '\'';
+				args.push({
+					raw: '\'' + operationValues[i] + '\'',
+					type: 'Literal',
+					value: operationValues[i]
+				});
+			}
 
-            nodeTag.operationValues = operationValues;
-            var expr = (0, _util.parseExpression)('{{_N' + nodeTag.nodeId + '.' + nodeTag.pinId + '}}');
-            if ('CallExpression' == expr.type) {
-                expr = expr.callee.object;
-            }
-            if (operationName) {
-                expr = {
-                    type: 'CallExpression',
-                    callee: {
-                        type: 'MemberExpression',
-                        object: expr,
-                        property: {
-                            type: 'Identifier',
-                            name: operationName
-                        }
-                    },
-                    arguments: args
-                };
-            }
-            var dataa = (0, _util.stringifyExpression)(expr);
-            var matches = dataa.match(/\{\{_N([0-9]*).([^\}]*)\}\}/i);
-            var tagMapId = matches[1] + '__' + nodeTag.pinId;
-            nodeTag.pinId = matches[2];
-            nodeTag.pinLabel = matches[2];
-            this.nodeTags[tagId] = nodeTag;
+			nodeTag.operationValues = operationValues;
+			var expr = (0, _util.parseExpression)('{{_N' + nodeTag.nodeId + '.' + nodeTag.pinId + '}}');
+			if ('CallExpression' == expr.type) {
+				expr = expr.callee.object;
+			}
+			if (operationName) {
+				expr = {
+					type: 'CallExpression',
+					callee: {
+						type: 'MemberExpression',
+						object: expr,
+						property: {
+							type: 'Identifier',
+							name: operationName
+						}
+					},
+					arguments: args
+				};
+			}
+			var dataa = (0, _util.stringifyExpression)(expr);
+			var matches = dataa.match(/\{\{_N([0-9]*).([^\}]*)\}\}/i);
+			var tagMapId = matches[1] + '__' + nodeTag.pinId;
+			nodeTag.pinId = matches[2];
+			nodeTag.pinLabel = matches[2];
+			this.nodeTags[tagId] = nodeTag;
 
-            var tagMaps = this.tagMaps;
-            tagMaps[matches[1] + '__' + nodeTag.pinId] = tagId;
-            this.tagMaps = tagMaps;
-            var newValue = this.getExpression();
+			var tagMaps = this.tagMaps;
+			tagMaps[matches[1] + '__' + nodeTag.pinId] = tagId;
+			this.tagMaps = tagMaps;
+			var newValue = this.getExpression();
 
-            if (newValue != this.props.value) {
-                if (this.props.onChange) {
-                    this.props.onChange(newValue);
-                }
-            }
-            if (matches) {
-                this.setState({
-                    text: this.props.getNodeLabel(matches[1]) + ' - ' + matches[2],
-                    id: dataa
-                });
-            }
-            this.forceUpdate();
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var _this4 = this;
+			if (newValue != this.props.value) {
+				if (this.props.onChange) {
+					this.props.onChange(newValue);
+				}
+			}
+			if (matches) {
+				this.setState({
+					text: this.props.getNodeLabel(matches[1]) + ' - ' + matches[2],
+					id: dataa
+				});
+			}
+			this.forceUpdate();
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this4 = this;
 
-            var operations = false;
+			var operations = false;
 
-            if (this.props.schemas[this.state.operationFieldType] && this.props.schemas[this.state.operationFieldType].methods) {
-                operations = true;
-            }
+			if (this.props.schemas[this.state.operationFieldType] && this.props.schemas[this.state.operationFieldType].methods) {
+				operations = true;
+			}
 
-            var allowExpressions = true;
-            return _react2.default.createElement(
-                'div',
-                { style: { position: 'relative' } },
-                _react2.default.createElement(
-                    'div',
-                    { className: 'node-control-container ' + (this.props.errorMessage && 'node-error' || '') },
-                    ' ',
-                    _react2.default.createElement(
-                        'div',
-                        { ref: function ref(el) {
-                                _this4.element = el;
-                            }, className: 'node-editable-setting' },
-                        ' ',
-                        _react2.default.createElement('textarea', { id: 'expr_' + this.props.nodeId + '__' + this.props.name, name: 'expr_' + this.props.nodeId + '__' + this.props.name, type: 'text', ref: function ref(el) {
-                                return _this4.textbox = el;
-                            }, value: this.getValue() }),
-                        ' '
-                    ),
-                    this.props.value && _react2.default.createElement(
-                        'a',
-                        { href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
-                                return _this4.clearValue();
-                            } },
-                        _react2.default.createElement('i', { className: 'fa fa-trash' })
-                    ),
-                    allowExpressions && _react2.default.createElement(
-                        'a',
-                        { href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick(e) {
-                                return _this4.toggleQuickSearch(e);
-                            } },
-                        _react2.default.createElement('i', { className: 'fa fa-crosshairs' })
-                    ),
-                    !allowExpressions && _react2.default.createElement(
-                        'a',
-                        { href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick(e) {
-                                return _this4.toggleQuickSearch(e);
-                            } },
-                        _react2.default.createElement('i', { className: 'fa fa-caret-down' })
-                    )
-                ),
-                _react2.default.createElement(_QuickSearch2.default, { className: 'node-quick-search node-quick-search--editor',
-                    insertField: this.insertField.bind(this),
-                    resetControlTypeClicked: this.props.resetControlTypeClicked,
-                    show: this.state.quickSearch,
-                    availableFields: this.props.availableFields.filter(function (f) {
-                        return !f.visibleTo;
-                    }),
-                    schemas: this.props.schemas,
-                    getNodeIcon: this.props.getNodeIcon,
-                    canUseField: function canUseField(field, node) {
+			var allowExpressions = true;
+			return _react2.default.createElement(
+				'div',
+				{ style: { position: 'relative' } },
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-control-container ' + (this.props.errorMessage && 'node-error' || '') },
+					' ',
+					_react2.default.createElement(
+						'div',
+						{ ref: function ref(el) {
+								_this4.element = el;
+							}, className: 'node-editable-setting' },
+						' ',
+						_react2.default.createElement('textarea', { id: 'expr_' + this.props.nodeId + '__' + this.props.name, name: 'expr_' + this.props.nodeId + '__' + this.props.name, type: 'text', ref: function ref(el) {
+								return _this4.textbox = el;
+							}, value: this.getValue() }),
+						' '
+					),
+					this.props.value && _react2.default.createElement(
+						'a',
+						{ href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
+								return _this4.clearValue();
+							} },
+						_react2.default.createElement('i', { className: 'fa fa-trash' })
+					),
+					allowExpressions && _react2.default.createElement(
+						'a',
+						{ href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick(e) {
+								return _this4.toggleQuickSearch(e);
+							} },
+						_react2.default.createElement('i', { className: 'fa fa-crosshairs' })
+					),
+					!allowExpressions && _react2.default.createElement(
+						'a',
+						{ href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick(e) {
+								return _this4.toggleQuickSearch(e);
+							} },
+						_react2.default.createElement('i', { className: 'fa fa-caret-down' })
+					)
+				),
+				_react2.default.createElement(_QuickSearch2.default, { className: 'node-quick-search node-quick-search--editor',
+					insertField: this.insertField.bind(this),
+					resetControlTypeClicked: this.props.resetControlTypeClicked,
+					show: this.state.quickSearch,
+					availableFields: this.props.availableFields.filter(function (f) {
+						return !f.visibleTo;
+					}),
+					schemas: this.props.schemas,
+					getNodeIcon: this.props.getNodeIcon,
+					canUseField: function canUseField(field, node) {
 
-                        return !field.visibleTo || 0 <= field.visibleTo.indexOf(_this4.props.name) && node.nid == _this4.props.nodeId;
-                    }
-                }),
-                this.state.showOperations && _react2.default.createElement(_OperationsPanel2.default, {
-                    updateSelectedOperation: function updateSelectedOperation(op) {
-                        return _this4.updateSelectedOperation(op);
-                    },
-                    selectedOperation: this.state.selectedOperation,
-                    operationX: this.state.operationX,
-                    fieldType: this.state.operationFieldType,
-                    operationY: this.state.operationY,
-                    operationValues: this.nodeTags[this.state.operationTagId] && this.nodeTags[this.state.operationTagId].operationValues && this.nodeTags[this.state.operationTagId].operationValues,
-                    setOperationValue: function setOperationValue(f, v) {
-                        return _this4.setOperationValue(f, v);
-                    }
-                })
-            );
-        }
-    }]);
+						return !field.visibleTo || 0 <= field.visibleTo.indexOf(_this4.props.name) && node.nid == _this4.props.nodeId;
+					}
+				}),
+				this.state.showOperations && _react2.default.createElement(_OperationsPanel2.default, {
+					updateSelectedOperation: function updateSelectedOperation(op) {
+						return _this4.updateSelectedOperation(op);
+					},
+					selectedOperation: this.state.selectedOperation,
+					operationX: this.state.operationX,
+					fieldType: this.state.operationFieldType,
+					operationY: this.state.operationY,
+					operationValues: this.nodeTags[this.state.operationTagId] && this.nodeTags[this.state.operationTagId].operationValues && this.nodeTags[this.state.operationTagId].operationValues,
+					setOperationValue: function setOperationValue(f, v) {
+						return _this4.setOperationValue(f, v);
+					}
+				})
+			);
+		}
+	}]);
 
-    return ExpressionEditor;
+	return ExpressionEditor;
 }(_react2.default.Component);
 
 var mapStateToProps = function mapStateToProps(state, ownProps) {
-    var schemas = {};
-    for (var i in ownProps.availableFields) {
-        var fields = ownProps.availableFields[i];
-        for (var f in fields.fields) {
-            var type = fields.fields[f].type;
-            schemas[type] = state.datatypes[type] && state.datatypes[type].schema || null;
-        }
-    }
-    return {
-        values: state.datatypes && state.datatypes[ownProps.type] && state.datatypes[ownProps.type].choices,
-        getNodeLabel: function getNodeLabel(nid) {
-            return 0 == nid ? 'Global' : state.nodes[nid].name;
-        },
-        getNodeIcon: function getNodeIcon(nid) {
-            if (!state.nodes[nid] || !state.definitions[state.nodes[nid].type].plugin || !state.definitions[state.nodes[nid].type].plugin.icon) {
-                return '';
-            }
-            return state.definitions[state.nodes[nid].type].plugin.icon;
-        },
-        schemas: schemas
-    };
+	var schemas = {};
+	for (var i in ownProps.availableFields) {
+		var fields = ownProps.availableFields[i];
+		for (var f in fields.fields) {
+			var type = fields.fields[f].type;
+			schemas[type] = state.datatypes[type] && state.datatypes[type].schema || null;
+		}
+	}
+	return {
+		values: state.datatypes && state.datatypes[ownProps.type] && state.datatypes[ownProps.type].choices,
+		getNodeLabel: function getNodeLabel(nid) {
+			return 0 == nid ? 'Global' : state.nodes[nid].name;
+		},
+		getNodeIcon: function getNodeIcon(nid) {
+			if (!state.nodes[nid] || !state.definitions[state.nodes[nid].type].plugin || !state.definitions[state.nodes[nid].type].plugin.icon) {
+				return '';
+			}
+			return state.definitions[state.nodes[nid].type].plugin.icon;
+		},
+		schemas: schemas
+	};
 };
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-    return {
-        loadDataType: function loadDataType(dataTypeId) {
-            return dispatch((0, _actions.loadDataType)(dataTypeId));
-        }
-    };
+	return {
+		loadDataType: function loadDataType(dataTypeId) {
+			return dispatch((0, _actions.loadDataType)(dataTypeId));
+		}
+	};
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps, null, {
-    withRef: true
+	withRef: true
 })((0, _reactOnclickoutside2.default)(ExpressionEditor, {
-    excludeScrollbar: true
+	excludeScrollbar: true
 }));
 
 /***/ }),
@@ -44927,7 +44923,7 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps, 
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -44957,425 +44953,425 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ExpressionSelectBox = function (_React$Component) {
-    _inherits(ExpressionSelectBox, _React$Component);
+	_inherits(ExpressionSelectBox, _React$Component);
 
-    function ExpressionSelectBox(props) {
-        _classCallCheck(this, ExpressionSelectBox);
+	function ExpressionSelectBox(props) {
+		_classCallCheck(this, ExpressionSelectBox);
 
-        var _this = _possibleConstructorReturn(this, (ExpressionSelectBox.__proto__ || Object.getPrototypeOf(ExpressionSelectBox)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (ExpressionSelectBox.__proto__ || Object.getPrototypeOf(ExpressionSelectBox)).call(this, props));
 
-        if ('string' == typeof props.value) {
-            var matches = props.value.match(/\{\{_N([0-9]*).([^\}]*)\}\}/i);
-            if (matches) {
-                _this.state = {
-                    text: props.getNodeLabel(matches[1]) + ' - ' + matches[2],
-                    id: props.value,
-                    expr: (0, _util.parseExpression)(props.value)
-                };
-            } else {
-                _this.state = {
-                    id: props.value,
-                    expr: (0, _util.parseExpression)(props.value)
-                };
-            }
-        } else {
-            _this.state = {
-                text: props.value.text,
-                id: props.value.id
-            };
-        }
-        return _this;
-    }
+		if ('string' == typeof props.value) {
+			var matches = props.value.match(/\{\{_N([0-9]*).([^\}]*)\}\}/i);
+			if (matches) {
+				_this.state = {
+					text: props.getNodeLabel(matches[1]) + ' - ' + matches[2],
+					id: props.value,
+					expr: (0, _util.parseExpression)(props.value)
+				};
+			} else {
+				_this.state = {
+					id: props.value,
+					expr: (0, _util.parseExpression)(props.value)
+				};
+			}
+		} else {
+			_this.state = {
+				text: props.value.text,
+				id: props.value.id
+			};
+		}
+		return _this;
+	}
 
-    _createClass(ExpressionSelectBox, [{
-        key: 'componentWillReceiveProps',
-        value: function componentWillReceiveProps(props) {
-            if (props.value) {
-                if ('string' == typeof props.value) {
-                    var matches = props.value.match(/\{\{_N([0-9]*).([^\}]*)\}\}/i);
-                    if (matches) {
-                        this.setState({
-                            text: props.getNodeLabel(matches[1]) + ' - ' + matches[2],
-                            id: props.value,
-                            expr: (0, _util.parseExpression)(props.value)
-                        });
-                    }
-                } else {
-                    this.setState({
-                        text: props.value.text,
-                        id: props.value.id
-                    });
-                }
-            }
-            for (var i in props.availableFields) {
-                for (var f in props.availableFields[i].fields) {
-                    if (!props.datatypes[props.availableFields[i].fields[f].type]) {
-                        props.loadDataType(props.availableFields[i].fields[f].type);
-                    }
-                }
-            }
-        }
-    }, {
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            for (var i in this.props.availableFields) {
-                for (var f in this.props.availableFields[i].fields) {
-                    this.props.loadDataType(this.props.availableFields[i].fields[f].type);
-                }
-            }
-        }
-    }, {
-        key: 'insertField',
-        value: function insertField(node, field, subprop, subtype) {
-            this.setState({
-                quickSearch: false
-            });
-            var expression = field.name;
-            if ('object' == (typeof subprop === 'undefined' ? 'undefined' : _typeof(subprop))) {
-                for (var i in subprop) {
-                    if (2 < i) {
-                        expression += '.' + subprop[i];
-                    }
-                }
-            } else if (subprop) {
-                expression += '.' + subprop;
-            }
-            this.setState({
-                fieldType: subtype || field.type
-            });
+	_createClass(ExpressionSelectBox, [{
+		key: 'componentWillReceiveProps',
+		value: function componentWillReceiveProps(props) {
+			if (props.value) {
+				if ('string' == typeof props.value) {
+					var matches = props.value.match(/\{\{_N([0-9]*).([^\}]*)\}\}/i);
+					if (matches) {
+						this.setState({
+							text: props.getNodeLabel(matches[1]) + ' - ' + matches[2],
+							id: props.value,
+							expr: (0, _util.parseExpression)(props.value)
+						});
+					}
+				} else {
+					this.setState({
+						text: props.value.text,
+						id: props.value.id
+					});
+				}
+			}
+			for (var i in props.availableFields) {
+				for (var f in props.availableFields[i].fields) {
+					if (!props.datatypes[props.availableFields[i].fields[f].type]) {
+						props.loadDataType(props.availableFields[i].fields[f].type);
+					}
+				}
+			}
+		}
+	}, {
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			for (var i in this.props.availableFields) {
+				for (var f in this.props.availableFields[i].fields) {
+					this.props.loadDataType(this.props.availableFields[i].fields[f].type);
+				}
+			}
+		}
+	}, {
+		key: 'insertField',
+		value: function insertField(node, field, subprop, subtype) {
+			this.setState({
+				quickSearch: false
+			});
+			var expression = field.name;
+			if ('object' == (typeof subprop === 'undefined' ? 'undefined' : _typeof(subprop))) {
+				for (var i in subprop) {
+					if (2 < i) {
+						expression += '.' + subprop[i];
+					}
+				}
+			} else if (subprop) {
+				expression += '.' + subprop;
+			}
+			this.setState({
+				fieldType: subtype || field.type
+			});
 
-            this.setState({
-                text: expression,
-                id: '{{_N' + node.nid + '.' + expression + '}}',
-                expr: (0, _util.parseExpression)('{{_N' + node.nid + '.' + expression + '}}')
-            });
-            if (this.props.onSetFieldType) {
-                this.props.onSetFieldType(subtype || field.type);
-            }
-            var nid = node.nid;
-            if ('Global' == nid) {
-                nid = '';
-            }
-            if (this.props.onSelect) {
-                this.props.onSelect(node, field, '{{_N' + nid + '.' + expression + '}}', subtype || field.type, expression);
-            }
-            if (this.props.onChange) {
-                this.props.onChange('{{_N' + node.nid + '.' + expression + '}}');
-            }
-        }
-    }, {
-        key: 'clearValue',
-        value: function clearValue() {
-            this.setState({
-                text: null,
-                id: null
-            });
-            this.props.onChange(null);
-        }
-    }, {
-        key: 'selectChoice',
-        value: function selectChoice(node, field) {
-            this.setState({
-                quickSearch: false
-            });
+			this.setState({
+				text: expression,
+				id: '{{_N' + node.nid + '.' + expression + '}}',
+				expr: (0, _util.parseExpression)('{{_N' + node.nid + '.' + expression + '}}')
+			});
+			if (this.props.onSetFieldType) {
+				this.props.onSetFieldType(subtype || field.type);
+			}
+			var nid = node.nid;
+			if ('Global' == nid) {
+				nid = '';
+			}
+			if (this.props.onSelect) {
+				this.props.onSelect(node, field, '{{_N' + nid + '.' + expression + '}}', subtype || field.type, expression);
+			}
+			if (this.props.onChange) {
+				this.props.onChange('{{_N' + node.nid + '.' + expression + '}}');
+			}
+		}
+	}, {
+		key: 'clearValue',
+		value: function clearValue() {
+			this.setState({
+				text: null,
+				id: null
+			});
+			this.props.onChange(null);
+		}
+	}, {
+		key: 'selectChoice',
+		value: function selectChoice(node, field) {
+			this.setState({
+				quickSearch: false
+			});
 
-            this.insertField(node);
-        }
-    }, {
-        key: 'toggleQuickSearch',
-        value: function toggleQuickSearch() {
-            this.loadOptions();
-            this.setState({
-                quickSearch: !this.state.quickSearch,
-                quickSearchFilter: null
-            });
-        }
-    }, {
-        key: 'toggleDropdown',
-        value: function toggleDropdown() {
-            this.loadOptions();
-            this.setState({
-                dropdown: !this.state.dropdown
-            });
-        }
-    }, {
-        key: 'loadOptions',
-        value: function loadOptions() {}
-    }, {
-        key: 'ensureSelected',
-        value: function ensureSelected() {
-            var _this2 = this;
+			this.insertField(node);
+		}
+	}, {
+		key: 'toggleQuickSearch',
+		value: function toggleQuickSearch() {
+			this.loadOptions();
+			this.setState({
+				quickSearch: !this.state.quickSearch,
+				quickSearchFilter: null
+			});
+		}
+	}, {
+		key: 'toggleDropdown',
+		value: function toggleDropdown() {
+			this.loadOptions();
+			this.setState({
+				dropdown: !this.state.dropdown
+			});
+		}
+	}, {
+		key: 'loadOptions',
+		value: function loadOptions() {}
+	}, {
+		key: 'ensureSelected',
+		value: function ensureSelected() {
+			var _this2 = this;
 
-            if (!this.props.dataTypeChoices) {
-                return;
-            }
-            var avail = this.props.dataTypeChoices.filter(function (n) {
-                return null == _this2.state.quickSearchFilter || 0 <= n.text.indexOf(_this2.state.quickSearchFilter);
-            });
-            if (0 < avail.length) {
-                this.selectChoice(avail[0]);
-            } else {
-                this.clearValue();
-            }
-            this.setState({
-                quickSearch: false,
-                quickSearchFilter: null
-            });
-        }
-    }, {
-        key: 'updateValue',
-        value: function updateValue(event) {
-            this.setState({
-                text: event.target.value,
-                quickSearch: true,
-                quickSearchFilter: event.target.value
-            });
-        }
-    }, {
-        key: 'toggleOperations',
-        value: function toggleOperations() {
-            this.setState({
-                showOperations: !this.state.showOperations
-            });
-        }
-    }, {
-        key: 'updateSelectedOperation',
-        value: function updateSelectedOperation(v) {
-            this.setState({
-                selectedOperation: v
-            });
-        }
-    }, {
-        key: 'setOperationValue',
-        value: function setOperationValue(key, value) {
-            var operationValues = this.state.operationValues || {};
-            operationValues[key] = value;
-            var fields = '';
-            var args = [];
-            for (var i in operationValues) {
-                var prefix = '' == fields ? '' : ',';
-                fields += prefix + '\'' + operationValues[i] + '\'';
-                args.push({
-                    raw: '\'' + operationValues[i] + '\'',
-                    type: 'Literal',
-                    value: operationValues[i]
-                });
-            }
-            var expr = (0, _util.parseExpression)(this.state.id);
-            if ('CallExpression' == expr.type) {
-                expr = expr.callee.object;
-            }
-            expr = {
-                type: 'CallExpression',
-                callee: {
-                    type: 'MemberExpression',
-                    object: expr,
-                    property: {
-                        type: 'Identifier',
-                        name: this.state.selectedOperation
-                    }
-                },
-                arguments: args
-            };
-            var dataa = (0, _util.stringifyExpression)(expr);
-            var matches = dataa.match(/\{\{_N([0-9]*).([^\}]*)\}\}/i);
-            this.setState({
-                operationValues: operationValues,
-                text: this.props.getNodeLabel(matches[1]) + ' - ' + matches[2],
-                id: dataa
-            });
-            if (this.props.onChange) {
-                this.props.onChange(dataa);
-            }
-            if (this.props.onSelect) {
-                this.props.onSelect(null, null, dataa, 'string', this.props.getNodeLabel(matches[1]) + ' - ' + matches[2]);
-            }
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var _this3 = this;
+			if (!this.props.dataTypeChoices) {
+				return;
+			}
+			var avail = this.props.dataTypeChoices.filter(function (n) {
+				return null == _this2.state.quickSearchFilter || 0 <= n.text.indexOf(_this2.state.quickSearchFilter);
+			});
+			if (0 < avail.length) {
+				this.selectChoice(avail[0]);
+			} else {
+				this.clearValue();
+			}
+			this.setState({
+				quickSearch: false,
+				quickSearchFilter: null
+			});
+		}
+	}, {
+		key: 'updateValue',
+		value: function updateValue(event) {
+			this.setState({
+				text: event.target.value,
+				quickSearch: true,
+				quickSearchFilter: event.target.value
+			});
+		}
+	}, {
+		key: 'toggleOperations',
+		value: function toggleOperations() {
+			this.setState({
+				showOperations: !this.state.showOperations
+			});
+		}
+	}, {
+		key: 'updateSelectedOperation',
+		value: function updateSelectedOperation(v) {
+			this.setState({
+				selectedOperation: v
+			});
+		}
+	}, {
+		key: 'setOperationValue',
+		value: function setOperationValue(key, value) {
+			var operationValues = this.state.operationValues || {};
+			operationValues[key] = value;
+			var fields = '';
+			var args = [];
+			for (var i in operationValues) {
+				var prefix = '' == fields ? '' : ',';
+				fields += prefix + '\'' + operationValues[i] + '\'';
+				args.push({
+					raw: '\'' + operationValues[i] + '\'',
+					type: 'Literal',
+					value: operationValues[i]
+				});
+			}
+			var expr = (0, _util.parseExpression)(this.state.id);
+			if ('CallExpression' == expr.type) {
+				expr = expr.callee.object;
+			}
+			expr = {
+				type: 'CallExpression',
+				callee: {
+					type: 'MemberExpression',
+					object: expr,
+					property: {
+						type: 'Identifier',
+						name: this.state.selectedOperation
+					}
+				},
+				arguments: args
+			};
+			var dataa = (0, _util.stringifyExpression)(expr);
+			var matches = dataa.match(/\{\{_N([0-9]*).([^\}]*)\}\}/i);
+			this.setState({
+				operationValues: operationValues,
+				text: this.props.getNodeLabel(matches[1]) + ' - ' + matches[2],
+				id: dataa
+			});
+			if (this.props.onChange) {
+				this.props.onChange(dataa);
+			}
+			if (this.props.onSelect) {
+				this.props.onSelect(null, null, dataa, 'string', this.props.getNodeLabel(matches[1]) + ' - ' + matches[2]);
+			}
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this3 = this;
 
-            var allowExpressions = false;
-            var operations = false;
-            var fieldTypeMethods = this.props.schemas[this.state.fieldType] && this.props.schemas[this.state.fieldType].methods;
-            if (fieldTypeMethods) {
-                operations = true;
-            }
-            return _react2.default.createElement(
-                'div',
-                null,
-                _react2.default.createElement(
-                    'div',
-                    { className: 'node-control-container node-control-expr-select ' + (this.props.errorMessage && 'node-error' || '') },
-                    ' ',
-                    _react2.default.createElement(
-                        'div',
-                        { ref: function ref(el) {
-                                _this3.element = el;
-                            }, className: 'node-editable-setting' },
-                        _react2.default.createElement('input', { type: 'text', readOnly: this.props.lookupOnly, value: this.state.text, className: 'node-editable-text', onBlur: function onBlur(v) {
-                                return _this3.ensureSelected();
-                            }, onChange: function onChange(v) {
-                                return _this3.updateValue(v);
-                            } }),
-                        ' '
-                    ),
-                    ' ',
-                    operations && _react2.default.createElement(
-                        'a',
-                        { href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
-                                return _this3.toggleOperations();
-                            } },
-                        '  ',
-                        _react2.default.createElement('i', { className: 'fa fa-cogs' }),
-                        '  '
-                    ),
-                    allowExpressions && _react2.default.createElement(
-                        'a',
-                        { href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
-                                return _this3.toggleQuickSearch();
-                            } },
-                        _react2.default.createElement('i', { className: 'fa fa-crosshairs' })
-                    ),
-                    !allowExpressions && _react2.default.createElement(
-                        'a',
-                        { href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
-                                return _this3.toggleQuickSearch();
-                            } },
-                        _react2.default.createElement('i', { className: 'fa fa-caret-down' })
-                    )
-                ),
-                '    ',
-                this.state.showOperations && _react2.default.createElement(
-                    'div',
-                    { className: 'triggerhappy-operations' },
-                    '    ',
-                    _react2.default.createElement(
-                        'label',
-                        null,
-                        'Operation Type'
-                    ),
-                    '    ',
-                    _react2.default.createElement(
-                        'select',
-                        { onChange: function onChange(e) {
-                                return _this3.updateSelectedOperation(e.target.value);
-                            } },
-                        ' ',
-                        _react2.default.createElement(
-                            'option',
-                            { value: '' },
-                            'None'
-                        ),
-                        ' ',
-                        Object.keys(fieldTypeMethods).map(function (m) {
-                            return _react2.default.createElement(
-                                'option',
-                                { value: m },
-                                fieldTypeMethods[m].description
-                            );
-                        }),
-                        '    '
-                    ),
-                    '    ',
-                    this.state.selectedOperation && null != this.state.selectedOperation && _react2.default.createElement(
-                        'div',
-                        null,
-                        '    ',
-                        _react2.default.createElement('hr', null),
-                        '    ',
-                        Object.keys(fieldTypeMethods[this.state.selectedOperation].fields).map(function (f) {
-                            return _react2.default.createElement(
-                                'div',
-                                null,
-                                '    ',
-                                _react2.default.createElement(
-                                    'label',
-                                    null,
-                                    f
-                                ),
-                                ' ',
-                                _react2.default.createElement('input', { type: 'text', onChange: function onChange(e) {
-                                        return _this3.setOperationValue(f, e.target.value);
-                                    }, value: _this3.state.operationValues && _this3.state.operationValues[f] || '' }),
-                                ' ',
-                                _react2.default.createElement(
-                                    'div',
-                                    { className: 'desc' },
-                                    fieldTypeMethods[_this3.state.selectedOperation].fields[f].description
-                                ),
-                                '    '
-                            );
-                        }),
-                        '    '
-                    ),
-                    ' ',
-                    _react2.default.createElement(
-                        'a',
-                        { className: 'button button-small' },
-                        'OK'
-                    ),
-                    ' '
-                ),
-                '    ',
-                _react2.default.createElement(_QuickSearch2.default, { allowTypes: this.props.type, allowExpressions: allowExpressions, className: 'node-quick-search', insertField: this.insertField.bind(this), resetControlTypeClicked: this.props.resetControlTypeClicked, show: this.state.quickSearch, availableFields: this.props.availableFields, schemas: this.props.schemas, getNodeIcon: this.props.getNodeIcon })
-            );
-        }
-    }]);
+			var allowExpressions = false;
+			var operations = false;
+			var fieldTypeMethods = this.props.schemas[this.state.fieldType] && this.props.schemas[this.state.fieldType].methods;
+			if (fieldTypeMethods) {
+				operations = true;
+			}
+			return _react2.default.createElement(
+				'div',
+				null,
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-control-container node-control-expr-select ' + (this.props.errorMessage && 'node-error' || '') },
+					' ',
+					_react2.default.createElement(
+						'div',
+						{ ref: function ref(el) {
+								_this3.element = el;
+							}, className: 'node-editable-setting' },
+						_react2.default.createElement('input', { type: 'text', readOnly: this.props.lookupOnly, value: this.state.text, className: 'node-editable-text', onBlur: function onBlur(v) {
+								return _this3.ensureSelected();
+							}, onChange: function onChange(v) {
+								return _this3.updateValue(v);
+							} }),
+						' '
+					),
+					' ',
+					operations && _react2.default.createElement(
+						'a',
+						{ href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
+								return _this3.toggleOperations();
+							} },
+						'  ',
+						_react2.default.createElement('i', { className: 'fa fa-cogs' }),
+						'  '
+					),
+					allowExpressions && _react2.default.createElement(
+						'a',
+						{ href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
+								return _this3.toggleQuickSearch();
+							} },
+						_react2.default.createElement('i', { className: 'fa fa-crosshairs' })
+					),
+					!allowExpressions && _react2.default.createElement(
+						'a',
+						{ href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
+								return _this3.toggleQuickSearch();
+							} },
+						_react2.default.createElement('i', { className: 'fa fa-caret-down' })
+					)
+				),
+				'    ',
+				this.state.showOperations && _react2.default.createElement(
+					'div',
+					{ className: 'triggerhappy-operations' },
+					'    ',
+					_react2.default.createElement(
+						'label',
+						null,
+						'Operation Type'
+					),
+					'    ',
+					_react2.default.createElement(
+						'select',
+						{ onChange: function onChange(e) {
+								return _this3.updateSelectedOperation(e.target.value);
+							} },
+						' ',
+						_react2.default.createElement(
+							'option',
+							{ value: '' },
+							'None'
+						),
+						' ',
+						Object.keys(fieldTypeMethods).map(function (m) {
+							return _react2.default.createElement(
+								'option',
+								{ value: m },
+								fieldTypeMethods[m].description
+							);
+						}),
+						'    '
+					),
+					'    ',
+					this.state.selectedOperation && null != this.state.selectedOperation && _react2.default.createElement(
+						'div',
+						null,
+						'    ',
+						_react2.default.createElement('hr', null),
+						'    ',
+						Object.keys(fieldTypeMethods[this.state.selectedOperation].fields).map(function (f) {
+							return _react2.default.createElement(
+								'div',
+								null,
+								'    ',
+								_react2.default.createElement(
+									'label',
+									null,
+									f
+								),
+								' ',
+								_react2.default.createElement('input', { type: 'text', onChange: function onChange(e) {
+										return _this3.setOperationValue(f, e.target.value);
+									}, value: _this3.state.operationValues && _this3.state.operationValues[f] || '' }),
+								' ',
+								_react2.default.createElement(
+									'div',
+									{ className: 'desc' },
+									fieldTypeMethods[_this3.state.selectedOperation].fields[f].description
+								),
+								'    '
+							);
+						}),
+						'    '
+					),
+					' ',
+					_react2.default.createElement(
+						'a',
+						{ className: 'button button-small' },
+						'OK'
+					),
+					' '
+				),
+				'    ',
+				_react2.default.createElement(_QuickSearch2.default, { allowTypes: this.props.type, allowExpressions: allowExpressions, className: 'node-quick-search', insertField: this.insertField.bind(this), resetControlTypeClicked: this.props.resetControlTypeClicked, show: this.state.quickSearch, availableFields: this.props.availableFields, schemas: this.props.schemas, getNodeIcon: this.props.getNodeIcon })
+			);
+		}
+	}]);
 
-    return ExpressionSelectBox;
+	return ExpressionSelectBox;
 }(_react2.default.Component);
 
 var mapStateToProps = function mapStateToProps(state, ownProps) {
-    var schemas = {};
-    for (var i in ownProps.availableFields) {
-        var fields = ownProps.availableFields[i];
-        for (var f in fields.fields) {
-            var type = fields.fields[f].type;
-            schemas[type] = state.datatypes[type] && state.datatypes[type].schema || null;
-        }
-        schemas.array = {
-            methods: {
-                'getItem': {
-                    description: 'Get Item',
-                    'type': 'number',
-                    'fields': {
-                        'key': {
-                            'type': 'string',
-                            'description': 'The item key'
-                        }
-                    }
-                }
-            }
-        };
-    }
-    return {
-        getNodeIcon: function getNodeIcon(nid) {
-            if (!state.nodes[nid] || !state.definitions[state.nodes[nid].type].plugin || !state.definitions[state.nodes[nid].type].plugin.icon) {
-                return '';
-            }
-            return state.definitions[state.nodes[nid].type].plugin.icon;
-        },
-        getNodeLabel: function getNodeLabel(nid) {
-            return 0 == nid ? 'Global' : state.nodes[nid].name;
-        },
-        schemas: schemas,
-        datatypes: state.datatypes
-    };
+	var schemas = {};
+	for (var i in ownProps.availableFields) {
+		var fields = ownProps.availableFields[i];
+		for (var f in fields.fields) {
+			var type = fields.fields[f].type;
+			schemas[type] = state.datatypes[type] && state.datatypes[type].schema || null;
+		}
+		schemas.array = {
+			methods: {
+				'getItem': {
+					description: 'Get Item',
+					'type': 'number',
+					'fields': {
+						'key': {
+							'type': 'string',
+							'description': 'The item key'
+						}
+					}
+				}
+			}
+		};
+	}
+	return {
+		getNodeIcon: function getNodeIcon(nid) {
+			if (!state.nodes[nid] || !state.definitions[state.nodes[nid].type].plugin || !state.definitions[state.nodes[nid].type].plugin.icon) {
+				return '';
+			}
+			return state.definitions[state.nodes[nid].type].plugin.icon;
+		},
+		getNodeLabel: function getNodeLabel(nid) {
+			return 0 == nid ? 'Global' : state.nodes[nid].name;
+		},
+		schemas: schemas,
+		datatypes: state.datatypes
+	};
 };
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-    return {
+	return {
 
-        loadDataType: function loadDataType(dataTypeId) {
-            return dispatch((0, _actions.loadDataType)(dataTypeId));
-        }
-    };
+		loadDataType: function loadDataType(dataTypeId) {
+			return dispatch((0, _actions.loadDataType)(dataTypeId));
+		}
+	};
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps, null, {
-    withRef: true
+	withRef: true
 })(ExpressionSelectBox);
 
 /***/ }),
@@ -45386,7 +45382,7 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps, 
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -45422,375 +45418,375 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var RichEditor = function (_React$Component) {
-    _inherits(RichEditor, _React$Component);
+	_inherits(RichEditor, _React$Component);
 
-    function RichEditor(props) {
-        _classCallCheck(this, RichEditor);
+	function RichEditor(props) {
+		_classCallCheck(this, RichEditor);
 
-        var _this = _possibleConstructorReturn(this, (RichEditor.__proto__ || Object.getPrototypeOf(RichEditor)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (RichEditor.__proto__ || Object.getPrototypeOf(RichEditor)).call(this, props));
 
-        _this.nodeTags = {};
-        _this.charMap = {};
-        _this.state = {
-            value: props.value,
-            operationFieldType: ''
-        };
-        return _this;
-    }
+		_this.nodeTags = {};
+		_this.charMap = {};
+		_this.state = {
+			value: props.value,
+			operationFieldType: ''
+		};
+		return _this;
+	}
 
-    _createClass(RichEditor, [{
-        key: 'createTagNode',
-        value: function createTagNode(nodeId, path, type) {
+	_createClass(RichEditor, [{
+		key: 'createTagNode',
+		value: function createTagNode(nodeId, path, type) {
 
-            var icon = this.props.getNodeIcon(nodeId);
+			var icon = this.props.getNodeIcon(nodeId);
 
-            var parts = path.split('.');
-            var expr = '<span spellcheck=\'false\' data-type=\'' + type + '\' class=\'node-expression-data-tag\' data-triggerhappy-tag=\'_N' + nodeId + '.' + path + '\' contenteditable=\'false\' data-id=\'' + nodeId + '\'>';
-            if (icon) {
-                expr += '<img src="' + this.props.getNodeIcon(nodeId) + '" class="expression-icon" />';
-            }
-            expr += '<span  class="node-expression-data-tag__node">#' + nodeId + '</span>';
+			var parts = path.split('.');
+			var expr = '<span spellcheck=\'false\' data-type=\'' + type + '\' class=\'node-expression-data-tag\' data-triggerhappy-tag=\'_N' + nodeId + '.' + path + '\' contenteditable=\'false\' data-id=\'' + nodeId + '\'>';
+			if (icon) {
+				expr += '<img src="' + this.props.getNodeIcon(nodeId) + '" class="expression-icon" />';
+			}
+			expr += '<span  class="node-expression-data-tag__node">#' + nodeId + '</span>';
 
-            for (var i in parts) {
-                var p = parts[i];
-                var text = p;
-                var result = text.replace(/([A-Z])/g, ' $1');
-                result = result.replace(/_([a-z])/g, function (r, m) {
-                    return ' ' + m.toUpperCase();
-                });
-                var finalResult = result.charAt(0).toUpperCase() + result.slice(1);
-                expr += '<i class="fa fa-chevron-right"></i>';
-                expr += '<span class="node-expression-data-tag__prop">' + finalResult + '</span>';
-            }
-            expr += '</span>';
+			for (var i in parts) {
+				var p = parts[i];
+				var text = p;
+				var result = text.replace(/([A-Z])/g, ' $1');
+				result = result.replace(/_([a-z])/g, function (r, m) {
+					return ' ' + m.toUpperCase();
+				});
+				var finalResult = result.charAt(0).toUpperCase() + result.slice(1);
+				expr += '<i class="fa fa-chevron-right"></i>';
+				expr += '<span class="node-expression-data-tag__prop">' + finalResult + '</span>';
+			}
+			expr += '</span>';
 
-            this.nodeTags[nodeId + '.' + path] = {
-                html: expr,
-                nodeId: nodeId,
-                path: path,
-                type: type
-            };
-            return expr;
-        }
-    }, {
-        key: 'componentWillUnmount',
-        value: function componentWillUnmount() {
-            if (this.editor) {
-                this.editor.remove();
-            }
-        }
-    }, {
-        key: 'updateExpressionWithOperation',
-        value: function updateExpressionWithOperation(expression, operationName, operationValues) {
+			this.nodeTags[nodeId + '.' + path] = {
+				html: expr,
+				nodeId: nodeId,
+				path: path,
+				type: type
+			};
+			return expr;
+		}
+	}, {
+		key: 'componentWillUnmount',
+		value: function componentWillUnmount() {
+			if (this.editor) {
+				this.editor.remove();
+			}
+		}
+	}, {
+		key: 'updateExpressionWithOperation',
+		value: function updateExpressionWithOperation(expression, operationName, operationValues) {
 
-            var fields = '';
-            var args = [];
-            for (var i in operationValues) {
-                var prefix = '' == fields ? '' : ',';
-                fields += prefix + '\'' + operationValues[i] + '\'';
-                args.push({
-                    raw: '\'' + operationValues[i] + '\'',
-                    type: 'Literal',
-                    value: operationValues[i]
-                });
-            }
+			var fields = '';
+			var args = [];
+			for (var i in operationValues) {
+				var prefix = '' == fields ? '' : ',';
+				fields += prefix + '\'' + operationValues[i] + '\'';
+				args.push({
+					raw: '\'' + operationValues[i] + '\'',
+					type: 'Literal',
+					value: operationValues[i]
+				});
+			}
 
-            var expr = (0, _util.parseExpression)(expression);
+			var expr = (0, _util.parseExpression)(expression);
 
-            if ('CallExpression' == expr.type) {
-                expr = expr.callee.object;
-            }
-            if (operationName) {
-                expr = {
-                    type: 'CallExpression',
-                    callee: {
-                        type: 'MemberExpression',
-                        object: expr,
-                        property: {
-                            type: 'Identifier',
-                            name: operationName
-                        }
-                    },
-                    arguments: args
-                };
-            }
-            var dataa = (0, _util.stringifyExpression)(expr);
+			if ('CallExpression' == expr.type) {
+				expr = expr.callee.object;
+			}
+			if (operationName) {
+				expr = {
+					type: 'CallExpression',
+					callee: {
+						type: 'MemberExpression',
+						object: expr,
+						property: {
+							type: 'Identifier',
+							name: operationName
+						}
+					},
+					arguments: args
+				};
+			}
+			var dataa = (0, _util.stringifyExpression)(expr);
 
-            return dataa;
-        }
-    }, {
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            var id = this.textbox.getAttribute('id');
-            var self = this;
+			return dataa;
+		}
+	}, {
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			var id = this.textbox.getAttribute('id');
+			var self = this;
 
-            wp.editor.initialize(id, {
-                wpautop: false,
+			wp.editor.initialize(id, {
+				wpautop: false,
 
-                tinymce: {
-                    plugins: wp.editor.getDefaultSettings().tinymce.plugins + ',wpflowexpression',
+				tinymce: {
+					plugins: wp.editor.getDefaultSettings().tinymce.plugins + ',wpflowexpression',
 
-                    setup: function setup(editor) {
-                        self.editor = editor;
-                        self.editor.mountOperationsPanel = function (selectedExpressionElement, mountElement) {
-                            var currentExpression = '{{' + self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-tag') + '}}';
-                            var _updateSelectedOperation = function _updateSelectedOperation(op) {
-                                self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values', '');
-                                self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-operation', op);
-                                var newExpr = self.updateExpressionWithOperation(self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-tag'), op, {});
-                                self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-tag', newExpr.replace('{{', '').replace('}}', ''));
-                                var newHtml = self.replaceSpecialCharsWithTags(newExpr, true);
-                                selectedExpressionElement.innerHTML = self.editor.dom.$(newHtml).html();
-                                renderOp();
-                            };
-                            var _setOperationValue = function _setOperationValue(f, v) {
-                                var values = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values');
-                                if (values) {
-                                    values = JSON.parse(values);
-                                } else {
-                                    values = {};
-                                }
-                                values[f] = v;
-                                var op = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation');
-                                self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values', JSON.stringify(values));
-                                var newExpr = self.updateExpressionWithOperation(self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-tag'), op, values);
-                                self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-tag', newExpr.replace('{{', '').replace('}}', ''));
-                                var newHtml = self.replaceSpecialCharsWithTags(newExpr, true);
-                                selectedExpressionElement.innerHTML = self.editor.dom.$(newHtml).html();
-                                renderOp();
-                            };
-                            var renderOp = function renderOp() {
+					setup: function setup(editor) {
+						self.editor = editor;
+						self.editor.mountOperationsPanel = function (selectedExpressionElement, mountElement) {
+							var currentExpression = '{{' + self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-tag') + '}}';
+							var _updateSelectedOperation = function _updateSelectedOperation(op) {
+								self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values', '');
+								self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-operation', op);
+								var newExpr = self.updateExpressionWithOperation(self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-tag'), op, {});
+								self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-tag', newExpr.replace('{{', '').replace('}}', ''));
+								var newHtml = self.replaceSpecialCharsWithTags(newExpr, true);
+								selectedExpressionElement.innerHTML = self.editor.dom.$(newHtml).html();
+								renderOp();
+							};
+							var _setOperationValue = function _setOperationValue(f, v) {
+								var values = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values');
+								if (values) {
+									values = JSON.parse(values);
+								} else {
+									values = {};
+								}
+								values[f] = v;
+								var op = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation');
+								self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values', JSON.stringify(values));
+								var newExpr = self.updateExpressionWithOperation(self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-tag'), op, values);
+								self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-tag', newExpr.replace('{{', '').replace('}}', ''));
+								var newHtml = self.replaceSpecialCharsWithTags(newExpr, true);
+								selectedExpressionElement.innerHTML = self.editor.dom.$(newHtml).html();
+								renderOp();
+							};
+							var renderOp = function renderOp() {
 
-                                var selectedType = self.editor.dom.getAttrib(selectedExpressionElement, 'data-type');
-                                var fieldTypeMethods = self.props.schemas[selectedType] && self.props.schemas[selectedType].methods;
-                                var opType = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation') || '';
-                                var opValues = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values') || '{}';
-                                opValues = JSON.parse(opValues);
+								var selectedType = self.editor.dom.getAttrib(selectedExpressionElement, 'data-type');
+								var fieldTypeMethods = self.props.schemas[selectedType] && self.props.schemas[selectedType].methods;
+								var opType = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation') || '';
+								var opValues = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values') || '{}';
+								opValues = JSON.parse(opValues);
 
-                                if (fieldTypeMethods) {
-                                    _reactDom2.default.render(_react2.default.createElement(
-                                        _reactRedux.Provider,
-                                        { store: window.TH.nodeStore },
-                                        _react2.default.createElement(_OperationsPanel2.default, {
-                                            updateSelectedOperation: function updateSelectedOperation(op) {
-                                                return _updateSelectedOperation(op);
-                                            },
-                                            selectedOperation: opType,
-                                            operationX: 0,
-                                            fieldType: selectedType,
-                                            operationY: 0,
-                                            operationValues: opValues,
-                                            setOperationValue: function setOperationValue(f, v) {
-                                                return _setOperationValue(f, v);
-                                            }
-                                        })
-                                    ), mountElement);
-                                }
-                            };
-                            renderOp();
-                        };
-                        editor.settings.toolbar1 += ',insertExpr';
-                        editor.settings.content_css += ',' + TH.expression_css_url; // eslint-disable-line camelcase
+								if (fieldTypeMethods) {
+									_reactDom2.default.render(_react2.default.createElement(
+										_reactRedux.Provider,
+										{ store: window.TH.nodeStore },
+										_react2.default.createElement(_OperationsPanel2.default, {
+											updateSelectedOperation: function updateSelectedOperation(op) {
+												return _updateSelectedOperation(op);
+											},
+											selectedOperation: opType,
+											operationX: 0,
+											fieldType: selectedType,
+											operationY: 0,
+											operationValues: opValues,
+											setOperationValue: function setOperationValue(f, v) {
+												return _setOperationValue(f, v);
+											}
+										})
+									), mountElement);
+								}
+							};
+							renderOp();
+						};
+						editor.settings.toolbar1 += ',insertExpr';
+						editor.settings.content_css += ',' + TH.expression_css_url; // eslint-disable-line camelcase
 
-                        editor.addButton('insertExpr', {
-                            text: '',
-                            icon: 'crosshairs',
-                            onclick: function onclick() {
-                                self.setState({
-                                    quickSearch: !self.state.quickSearch,
-                                    quickSearchText: ''
-                                });
-                            }
-                        });
+						editor.addButton('insertExpr', {
+							text: '',
+							icon: 'crosshairs',
+							onclick: function onclick() {
+								self.setState({
+									quickSearch: !self.state.quickSearch,
+									quickSearchText: ''
+								});
+							}
+						});
 
-                        editor.on('beforesetcontent', function (e) {
-                            e.content = self.replaceSpecialCharsWithTags(event.content, true);
-                        });
-                        editor.on('postProcess', function (e) {
-                            e.content = self.unreplaceTags(e.content);
-                        });
-                        editor.on('change', function (event, v) {
-                            self.props.onChange(editor.getContent());
-                        });
-                        editor.on('keyup', function (event, v) {
-                            self.props.onChange(editor.getContent());
-                        });
-                    }
-                },
-                quicktags: true
-            });
+						editor.on('beforesetcontent', function (e) {
+							e.content = self.replaceSpecialCharsWithTags(event.content, true);
+						});
+						editor.on('postProcess', function (e) {
+							e.content = self.unreplaceTags(e.content);
+						});
+						editor.on('change', function (event, v) {
+							self.props.onChange(editor.getContent());
+						});
+						editor.on('keyup', function (event, v) {
+							self.props.onChange(editor.getContent());
+						});
+					}
+				},
+				quicktags: true
+			});
 
-            for (var i in this.props.availableFields) {
-                for (var f in this.props.availableFields[i].fields) {
-                    this.props.loadDataType(this.props.availableFields[i].fields[f].type);
-                }
-            }
-        }
-    }, {
-        key: 'unreplaceTags',
-        value: function unreplaceTags(val, isString) {
+			for (var i in this.props.availableFields) {
+				for (var f in this.props.availableFields[i].fields) {
+					this.props.loadDataType(this.props.availableFields[i].fields[f].type);
+				}
+			}
+		}
+	}, {
+		key: 'unreplaceTags',
+		value: function unreplaceTags(val, isString) {
 
-            val = val.replace(/<span[^<]*data-triggerhappy-tag=['"](.*?)['"].*<\/span>.*<\/span>/gi, function (d, m) {
-                return '{{' + m + '}}';
-            });
-            return val;
-        }
-    }, {
-        key: 'replaceSpecialCharsWithTags',
-        value: function replaceSpecialCharsWithTags(val, isString) {
+			val = val.replace(/<span[^<]*data-triggerhappy-tag=['"](.*?)['"].*<\/span>.*<\/span>/gi, function (d, m) {
+				return '{{' + m + '}}';
+			});
+			return val;
+		}
+	}, {
+		key: 'replaceSpecialCharsWithTags',
+		value: function replaceSpecialCharsWithTags(val, isString) {
 
-            return String(val).replace(/\{\{_N(.*?)\.(.*?)\}\}/g, function (tag, m1, m2) {
+			return String(val).replace(/\{\{_N(.*?)\.(.*?)\}\}/g, function (tag, m1, m2) {
 
-                return this.createTagNode(m1, m2);
-            }.bind(this));
-        }
-    }, {
-        key: 'updateSelectedOperation',
-        value: function updateSelectedOperation(v) {
-            this.setState({
-                selectedOperation: v
-            });
-            var tagId = this.state.operationTagId;
-            if ('' == v) {
-                v = null;
-            }
-            this.updateExpressionWithOperation(tagId, v, {});
-        }
-    }, {
-        key: 'setOperationValue',
-        value: function setOperationValue(key, value) {
-            var tagId = this.state.operationTagId;
-            var nodeTag = this.nodeTags[tagId];
+				return this.createTagNode(m1, m2);
+			}.bind(this));
+		}
+	}, {
+		key: 'updateSelectedOperation',
+		value: function updateSelectedOperation(v) {
+			this.setState({
+				selectedOperation: v
+			});
+			var tagId = this.state.operationTagId;
+			if ('' == v) {
+				v = null;
+			}
+			this.updateExpressionWithOperation(tagId, v, {});
+		}
+	}, {
+		key: 'setOperationValue',
+		value: function setOperationValue(key, value) {
+			var tagId = this.state.operationTagId;
+			var nodeTag = this.nodeTags[tagId];
 
-            var operationValues = nodeTag.operationValues || {};
-            if (key) {
-                operationValues[key] = value;
-            }
-            this.updateExpressionWithOperation(tagId, this.state.selectedOperation, operationValues);
-        }
-    }, {
-        key: 'textChange',
-        value: function textChange(e, v) {
+			var operationValues = nodeTag.operationValues || {};
+			if (key) {
+				operationValues[key] = value;
+			}
+			this.updateExpressionWithOperation(tagId, this.state.selectedOperation, operationValues);
+		}
+	}, {
+		key: 'textChange',
+		value: function textChange(e, v) {
 
-            this.props.onChange(e.target.value);
-        }
-    }, {
-        key: 'insertField',
-        value: function insertField(node, field, subprop, type) {
+			this.props.onChange(e.target.value);
+		}
+	}, {
+		key: 'insertField',
+		value: function insertField(node, field, subprop, type) {
 
-            var fieldText = field.name;
-            if (subprop) {
-                if (!_.isArray(subprop)) {
-                    subprop = [subprop];
-                }
+			var fieldText = field.name;
+			if (subprop) {
+				if (!_.isArray(subprop)) {
+					subprop = [subprop];
+				}
 
-                fieldText += '.' + _.join(subprop, '.');
-            }
+				fieldText += '.' + _.join(subprop, '.');
+			}
 
-            var expr = this.createTagNode(node.nid, fieldText, type);
+			var expr = this.createTagNode(node.nid, fieldText, type);
 
-            this.editor.execCommand('mceInsertContent', false, expr);
-            this.setState({
-                quickSearch: false
-            });
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var _this2 = this;
+			this.editor.execCommand('mceInsertContent', false, expr);
+			this.setState({
+				quickSearch: false
+			});
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this2 = this;
 
-            return _react2.default.createElement(
-                'div',
-                { ref: function ref(el) {
-                        _this2.element = el;
-                    }, className: 'node-editable-setting ' + (this.props.errorMessage && 'node-error' || '') },
-                _react2.default.createElement('textarea', { id: 'expr_' + this.props.id, className: 'wp-editor-area', name: 'expr_' + this.props.id, type: 'text', ref: function ref(el) {
-                        return _this2.textbox = el;
-                    }, onChange: function onChange(e) {
-                        return _this2.textChange(e);
-                    }, value: this.props.value }),
-                _react2.default.createElement(_QuickSearch2.default, { className: 'node-quick-search node-quick-search--tinymce',
-                    insertField: this.insertField.bind(this),
-                    resetControlTypeClicked: this.props.resetControlTypeClicked,
-                    show: this.state.quickSearch,
-                    availableFields: this.props.availableFields,
-                    schemas: this.props.schemas,
-                    getNodeIcon: this.props.getNodeIcon,
-                    canUseField: function canUseField(field, node) {
+			return _react2.default.createElement(
+				'div',
+				{ ref: function ref(el) {
+						_this2.element = el;
+					}, className: 'node-editable-setting ' + (this.props.errorMessage && 'node-error' || '') },
+				_react2.default.createElement('textarea', { id: 'expr_' + this.props.id, className: 'wp-editor-area', name: 'expr_' + this.props.id, type: 'text', ref: function ref(el) {
+						return _this2.textbox = el;
+					}, onChange: function onChange(e) {
+						return _this2.textChange(e);
+					}, value: this.props.value }),
+				_react2.default.createElement(_QuickSearch2.default, { className: 'node-quick-search node-quick-search--tinymce',
+					insertField: this.insertField.bind(this),
+					resetControlTypeClicked: this.props.resetControlTypeClicked,
+					show: this.state.quickSearch,
+					availableFields: this.props.availableFields,
+					schemas: this.props.schemas,
+					getNodeIcon: this.props.getNodeIcon,
+					canUseField: function canUseField(field, node) {
 
-                        return !field.visibleTo || 0 <= field.visibleTo.indexOf(_this2.props.name) && node.nid == _this2.props.nodeId;
-                    }
-                })
-            );
-        }
-    }]);
+						return !field.visibleTo || 0 <= field.visibleTo.indexOf(_this2.props.name) && node.nid == _this2.props.nodeId;
+					}
+				})
+			);
+		}
+	}]);
 
-    return RichEditor;
+	return RichEditor;
 }(_react2.default.Component);
 
 var mapStateToProps = function mapStateToProps(state, ownProps) {
-    var dataTypeChoices = false;
-    var schemas = {};
-    for (var i in ownProps.availableFields) {
-        var fields = ownProps.availableFields[i];
+	var dataTypeChoices = false;
+	var schemas = {};
+	for (var i in ownProps.availableFields) {
+		var fields = ownProps.availableFields[i];
 
-        for (var f in fields.fields) {
-            var type = fields.fields[f].type;
-            schemas[type] = state.datatypes[type] && state.datatypes[type].schema || null;
-        }
-    }
-    schemas.array = {
-        methods: {
-            'getItem': {
-                description: 'Get Item',
-                'type': 'number',
-                'fields': {
-                    'key': {
-                        'type': 'string',
-                        'description': 'The item key'
-                    }
-                }
-            }
-        }
-    };
-    schemas.string = {
-        methods: {
-            'toUpperCase': {
-                description: 'To Upper Case',
-                'type': 'string',
-                'fields': {}
-            },
-            'toLowerCase': {
-                description: 'To Lower Case',
-                'type': 'string',
-                'fields': {}
-            }
-        }
-    };
-    return {
-        getNodeIcon: function getNodeIcon(nid) {
-            if (!state.nodes[nid] || !state.definitions[state.nodes[nid].type].plugin || !state.definitions[state.nodes[nid].type].plugin.icon) {
-                return '';
-            }
-            return state.definitions[state.nodes[nid].type].plugin.icon;
-        },
-        getNodeLabel: function getNodeLabel(nid) {
-            return 0 == nid ? 'Global' : state.nodes[nid].name;
-        },
-        schemas: schemas
-    };
+		for (var f in fields.fields) {
+			var type = fields.fields[f].type;
+			schemas[type] = state.datatypes[type] && state.datatypes[type].schema || null;
+		}
+	}
+	schemas.array = {
+		methods: {
+			'getItem': {
+				description: 'Get Item',
+				'type': 'number',
+				'fields': {
+					'key': {
+						'type': 'string',
+						'description': 'The item key'
+					}
+				}
+			}
+		}
+	};
+	schemas.string = {
+		methods: {
+			'toUpperCase': {
+				description: 'To Upper Case',
+				'type': 'string',
+				'fields': {}
+			},
+			'toLowerCase': {
+				description: 'To Lower Case',
+				'type': 'string',
+				'fields': {}
+			}
+		}
+	};
+	return {
+		getNodeIcon: function getNodeIcon(nid) {
+			if (!state.nodes[nid] || !state.definitions[state.nodes[nid].type].plugin || !state.definitions[state.nodes[nid].type].plugin.icon) {
+				return '';
+			}
+			return state.definitions[state.nodes[nid].type].plugin.icon;
+		},
+		getNodeLabel: function getNodeLabel(nid) {
+			return 0 == nid ? 'Global' : state.nodes[nid].name;
+		},
+		schemas: schemas
+	};
 };
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-    return {
-        loadDataType: function loadDataType(dataTypeId) {
-            return dispatch((0, _actions.loadDataType)(dataTypeId));
-        }
-    };
+	return {
+		loadDataType: function loadDataType(dataTypeId) {
+			return dispatch((0, _actions.loadDataType)(dataTypeId));
+		}
+	};
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps, null, {
-    withRef: true
+	withRef: true
 })(RichEditor);
 
 /***/ }),
@@ -45801,7 +45797,7 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps, 
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -45831,332 +45827,332 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var _ = __webpack_require__(24);
 
 var SelectBox = function (_React$Component) {
-    _inherits(SelectBox, _React$Component);
+	_inherits(SelectBox, _React$Component);
 
-    function SelectBox(props) {
-        _classCallCheck(this, SelectBox);
+	function SelectBox(props) {
+		_classCallCheck(this, SelectBox);
 
-        var _this = _possibleConstructorReturn(this, (SelectBox.__proto__ || Object.getPrototypeOf(SelectBox)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (SelectBox.__proto__ || Object.getPrototypeOf(SelectBox)).call(this, props));
 
-        _this.state = {
-            text: props.value && props.value.text || '',
-            id: props.value && props.value.id || null
-        };
+		_this.state = {
+			text: props.value && props.value.text || '',
+			id: props.value && props.value.id || null
+		};
 
-        if ('string' === typeof props.value) {
+		if ('string' === typeof props.value) {
 
-            _this.state = {
-                id: props.value
-            };
-        }
-        return _this;
-    }
+			_this.state = {
+				id: props.value
+			};
+		}
+		return _this;
+	}
 
-    _createClass(SelectBox, [{
-        key: 'lookupValue',
-        value: function lookupValue(id) {
-            var choices = this.getChoices();
-            for (var i = 0; i < choices.length; i++) {
-                if (choices[i].id == id) {
-                    return choices[i].text;
-                }
-            }
-            return '';
-        }
-    }, {
-        key: 'componentWillReceiveProps',
-        value: function componentWillReceiveProps(props) {
-            if (props.value) {
+	_createClass(SelectBox, [{
+		key: 'lookupValue',
+		value: function lookupValue(id) {
+			var choices = this.getChoices();
+			for (var i = 0; i < choices.length; i++) {
+				if (choices[i].id == id) {
+					return choices[i].text;
+				}
+			}
+			return '';
+		}
+	}, {
+		key: 'componentWillReceiveProps',
+		value: function componentWillReceiveProps(props) {
+			if (props.value) {
 
-                if ('string' === typeof props.value || 'number' === typeof props.value || 'boolean' === typeof props.value) {
+				if ('string' === typeof props.value || 'number' === typeof props.value || 'boolean' === typeof props.value) {
 
-                    this.setState({
-                        id: props.value
-                    });
-                } else {
-                    this.setState({
-                        text: props.value && props.value.text || props.value && this.lookupValue(props.value.id),
-                        id: props.value && props.value.id
-                    });
-                }
-            }
-        }
-    }, {
-        key: 'componentWillMount',
-        value: function componentWillMount() {
-            var _this2 = this;
+					this.setState({
+						id: props.value
+					});
+				} else {
+					this.setState({
+						text: props.value && props.value.text || props.value && this.lookupValue(props.value.id),
+						id: props.value && props.value.id
+					});
+				}
+			}
+		}
+	}, {
+		key: 'componentWillMount',
+		value: function componentWillMount() {
+			var _this2 = this;
 
-            this.handleSearchDebounced = _.debounce(function () {
-                _this2.handleSearch.apply(_this2, [_this2.state.quickSearchText]);
-            }, 500);
-        }
-    }, {
-        key: 'handleSearch',
-        value: function handleSearch(query) {
-            var _this3 = this;
+			this.handleSearchDebounced = _.debounce(function () {
+				_this2.handleSearch.apply(_this2, [_this2.state.quickSearchText]);
+			}, 500);
+		}
+	}, {
+		key: 'handleSearch',
+		value: function handleSearch(query) {
+			var _this3 = this;
 
-            this.setState({
-                result: query
-            });
-            fetch('/wp-json/wpflow/v1/types/' + this.props.type + '/values/' + query + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
-                credentials: 'same-origin'
-            }).then(function (response) {
-                if (200 != response.status) {
-                    return [];
-                }
-                return response.json();
-            }).then(function (data) {
-                return _this3.setState({
-                    choices: data
-                });
-            });
-        }
-    }, {
-        key: 'componentDidMount',
-        value: function componentDidMount() {
+			this.setState({
+				result: query
+			});
+			fetch('/wp-json/wpflow/v1/types/' + this.props.type + '/values/' + query + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
+				credentials: 'same-origin'
+			}).then(function (response) {
+				if (200 != response.status) {
+					return [];
+				}
+				return response.json();
+			}).then(function (data) {
+				return _this3.setState({
+					choices: data
+				});
+			});
+		}
+	}, {
+		key: 'componentDidMount',
+		value: function componentDidMount() {
 
-            this.props.loadDataType(this.props.type);
-        }
-    }, {
-        key: 'componentWillReceiveProps',
-        value: function componentWillReceiveProps(props) {
+			this.props.loadDataType(this.props.type);
+		}
+	}, {
+		key: 'componentWillReceiveProps',
+		value: function componentWillReceiveProps(props) {
 
-            props.loadDataType(props.type);
-        }
-    }, {
-        key: 'insertField',
-        value: function insertField(data) {
+			props.loadDataType(props.type);
+		}
+	}, {
+		key: 'insertField',
+		value: function insertField(data) {
 
-            this.setState({
-                text: data.text,
-                id: data.id
-            });
-            this.props.onChange && this.props.onChange(data.id);
-        }
-    }, {
-        key: 'clearValue',
-        value: function clearValue() {
-            this.setState({
-                text: null,
-                id: null
-            });
-            this.props.onChange && this.props.onChange(null);
-        }
-    }, {
-        key: 'selectChoice',
-        value: function selectChoice(node, field) {
-            this.setState({
-                quickSearch: false
-            });
+			this.setState({
+				text: data.text,
+				id: data.id
+			});
+			this.props.onChange && this.props.onChange(data.id);
+		}
+	}, {
+		key: 'clearValue',
+		value: function clearValue() {
+			this.setState({
+				text: null,
+				id: null
+			});
+			this.props.onChange && this.props.onChange(null);
+		}
+	}, {
+		key: 'selectChoice',
+		value: function selectChoice(node, field) {
+			this.setState({
+				quickSearch: false
+			});
 
-            this.insertField(node);
-        }
-    }, {
-        key: 'toggleQuickSearch',
-        value: function toggleQuickSearch() {
-            this.loadOptions();
-            this.setState({
-                quickSearch: !this.state.quickSearch,
-                quickSearchFilter: null
-            });
-        }
-    }, {
-        key: 'loadOptions',
-        value: function loadOptions() {}
-    }, {
-        key: 'ensureSelected',
-        value: function ensureSelected() {
-            var _this4 = this;
+			this.insertField(node);
+		}
+	}, {
+		key: 'toggleQuickSearch',
+		value: function toggleQuickSearch() {
+			this.loadOptions();
+			this.setState({
+				quickSearch: !this.state.quickSearch,
+				quickSearchFilter: null
+			});
+		}
+	}, {
+		key: 'loadOptions',
+		value: function loadOptions() {}
+	}, {
+		key: 'ensureSelected',
+		value: function ensureSelected() {
+			var _this4 = this;
 
-            if (!props.dataTypeChoices) {
-                return;
-            }
+			if (!props.dataTypeChoices) {
+				return;
+			}
 
-            var avail = props.dataTypeChoices.filter(function (n) {
-                return null == _this4.state.quickSearchFilter || 0 <= n.text.indexOf(_this4.state.quickSearchFilter);
-            });
-            if (0 < avail.length) {
-                this.selectChoice(avail[0]);
-            } else {
-                this.clearValue();
-            }
-            this.setState({
-                quickSearch: false,
-                quickSearchFilter: null
-            });
-        }
-    }, {
-        key: 'updateValue',
-        value: function updateValue(event) {
-            this.setState({
-                text: event.target.value,
-                quickSearch: true,
-                quickSearchFilter: event.target.value
-            });
-        }
-    }, {
-        key: 'getChoices',
-        value: function getChoices() {
-            return this.state.choices || this.props.dataTypeChoices;
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var _this5 = this;
+			var avail = props.dataTypeChoices.filter(function (n) {
+				return null == _this4.state.quickSearchFilter || 0 <= n.text.indexOf(_this4.state.quickSearchFilter);
+			});
+			if (0 < avail.length) {
+				this.selectChoice(avail[0]);
+			} else {
+				this.clearValue();
+			}
+			this.setState({
+				quickSearch: false,
+				quickSearchFilter: null
+			});
+		}
+	}, {
+		key: 'updateValue',
+		value: function updateValue(event) {
+			this.setState({
+				text: event.target.value,
+				quickSearch: true,
+				quickSearchFilter: event.target.value
+			});
+		}
+	}, {
+		key: 'getChoices',
+		value: function getChoices() {
+			return this.state.choices || this.props.dataTypeChoices;
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this5 = this;
 
-            var allowExpressions = false;
-            var choices = this.getChoices();
+			var allowExpressions = false;
+			var choices = this.getChoices();
 
-            var text = this.state.text || null !== this.state.id && '' !== this.state.id && choices && 0 < choices.filter(function (r) {
-                return r.id == _this5.state.id;
-            }).length && choices.filter(function (r) {
-                return r.id == _this5.state.id;
-            })[0].text || '';
-            return _react2.default.createElement(
-                'div',
-                null,
-                _react2.default.createElement(
-                    'div',
-                    { className: 'node-control-container' },
-                    ' ',
-                    _react2.default.createElement(
-                        'div',
-                        { ref: function ref(el) {
-                                _this5.element = el;
-                            }, className: 'node-editable-setting' },
-                        _react2.default.createElement('input', { type: 'text', value: text, className: 'node-editable-text', onBlur: function onBlur(v) {
-                                return _this5.ensureSelected();
-                            }, onChange: function onChange(v) {
-                                return _this5.updateValue(v);
-                            } }),
-                        ' '
-                    ),
-                    this.props.value && !this.props.notNull && _react2.default.createElement(
-                        'a',
-                        { href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
-                                return _this5.clearValue();
-                            } },
-                        _react2.default.createElement('i', { className: 'fa fa-trash' })
-                    ),
-                    allowExpressions && _react2.default.createElement(
-                        'a',
-                        { href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
-                                return _this5.toggleQuickSearch();
-                            } },
-                        _react2.default.createElement('i', { className: 'fa fa-crosshairs' })
-                    ),
-                    !allowExpressions && _react2.default.createElement(
-                        'a',
-                        { href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
-                                return _this5.toggleQuickSearch();
-                            } },
-                        _react2.default.createElement('i', { className: 'fa fa-caret-down' })
-                    )
-                ),
-                _react2.default.createElement(
-                    'div',
-                    { className: 'node-quick-search', style: { display: this.state.quickSearch ? 'block' : 'none' } },
-                    ' ',
-                    this.props.allowSearch && _react2.default.createElement(
-                        'div',
-                        { className: 'node-quick-search__search' },
-                        ' ',
-                        _react2.default.createElement('input', { type: 'text', className: 'node-quick-search__search-input', placeholder: 'search...', value: this.state.quickSearchText, onChange: function onChange(e) {
-                                _this5.setState({ quickSearchText: e.target.value });_this5.handleSearchDebounced();
-                            } }),
-                        ' '
-                    ),
-                    this.props.dataTypeChoicesLoading && _react2.default.createElement(
-                        'ul',
-                        null,
-                        _react2.default.createElement(
-                            'li',
-                            null,
-                            'Loading Choices'
-                        )
-                    ),
-                    choices && _react2.default.createElement(
-                        'div',
-                        null,
-                        _react2.default.createElement(
-                            'ul',
-                            null,
-                            choices.filter(function (n) {
-                                return null == _this5.state.quickSearchFilter || 0 <= n.text.indexOf(_this5.state.quickSearchFilter);
-                            }).map(function (n) {
-                                return _react2.default.createElement(
-                                    'li',
-                                    { className: 'node-quick-search__item' },
-                                    _react2.default.createElement(
-                                        'a',
-                                        { href: 'javascript:void(0);', onClick: function onClick() {
-                                                return _this5.selectChoice(n);
-                                            } },
-                                        _this5.props.showID && n.id + ' ',
-                                        _react2.default.createElement(
-                                            'strong',
-                                            null,
-                                            n.text
-                                        )
-                                    )
-                                );
-                            })
-                        ),
-                        ' '
-                    ),
-                    ' ',
-                    this.props.allowCustomValue && _react2.default.createElement(
-                        'div',
-                        null,
-                        _react2.default.createElement('hr', null),
-                        _react2.default.createElement(
-                            'ul',
-                            null,
-                            _react2.default.createElement(
-                                'li',
-                                { className: 'node-quick-search__item' },
-                                _react2.default.createElement(
-                                    'a',
-                                    { href: 'javascript:void(0);', onClick: function onClick() {
-                                            return _this5.props.customValueControlTypeClicked();
-                                        } },
-                                    ' Use custom value '
-                                )
-                            )
-                        )
-                    )
-                )
-            );
-        }
-    }]);
+			var text = this.state.text || null !== this.state.id && '' !== this.state.id && choices && 0 < choices.filter(function (r) {
+				return r.id == _this5.state.id;
+			}).length && choices.filter(function (r) {
+				return r.id == _this5.state.id;
+			})[0].text || '';
+			return _react2.default.createElement(
+				'div',
+				null,
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-control-container' },
+					' ',
+					_react2.default.createElement(
+						'div',
+						{ ref: function ref(el) {
+								_this5.element = el;
+							}, className: 'node-editable-setting' },
+						_react2.default.createElement('input', { type: 'text', value: text, className: 'node-editable-text', onBlur: function onBlur(v) {
+								return _this5.ensureSelected();
+							}, onChange: function onChange(v) {
+								return _this5.updateValue(v);
+							} }),
+						' '
+					),
+					this.props.value && !this.props.notNull && _react2.default.createElement(
+						'a',
+						{ href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
+								return _this5.clearValue();
+							} },
+						_react2.default.createElement('i', { className: 'fa fa-trash' })
+					),
+					allowExpressions && _react2.default.createElement(
+						'a',
+						{ href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
+								return _this5.toggleQuickSearch();
+							} },
+						_react2.default.createElement('i', { className: 'fa fa-crosshairs' })
+					),
+					!allowExpressions && _react2.default.createElement(
+						'a',
+						{ href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
+								return _this5.toggleQuickSearch();
+							} },
+						_react2.default.createElement('i', { className: 'fa fa-caret-down' })
+					)
+				),
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-quick-search', style: { display: this.state.quickSearch ? 'block' : 'none' } },
+					' ',
+					this.props.allowSearch && _react2.default.createElement(
+						'div',
+						{ className: 'node-quick-search__search' },
+						' ',
+						_react2.default.createElement('input', { type: 'text', className: 'node-quick-search__search-input', placeholder: 'search...', value: this.state.quickSearchText, onChange: function onChange(e) {
+								_this5.setState({ quickSearchText: e.target.value });_this5.handleSearchDebounced();
+							} }),
+						' '
+					),
+					this.props.dataTypeChoicesLoading && _react2.default.createElement(
+						'ul',
+						null,
+						_react2.default.createElement(
+							'li',
+							null,
+							'Loading Choices'
+						)
+					),
+					choices && _react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement(
+							'ul',
+							null,
+							choices.filter(function (n) {
+								return null == _this5.state.quickSearchFilter || 0 <= n.text.indexOf(_this5.state.quickSearchFilter);
+							}).map(function (n) {
+								return _react2.default.createElement(
+									'li',
+									{ className: 'node-quick-search__item' },
+									_react2.default.createElement(
+										'a',
+										{ href: 'javascript:void(0);', onClick: function onClick() {
+												return _this5.selectChoice(n);
+											} },
+										_this5.props.showID && n.id + ' ',
+										_react2.default.createElement(
+											'strong',
+											null,
+											n.text
+										)
+									)
+								);
+							})
+						),
+						' '
+					),
+					' ',
+					this.props.allowCustomValue && _react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement('hr', null),
+						_react2.default.createElement(
+							'ul',
+							null,
+							_react2.default.createElement(
+								'li',
+								{ className: 'node-quick-search__item' },
+								_react2.default.createElement(
+									'a',
+									{ href: 'javascript:void(0);', onClick: function onClick() {
+											return _this5.props.customValueControlTypeClicked();
+										} },
+									' Use custom value '
+								)
+							)
+						)
+					)
+				)
+			);
+		}
+	}]);
 
-    return SelectBox;
+	return SelectBox;
 }(_react2.default.Component);
 
 var mapStateToProps = function mapStateToProps(state, ownProps) {
-    var dataTypeChoices = false;
+	var dataTypeChoices = false;
 
-    if (!ownProps.dataTypeChoices && state.datatypes[ownProps.type] && state.datatypes[ownProps.type].choices) {
-        dataTypeChoices = state.datatypes[ownProps.type].choices;
-    }
-    return {
-        getNodeLabel: function getNodeLabel(nid) {
-            return state.nodes[nid].name;
-        },
-        dataTypeChoices: ownProps.dataTypeChoices || dataTypeChoices
-    };
+	if (!ownProps.dataTypeChoices && state.datatypes[ownProps.type] && state.datatypes[ownProps.type].choices) {
+		dataTypeChoices = state.datatypes[ownProps.type].choices;
+	}
+	return {
+		getNodeLabel: function getNodeLabel(nid) {
+			return state.nodes[nid].name;
+		},
+		dataTypeChoices: ownProps.dataTypeChoices || dataTypeChoices
+	};
 };
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-    return {
-        loadDataType: function loadDataType(dataTypeId) {
-            return dispatch((0, _actions.loadDataType)(dataTypeId));
-        }
-    };
+	return {
+		loadDataType: function loadDataType(dataTypeId) {
+			return dispatch((0, _actions.loadDataType)(dataTypeId));
+		}
+	};
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps, null, {
-    withRef: true
+	withRef: true
 })(SelectBox);
 
 /***/ }),
@@ -46207,7 +46203,7 @@ exports.SelectBox = _SelectBox2.default;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -46236,83 +46232,83 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * Loads the node definitions and globals from the API
  */
 function _loadDefinitions() {
-    return function (dispatch) {
-        return {
-            then: function then(cb) {
-                var completed = 0;
-                fetch('/wp-json/wpflow/v1/nodes/?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
-                    credentials: 'same-origin'
-                }).then(function (response) {
-                    return response.json();
-                }).then(function (data) {
-                    dispatch({
-                        type: 'SET_DEFINITIONS',
-                        definitions: data
-                    });
-                    completed++;
-                    if (2 == completed) {
-                        cb();
-                    }
-                });
-                fetch('/wp-json/wpflow/v1/globals/?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
-                    credentials: 'same-origin'
-                }).then(function (response) {
-                    return response.json();
-                }).then(function (data) {
-                    dispatch({
-                        type: 'SET_GLOBALS',
-                        globals: data
-                    });
-                    completed++;
-                    if (2 == completed) {
-                        cb();
-                    }
-                    return true;
-                });
-            }
-        };
-    };
+	return function (dispatch) {
+		return {
+			then: function then(cb) {
+				var completed = 0;
+				fetch('/wp-json/wpflow/v1/nodes/?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
+					credentials: 'same-origin'
+				}).then(function (response) {
+					return response.json();
+				}).then(function (data) {
+					dispatch({
+						type: 'SET_DEFINITIONS',
+						definitions: data
+					});
+					completed++;
+					if (2 == completed) {
+						cb();
+					}
+				});
+				fetch('/wp-json/wpflow/v1/globals/?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
+					credentials: 'same-origin'
+				}).then(function (response) {
+					return response.json();
+				}).then(function (data) {
+					dispatch({
+						type: 'SET_GLOBALS',
+						globals: data
+					});
+					completed++;
+					if (2 == completed) {
+						cb();
+					}
+					return true;
+				});
+			}
+		};
+	};
 }
 
 /**
  * Loads the nodes from the provided Node graph into the store
  */
 function _loadNodeGraph(graph) {
-    return function (dispatch, getState) {
-        var state = getState();
-        for (var i in graph.nodes) {
-            var nodeToLoad = graph.nodes[i];
-            dispatch((0, _actions.addNode)(Object.assign({}, state.definitions[nodeToLoad.type], nodeToLoad), nodeToLoad.nid));
-        }
-    };
+	return function (dispatch, getState) {
+		var state = getState();
+		for (var i in graph.nodes) {
+			var nodeToLoad = graph.nodes[i];
+			dispatch((0, _actions.addNode)(Object.assign({}, state.definitions[nodeToLoad.type], nodeToLoad), nodeToLoad.nid));
+		}
+	};
 }
 
 /**
  * Redux Connect MapDispatchToProps function for ReactGraph
  */
 function mapDispatchToProps(dispatch) {
-    return {
-        loadDefinitions: function loadDefinitions() {
-            return dispatch(_loadDefinitions());
-        },
-        loadNodeGraph: function loadNodeGraph(data) {
-            return dispatch(_loadNodeGraph(data));
-        }
-    };
+	return {
+		loadDefinitions: function loadDefinitions() {
+			return dispatch(_loadDefinitions());
+		},
+		loadNodeGraph: function loadNodeGraph(data) {
+			return dispatch(_loadNodeGraph(data));
+		}
+	};
 }
 
 /**
  * Redux Connect MapStateToProps function for ReactGraph
  */
 function mapStateToProps(state) {
-    return {
-        panelType: state.ui.panelType,
-        panelOptions: state.ui.panelOptions,
-        nextButtonText: state.ui.nextButtonText,
-        editType: state.ui.editType,
-        showPanel: state.ui.showPanel,
-        selectedNodeId: state.ui.selectedNodeId
-    };
+	return {
+		panelType: state.ui.panelType,
+		panelOptions: state.ui.panelOptions,
+		nextButtonText: state.ui.nextButtonText,
+		editType: state.ui.editType,
+		showPanel: state.ui.showPanel,
+		selectedNodeId: state.ui.selectedNodeId
+	};
 }
 
 /**
@@ -46325,52 +46321,52 @@ function mapStateToProps(state) {
  */
 
 var ReactGraph = function (_React$Component) {
-    _inherits(ReactGraph, _React$Component);
+	_inherits(ReactGraph, _React$Component);
 
-    function ReactGraph() {
-        _classCallCheck(this, ReactGraph);
+	function ReactGraph() {
+		_classCallCheck(this, ReactGraph);
 
-        return _possibleConstructorReturn(this, (ReactGraph.__proto__ || Object.getPrototypeOf(ReactGraph)).apply(this, arguments));
-    }
+		return _possibleConstructorReturn(this, (ReactGraph.__proto__ || Object.getPrototypeOf(ReactGraph)).apply(this, arguments));
+	}
 
-    _createClass(ReactGraph, [{
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            var _this2 = this;
+	_createClass(ReactGraph, [{
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			var _this2 = this;
 
-            this.props.loadDefinitions().then(function () {
-                _this2.props.loadNodeGraph(_this2.props.graph);
-            });
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var Control = _components2.default[this.props.panelType || 'CreateNew'];
-            return _react2.default.createElement(
-                'div',
-                null,
-                ' ',
-                _react2.default.createElement(
-                    'div',
-                    { className: 'node-sidebar' },
-                    ' ',
-                    _react2.default.createElement(_components2.default.NodeList, null),
-                    ' '
-                ),
-                ' ',
-                _react2.default.createElement(
-                    'div',
-                    { className: 'node-settings' },
-                    ' ',
-                    _react2.default.createElement(Control, this.props.panelOptions),
-                    ' '
-                ),
-                ' '
-            );
-        }
-    }]);
+			this.props.loadDefinitions().then(function () {
+				_this2.props.loadNodeGraph(_this2.props.graph);
+			});
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var Control = _components2.default[this.props.panelType || 'CreateNew'];
+			return _react2.default.createElement(
+				'div',
+				null,
+				' ',
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-sidebar' },
+					' ',
+					_react2.default.createElement(_components2.default.NodeList, null),
+					' '
+				),
+				' ',
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-settings' },
+					' ',
+					_react2.default.createElement(Control, this.props.panelOptions),
+					' '
+				),
+				' '
+			);
+		}
+	}]);
 
-    return ReactGraph;
+	return ReactGraph;
 }(_react2.default.Component);
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ReactGraph);
@@ -46383,7 +46379,7 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _immutabilityHelper = __webpack_require__(22);
@@ -46393,24 +46389,24 @@ var _immutabilityHelper2 = _interopRequireDefault(_immutabilityHelper);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var nodes = function nodes() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var action = arguments[1];
+	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	var action = arguments[1];
 
 
-    switch (action.type) {
+	switch (action.type) {
 
-        /* Adds a data type to the store */
-        case 'LOADED_DATA_TYPE':
-            var toMerge = {};
-            if (null != action.datatype) {
-                toMerge[action.dataTypeId] = action.datatype;
-                var newState = (0, _immutabilityHelper2.default)(state, { $merge: toMerge });
-                return newState;
-            }
+		/* Adds a data type to the store */
+		case 'LOADED_DATA_TYPE':
+			var toMerge = {};
+			if (null != action.datatype) {
+				toMerge[action.dataTypeId] = action.datatype;
+				var newState = (0, _immutabilityHelper2.default)(state, { $merge: toMerge });
+				return newState;
+			}
 
-        default:
-            return state;
-    }
+		default:
+			return state;
+	}
 };
 
 exports.default = nodes;
@@ -46423,27 +46419,27 @@ exports.default = nodes;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 var nodes = function nodes() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    var action = arguments[1];
+	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	var action = arguments[1];
 
 
-    switch (action.type) {
+	switch (action.type) {
 
-        /* Adds the definiton collection to the store */
-        case 'SET_DEFINITIONS':
+		/* Adds the definiton collection to the store */
+		case 'SET_DEFINITIONS':
 
-            return action.definitions.reduce(function (acc, cur, i) {
-                acc[cur.type] = cur;
-                return acc;
-            }, {});
+			return action.definitions.reduce(function (acc, cur, i) {
+				acc[cur.type] = cur;
+				return acc;
+			}, {});
 
-        default:
-            return state;
+		default:
+			return state;
 
-    }
+	}
 };
 
 exports.default = nodes;
@@ -46456,7 +46452,7 @@ exports.default = nodes;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _immutabilityHelper = __webpack_require__(22);
@@ -46466,26 +46462,26 @@ var _immutabilityHelper2 = _interopRequireDefault(_immutabilityHelper);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var nodes = function nodes() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var action = arguments[1];
+	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	var action = arguments[1];
 
 
-    switch (action.type) {
+	switch (action.type) {
 
-        /* Sets the expression for the specified node field */
-        case 'SET_NODE_EXPRESSION':
+		/* Sets the expression for the specified node field */
+		case 'SET_NODE_EXPRESSION':
 
-            var nid = action.nodeId;
-            var pin = action.connectorId;
-            var expr = action.expr;
-            var obj = {};
-            obj[nid + '.' + pin] = expr;
-            return Object.assign({}, state, obj);
+			var nid = action.nodeId;
+			var pin = action.connectorId;
+			var expr = action.expr;
+			var obj = {};
+			obj[nid + '.' + pin] = expr;
+			return Object.assign({}, state, obj);
 
-        default:
-            return state;
+		default:
+			return state;
 
-    }
+	}
 };
 
 exports.default = nodes;
@@ -46498,7 +46494,7 @@ exports.default = nodes;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _immutabilityHelper = __webpack_require__(22);
@@ -46508,25 +46504,25 @@ var _immutabilityHelper2 = _interopRequireDefault(_immutabilityHelper);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var nodes = function nodes() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var action = arguments[1];
+	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	var action = arguments[1];
 
 
-    switch (action.type) {
+	switch (action.type) {
 
-        /* Sets the field type of the specified Node Field */
-        case 'SET_FIELD_TYPE':
+		/* Sets the field type of the specified Node Field */
+		case 'SET_FIELD_TYPE':
 
-            var nid = action.nodeId;
-            var pin = action.fieldName;
-            var expr = action.fieldType;
-            var obj = {};
-            obj[nid + '.' + pin] = expr;
-            return Object.assign({}, state, obj);
+			var nid = action.nodeId;
+			var pin = action.fieldName;
+			var expr = action.fieldType;
+			var obj = {};
+			obj[nid + '.' + pin] = expr;
+			return Object.assign({}, state, obj);
 
-        default:
-            return state;
-    }
+		default:
+			return state;
+	}
 };
 
 exports.default = nodes;
@@ -46539,27 +46535,27 @@ exports.default = nodes;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 var globals = function globals() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    var action = arguments[1];
+	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	var action = arguments[1];
 
 
-    switch (action.type) {
+	switch (action.type) {
 
-        /* Set the available global variables */
-        case 'SET_GLOBALS':
+		/* Set the available global variables */
+		case 'SET_GLOBALS':
 
-            return action.globals.reduce(function (acc, cur, i) {
-                acc[cur.id] = cur;
-                return acc;
-            }, {});
+			return action.globals.reduce(function (acc, cur, i) {
+				acc[cur.id] = cur;
+				return acc;
+			}, {});
 
-        default:
-            return state;
+		default:
+			return state;
 
-    }
+	}
 };
 
 exports.default = globals;
@@ -46572,7 +46568,7 @@ exports.default = globals;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _redux = __webpack_require__(70);
@@ -46612,58 +46608,58 @@ var _ui2 = _interopRequireDefault(_ui);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function plugins() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
-        isFetching: false,
-        didInvalidate: false,
-        plugins: []
-    };
-    var action = arguments[1];
+	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+		isFetching: false,
+		didInvalidate: false,
+		plugins: []
+	};
+	var action = arguments[1];
 
-    switch (action.type) {
+	switch (action.type) {
 
-        case 'REQUEST_PLUGINS':
-            return Object.assign({}, state, {
-                isFetching: true,
-                didInvalidate: false
-            });
+		case 'REQUEST_PLUGINS':
+			return Object.assign({}, state, {
+				isFetching: true,
+				didInvalidate: false
+			});
 
-        case 'RECEIVED_PLUGINS':
-            return Object.assign({}, state, {
-                didInvalidate: false,
-                isFetching: false,
-                plugins: action.plugins
-            });
+		case 'RECEIVED_PLUGINS':
+			return Object.assign({}, state, {
+				didInvalidate: false,
+				isFetching: false,
+				plugins: action.plugins
+			});
 
-        default:
-            return state;
-    }
+		default:
+			return state;
+	}
 }
 
 function actions() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
-        isFetching: false,
-        didInvalidate: false,
-        actions: []
-    };
-    var action = arguments[1];
+	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+		isFetching: false,
+		didInvalidate: false,
+		actions: []
+	};
+	var action = arguments[1];
 
-    switch (action.type) {
+	switch (action.type) {
 
-        case 'REQUEST_ACTIONS':
-            return Object.assign({}, state, {
-                isFetching: true,
-                didInvalidate: false
-            });
-        case 'RECEIVED_ACTIONS':
-            return Object.assign({}, state, {
-                isFetching: false,
-                didInvalidate: false,
-                actions: action.actions
-            });
+		case 'REQUEST_ACTIONS':
+			return Object.assign({}, state, {
+				isFetching: true,
+				didInvalidate: false
+			});
+		case 'RECEIVED_ACTIONS':
+			return Object.assign({}, state, {
+				isFetching: false,
+				didInvalidate: false,
+				actions: action.actions
+			});
 
-        default:
-            return state;
-    }
+		default:
+			return state;
+	}
 }
 
 exports.default = (0, _redux.combineReducers)({ expressions: _expressions2.default, nodes: _nodes2.default, definitions: _definitions2.default, fieldTypes: _fieldTypes2.default, ui: _ui2.default, plugins: plugins, actions: actions, datatypes: _datatypes2.default, steps: _steps2.default, globals: _globals2.default });
@@ -46676,7 +46672,7 @@ exports.default = (0, _redux.combineReducers)({ expressions: _expressions2.defau
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _immutabilityHelper = __webpack_require__(22);
@@ -46688,80 +46684,80 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var nodes = function nodes() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var action = arguments[1];
+	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	var action = arguments[1];
 
 
-    switch (action.type) {
+	switch (action.type) {
 
-        /* Add a new node to the store */
-        case 'ADD_NODE':
+		/* Add a new node to the store */
+		case 'ADD_NODE':
 
-            var newNode = action.node;
+			var newNode = action.node;
 
-            // Trigger Nodes should always be the first node
-            if ('trigger' == newNode.nodeType) {
-                newNode.nid = 1;
-            }
+			// Trigger Nodes should always be the first node
+			if ('trigger' == newNode.nodeType) {
+				newNode.nid = 1;
+			}
 
-            var toMerge = {};
-            toMerge[newNode.nid] = newNode;
-            var newState = (0, _immutabilityHelper2.default)(state, { $merge: toMerge });
+			var toMerge = {};
+			toMerge[newNode.nid] = newNode;
+			var newState = (0, _immutabilityHelper2.default)(state, { $merge: toMerge });
 
-            return newState;
+			return newState;
 
-        /* Set the title of a node */
-        case 'SET_NODE_TITLE':
+		/* Set the title of a node */
+		case 'SET_NODE_TITLE':
 
-            var nodeId1 = action.nodeId;
-            var title = action.nodeTitle;
-            var toMergeTitle = { title: title };
-            var newStateTitle = (0, _immutabilityHelper2.default)(state, _defineProperty({}, nodeId1, { $merge: toMergeTitle }));
-            return newStateTitle;
+			var nodeId1 = action.nodeId;
+			var title = action.nodeTitle;
+			var toMergeTitle = { title: title };
+			var newStateTitle = (0, _immutabilityHelper2.default)(state, _defineProperty({}, nodeId1, { $merge: toMergeTitle }));
+			return newStateTitle;
 
-        /* Set the filters on a node */
-        case 'SET_NODE_FILTERS':
+		/* Set the filters on a node */
+		case 'SET_NODE_FILTERS':
 
-            var filterState = state;
-            var filteredNodeId = action.nodeId;
-            filterState = (0, _immutabilityHelper2.default)(filterState, _defineProperty({}, filteredNodeId, {
-                $merge: {
-                    filters: action.filters
-                }
-            }));
-            return filterState;
+			var filterState = state;
+			var filteredNodeId = action.nodeId;
+			filterState = (0, _immutabilityHelper2.default)(filterState, _defineProperty({}, filteredNodeId, {
+				$merge: {
+					filters: action.filters
+				}
+			}));
+			return filterState;
 
-        /* delete the specified node */
-        case 'REMOVE_NODE':
-            var toRemove = [action.nodeId];
-            return (0, _immutabilityHelper2.default)(state, { $unset: toRemove });
+		/* delete the specified node */
+		case 'REMOVE_NODE':
+			var toRemove = [action.nodeId];
+			return (0, _immutabilityHelper2.default)(state, { $unset: toRemove });
 
-        /* Set the expression for a node field */
-        case 'SET_NODE_EXPRESSION':
+		/* Set the expression for a node field */
+		case 'SET_NODE_EXPRESSION':
 
-            var nid = action.nodeId;
-            var pin = action.connectorId;
-            var expr = action.expr;
-            var obj = {};
-            var newState2 = state;
-            if (!newState2[nid].expressions) {
-                newState2 = (0, _immutabilityHelper2.default)(state, _defineProperty({}, nid, {
-                    $merge: {
-                        expressions: {}
-                    }
-                }));
-            }
-            newState2 = (0, _immutabilityHelper2.default)(newState2, _defineProperty({}, nid, {
-                expressions: {
-                    $merge: _defineProperty({}, pin, expr)
-                }
+			var nid = action.nodeId;
+			var pin = action.connectorId;
+			var expr = action.expr;
+			var obj = {};
+			var newState2 = state;
+			if (!newState2[nid].expressions) {
+				newState2 = (0, _immutabilityHelper2.default)(state, _defineProperty({}, nid, {
+					$merge: {
+						expressions: {}
+					}
+				}));
+			}
+			newState2 = (0, _immutabilityHelper2.default)(newState2, _defineProperty({}, nid, {
+				expressions: {
+					$merge: _defineProperty({}, pin, expr)
+				}
 
-            }));
-            return newState2;
+			}));
+			return newState2;
 
-        default:
-            return state;
-    }
+		default:
+			return state;
+	}
 };
 
 exports.default = nodes;
@@ -46774,7 +46770,7 @@ exports.default = nodes;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _immutabilityHelper = __webpack_require__(22);
@@ -46784,32 +46780,32 @@ var _immutabilityHelper2 = _interopRequireDefault(_immutabilityHelper);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var ui = function ui() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var action = arguments[1];
+	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	var action = arguments[1];
 
 
-    switch (action.type) {
+	switch (action.type) {
 
-        /* Add a node step (eg: Edit Settings) */
-        case 'ADD_STEP':
+		/* Add a node step (eg: Edit Settings) */
+		case 'ADD_STEP':
 
-            var nodeId = action.nodeId;
-            var stepDef = {};
-            stepDef[nodeId] = state[nodeId] || [];
-            stepDef[nodeId].push(action.step);
-            var newState = (0, _immutabilityHelper2.default)(state, { $merge: stepDef });
-            return newState;
+			var nodeId = action.nodeId;
+			var stepDef = {};
+			stepDef[nodeId] = state[nodeId] || [];
+			stepDef[nodeId].push(action.step);
+			var newState = (0, _immutabilityHelper2.default)(state, { $merge: stepDef });
+			return newState;
 
-        /* Delete all steps for the specified node */
-        case 'CLEAR_STEPS':
-            var clearstepDef = {};
-            clearstepDef[action.nodeId] = [];
+		/* Delete all steps for the specified node */
+		case 'CLEAR_STEPS':
+			var clearstepDef = {};
+			clearstepDef[action.nodeId] = [];
 
-            return (0, _immutabilityHelper2.default)(state, { $merge: clearstepDef });
+			return (0, _immutabilityHelper2.default)(state, { $merge: clearstepDef });
 
-        default:
-            return state;
-    }
+		default:
+			return state;
+	}
 };
 
 exports.default = ui;
@@ -46822,7 +46818,7 @@ exports.default = ui;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _immutabilityHelper = __webpack_require__(22);
@@ -46834,101 +46830,101 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var ui = function ui() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    var action = arguments[1];
+	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	var action = arguments[1];
 
 
-    switch (action.type) {
-        case 'EDIT_NODE':
+	switch (action.type) {
+		case 'EDIT_NODE':
 
-            return Object.assign({}, state, {
-                nextButtonText: 'Save and Continue',
-                editType: action.editType,
-                showPanel: '',
-                selectedNodeId: action.node.nid
-            });
+			return Object.assign({}, state, {
+				nextButtonText: 'Save and Continue',
+				editType: action.editType,
+				showPanel: '',
+				selectedNodeId: action.node.nid
+			});
 
-        case 'TEST_NODE':
-            return Object.assign({}, state, {
-                nextButtonText: 'Fetch and Continue',
-                showPanel: 'TestNode',
-                selectedNodeId: action.node.nid
-            });
+		case 'TEST_NODE':
+			return Object.assign({}, state, {
+				nextButtonText: 'Fetch and Continue',
+				showPanel: 'TestNode',
+				selectedNodeId: action.node.nid
+			});
 
-        case 'SHOW_CREATE_NEW':
-            return Object.assign({}, state, {
-                addTrigger: false,
-                selectedNodeId: null,
-                nextButtonText: null,
-                showPanel: 'CreateNew',
-                'selectedPlugin': null
-            });
+		case 'SHOW_CREATE_NEW':
+			return Object.assign({}, state, {
+				addTrigger: false,
+				selectedNodeId: null,
+				nextButtonText: null,
+				showPanel: 'CreateNew',
+				'selectedPlugin': null
+			});
 
-        case 'ADD_TRIGGER':
-            var prevStep = null;
-            if (state.panelType) {
-                prevStep = {
-                    page: state.panelType,
-                    options: state.panelOptions
-                };
-            }
-            return Object.assign({}, state, {
-                addTrigger: true,
-                panelType: 'CreateNew',
-                panelOptions: null,
-                prevStep: prevStep
-            });
+		case 'ADD_TRIGGER':
+			var prevStep = null;
+			if (state.panelType) {
+				prevStep = {
+					page: state.panelType,
+					options: state.panelOptions
+				};
+			}
+			return Object.assign({}, state, {
+				addTrigger: true,
+				panelType: 'CreateNew',
+				panelOptions: null,
+				prevStep: prevStep
+			});
 
-        case 'SHOW_SELECT_ACTION':
-            return Object.assign({}, state, {
-                selectedNodeId: null,
-                nextButtonText: null,
-                showPanel: 'SelectAction',
-                'selectedPlugin': action.plugin
-            });
+		case 'SHOW_SELECT_ACTION':
+			return Object.assign({}, state, {
+				selectedNodeId: null,
+				nextButtonText: null,
+				showPanel: 'SelectAction',
+				'selectedPlugin': action.plugin
+			});
 
-        case 'RESET_UI':
-            return Object.assign({}, state, {
-                showPanel: '',
-                nextButtonText: null,
-                'selectedPlugin': null
-            });
+		case 'RESET_UI':
+			return Object.assign({}, state, {
+				showPanel: '',
+				nextButtonText: null,
+				'selectedPlugin': null
+			});
 
-        case 'LOADING_DATA_TYPE':
-            return Object.assign({}, state, {
-                loadingDataTypes: true
-            });
+		case 'LOADING_DATA_TYPE':
+			return Object.assign({}, state, {
+				loadingDataTypes: true
+			});
 
-        case 'LOADED_DATA_TYPE':
-            return Object.assign({}, state, {
-                loadingDataTypes: false
-            });
+		case 'LOADED_DATA_TYPE':
+			return Object.assign({}, state, {
+				loadingDataTypes: false
+			});
 
-        case 'NAVIGATE':
-            return Object.assign({}, state, {
-                addTrigger: false,
-                panelType: action.page,
-                panelOptions: action.options
-            });
+		case 'NAVIGATE':
+			return Object.assign({}, state, {
+				addTrigger: false,
+				panelType: action.page,
+				panelOptions: action.options
+			});
 
-        case 'SET_ERROR_MESSAGE':
-            var newState = state;
-            if (!newState.errors) {
-                newState = (0, _immutabilityHelper2.default)(newState, { $merge: { errors: {} } });
-            }
-            if (!newState.errors[action.nodeId]) {
-                var errorMerge = {};
-                errorMerge[action.nodeId] = {};
-                newState = (0, _immutabilityHelper2.default)(newState, { errors: { $merge: errorMerge } });
-            }
-            var toMerge = {};
-            toMerge[action.fieldName] = action.message;
-            newState = (0, _immutabilityHelper2.default)(newState, { errors: _defineProperty({}, action.nodeId, { $merge: toMerge }) });
-            return newState;
+		case 'SET_ERROR_MESSAGE':
+			var newState = state;
+			if (!newState.errors) {
+				newState = (0, _immutabilityHelper2.default)(newState, { $merge: { errors: {} } });
+			}
+			if (!newState.errors[action.nodeId]) {
+				var errorMerge = {};
+				errorMerge[action.nodeId] = {};
+				newState = (0, _immutabilityHelper2.default)(newState, { errors: { $merge: errorMerge } });
+			}
+			var toMerge = {};
+			toMerge[action.fieldName] = action.message;
+			newState = (0, _immutabilityHelper2.default)(newState, { errors: _defineProperty({}, action.nodeId, { $merge: toMerge }) });
+			return newState;
 
-        default:
-            return state;
-    }
+		default:
+			return state;
+	}
 };
 
 exports.default = ui;

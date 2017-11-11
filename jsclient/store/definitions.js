@@ -1,19 +1,19 @@
 const nodes = ( state = [], action ) => {
 
-    switch ( action.type ) {
+	switch ( action.type ) {
 
-        /* Adds the definiton collection to the store */
-        case 'SET_DEFINITIONS':
+		/* Adds the definiton collection to the store */
+		case 'SET_DEFINITIONS':
 
-            return action.definitions.reduce( function( acc, cur, i ) {
-                acc[ cur.type ] = cur;
-                return acc;
-            }, {});
+			return action.definitions.reduce( function( acc, cur, i ) {
+				acc[ cur.type ] = cur;
+				return acc;
+			}, {});
 
-        default:
-            return state;
+		default:
+			return state;
 
-    }
+	}
 
 };
 

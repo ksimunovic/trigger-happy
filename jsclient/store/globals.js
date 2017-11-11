@@ -1,19 +1,19 @@
 const globals = ( state = [], action ) => {
 
-    switch ( action.type ) {
+	switch ( action.type ) {
 
-        /* Set the available global variables */
-        case 'SET_GLOBALS':
+		/* Set the available global variables */
+		case 'SET_GLOBALS':
 
-            return action.globals.reduce( function( acc, cur, i ) {
-                acc[ cur.id ] = cur;
-                return acc;
-            }, {});
+			return action.globals.reduce( function( acc, cur, i ) {
+				acc[ cur.id ] = cur;
+				return acc;
+			}, {});
 
-        default:
-            return state;
+		default:
+			return state;
 
-    }
+	}
 };
 
 export default globals;

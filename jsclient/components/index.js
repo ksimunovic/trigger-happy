@@ -3,7 +3,7 @@ import NodeSettings from './NodeSettings';
 import CreateNewPanel from './CreateNewPanel';
 import NodeList from './NodeList';
 export default {
-    NodeList: NodeList,
+	NodeList: NodeList,
 	CreateNew: CreateNewPanel,
 	NodeSettings: NodeSettings,
 	NodeFilters: NodeFilters

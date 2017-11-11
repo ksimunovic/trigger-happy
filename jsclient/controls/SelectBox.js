@@ -1,154 +1,154 @@
 import React from 'react';
 import {
-    buildExpression,
-    parseExpression
+	buildExpression,
+	parseExpression
 } from '../lib/util';
 import CodeMirror from 'codemirror';
 import {
-    connect
+	connect
 } from 'react-redux';
 
 import {
-    loadDataType
+	loadDataType
 } from '../actions';
 let _ = require( 'lodash' );
 class SelectBox extends React.Component {
-    constructor( props ) {
-        super( props );
-        this.state = {
-            text: props.value && props.value.text || '',
-            id: props.value && props.value.id || null
-        };
+	constructor( props ) {
+		super( props );
+		this.state = {
+			text: props.value && props.value.text || '',
+			id: props.value && props.value.id || null
+		};
 
-        if ( 'string' === typeof props.value ) {
+		if ( 'string' === typeof props.value ) {
 
-            this.state = {
-                id: props.value
-            };
-        }
-    }
-    lookupValue( id ) {
-        let choices = this.getChoices();
-        for ( let i = 0; i < choices.length; i++ ) {
-            if ( choices[i].id == id ) {
-                return choices[i].text;
-            }
-        }
-        return '';
-    }
-    componentWillReceiveProps( props ) {
-        if ( props.value ) {
+			this.state = {
+				id: props.value
+			};
+		}
+	}
+	lookupValue( id ) {
+		let choices = this.getChoices();
+		for ( let i = 0; i < choices.length; i++ ) {
+			if ( choices[i].id == id ) {
+				return choices[i].text;
+			}
+		}
+		return '';
+	}
+	componentWillReceiveProps( props ) {
+		if ( props.value ) {
 
-            if ( 'string' === typeof props.value || 'number' === typeof props.value || 'boolean' === typeof props.value ) {
+			if ( 'string' === typeof props.value || 'number' === typeof props.value || 'boolean' === typeof props.value ) {
 
-                this.setState({
-                    id: props.value
-                });
-            } else {
-                this.setState({
-                    text: props.value && props.value.text || props.value && this.lookupValue( props.value.id ),
-                    id: props.value && props.value.id
-                });
-            }
+				this.setState({
+					id: props.value
+				});
+			} else {
+				this.setState({
+					text: props.value && props.value.text || props.value && this.lookupValue( props.value.id ),
+					id: props.value && props.value.id
+				});
+			}
 
-        }
-    }
-    componentWillMount() {
-        this.handleSearchDebounced = _.debounce( () => {
-            this.handleSearch.apply( this, [ this.state.quickSearchText ]);
-        }, 500 );
-    }
-    handleSearch( query ) {
-        this.setState({
-            result: query
-        });
-        fetch( '/wp-json/wpflow/v1/types/' + this.props.type + '/values/' + query + '?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, {
-            credentials: 'same-origin'
-        }).then( response => {
-            if ( 200 != response.status ) {
-                return [];
-            }
-            return response.json();
-        }).then( data => this.setState({
-            choices: data
-        }) );
-    }
+		}
+	}
+	componentWillMount() {
+		this.handleSearchDebounced = _.debounce( () => {
+			this.handleSearch.apply( this, [ this.state.quickSearchText ]);
+		}, 500 );
+	}
+	handleSearch( query ) {
+		this.setState({
+			result: query
+		});
+		fetch( '/wp-json/wpflow/v1/types/' + this.props.type + '/values/' + query + '?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, {
+			credentials: 'same-origin'
+		}).then( response => {
+			if ( 200 != response.status ) {
+				return [];
+			}
+			return response.json();
+		}).then( data => this.setState({
+			choices: data
+		}) );
+	}
 
-    componentDidMount() {
+	componentDidMount() {
 
-        this.props.loadDataType( this.props.type );
-    }
-    componentWillReceiveProps( props ) {
+		this.props.loadDataType( this.props.type );
+	}
+	componentWillReceiveProps( props ) {
 
-        props.loadDataType( props.type );
-    }
-    insertField( data ) {
+		props.loadDataType( props.type );
+	}
+	insertField( data ) {
 
-        this.setState({
-            text: data.text,
-            id: data.id
-        });
-        this.props.onChange && this.props.onChange( data.id );
-    }
+		this.setState({
+			text: data.text,
+			id: data.id
+		});
+		this.props.onChange && this.props.onChange( data.id );
+	}
 
-    clearValue() {
-        this.setState({
-            text: null,
-            id: null
-        });
-        this.props.onChange && this.props.onChange( null );
-    }
-    selectChoice( node, field ) {
-        this.setState({
-            quickSearch: false
-        });
+	clearValue() {
+		this.setState({
+			text: null,
+			id: null
+		});
+		this.props.onChange && this.props.onChange( null );
+	}
+	selectChoice( node, field ) {
+		this.setState({
+			quickSearch: false
+		});
 
-        this.insertField( node );
+		this.insertField( node );
 
 
-    }
-    toggleQuickSearch() {
-        this.loadOptions();
-        this.setState({
-            quickSearch: ! this.state.quickSearch,
-            quickSearchFilter: null
-        });
-    }
-    loadOptions() {}
-    ensureSelected() {
-        if ( ! props.dataTypeChoices ) {
-            return;
-        }
+	}
+	toggleQuickSearch() {
+		this.loadOptions();
+		this.setState({
+			quickSearch: ! this.state.quickSearch,
+			quickSearchFilter: null
+		});
+	}
+	loadOptions() {}
+	ensureSelected() {
+		if ( ! props.dataTypeChoices ) {
+			return;
+		}
 
-        let avail = props.dataTypeChoices.filter( n => null == this.state.quickSearchFilter || 0 <= n.text.indexOf( this.state.quickSearchFilter ) );
-        if ( 0 < avail.length ) {
-            this.selectChoice( avail[0]);
-        } else {
-            this.clearValue();
-        }
-        this.setState({
-            quickSearch: false,
-            quickSearchFilter: null
-        });
-    }
-    updateValue( event ) {
-        this.setState({
-            text: event.target.value,
-            quickSearch: true,
-            quickSearchFilter: event.target.value
-        });
+		let avail = props.dataTypeChoices.filter( n => null == this.state.quickSearchFilter || 0 <= n.text.indexOf( this.state.quickSearchFilter ) );
+		if ( 0 < avail.length ) {
+			this.selectChoice( avail[0]);
+		} else {
+			this.clearValue();
+		}
+		this.setState({
+			quickSearch: false,
+			quickSearchFilter: null
+		});
+	}
+	updateValue( event ) {
+		this.setState({
+			text: event.target.value,
+			quickSearch: true,
+			quickSearchFilter: event.target.value
+		});
 
-    }
-    getChoices() {
-        return this.state.choices || this.props.dataTypeChoices;
-    }
-    render() {
-        let allowExpressions = false;
-        let choices = this.getChoices();
+	}
+	getChoices() {
+		return this.state.choices || this.props.dataTypeChoices;
+	}
+	render() {
+		let allowExpressions = false;
+		let choices = this.getChoices();
 
-        let text = this.state.text || null !== this.state.id && '' !== this.state.id && choices && 0 < choices.filter( r => r.id == this.state.id ).length && choices.filter( r => r.id == this.state.id )[0].text || '';
-        return (
-            <div>
+		let text = this.state.text || null !== this.state.id && '' !== this.state.id && choices && 0 < choices.filter( r => r.id == this.state.id ).length && choices.filter( r => r.id == this.state.id )[0].text || '';
+		return (
+			<div>
 <div className="node-control-container">	<div ref={( el ) => {
 this.element = el;
 }}  className="node-editable-setting">
@@ -181,30 +181,30 @@ this.element = el;
 </li></ul></div>	}
 </div>
 </div> );
-    }
+	}
 }
 
 const mapStateToProps = ( state, ownProps ) => {
-    let dataTypeChoices = false;
+	let dataTypeChoices = false;
 
-    if ( ! ownProps.dataTypeChoices && state.datatypes[ownProps.type] && state.datatypes[ownProps.type].choices ) {
-        dataTypeChoices = state.datatypes[ownProps.type].choices;
-    }
-    return {
-        getNodeLabel: ( nid ) => ( state.nodes[nid].name ),
-        dataTypeChoices: ownProps.dataTypeChoices || dataTypeChoices
-    };
+	if ( ! ownProps.dataTypeChoices && state.datatypes[ownProps.type] && state.datatypes[ownProps.type].choices ) {
+		dataTypeChoices = state.datatypes[ownProps.type].choices;
+	}
+	return {
+		getNodeLabel: ( nid ) => ( state.nodes[nid].name ),
+		dataTypeChoices: ownProps.dataTypeChoices || dataTypeChoices
+	};
 };
 
 const mapDispatchToProps = dispatch => {
-    return {
-        loadDataType: dataTypeId => dispatch( loadDataType( dataTypeId ) )
-    };
+	return {
+		loadDataType: dataTypeId => dispatch( loadDataType( dataTypeId ) )
+	};
 };
 
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps, null, {
-        withRef: true
-    }
+	mapStateToProps,
+	mapDispatchToProps, null, {
+		withRef: true
+	}
 )( SelectBox );
