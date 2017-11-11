@@ -197,38 +197,37 @@ class NodeFilter extends React.Component {
 
 		let simpleDataType = this.props.dataTypes[this.state.fieldType];
 		let isBool = 'boolean' == this.state.fieldType;
-		return ( <div className="node-filter-row">
+		return (
+			<div className="node-filter-row">
+				<div className="node-filter-item">
+					<ExpressionSelectBox
+						controlTypeOverrideText={this.state.controlTypeOverrideText}
+						customValueControlTypeClicked={()=>this.useControlType( 'string' )}
+						resetControlTypeClicked={()=>this.useControlType( null )}
+						availableFields={this.props.availableFields}
 
-			<div className="node-filter-item">
-			<ExpressionSelectBox
-			controlTypeOverrideText={this.state.controlTypeOverrideText}
-			customValueControlTypeClicked={()=>this.useControlType( 'string' )}
-			resetControlTypeClicked={()=>this.useControlType( null )}
-			availableFields={this.props.availableFields}
-
-			fetchNode={this.props.fetchNode}
-			nodeId={null}
-			onSelect={( n, v, e, t, text )=>this.selectLeftValue( n, v, e, t, text )}
-			value={this.getLeftValueForSelect()}
-			ref={( control )=>{
- this.control = control;
-}}
-			/>
+						fetchNode={this.props.fetchNode}
+						nodeId={null}
+						onSelect={( n, v, e, t, text )=>this.selectLeftValue( n, v, e, t, text )}
+						value={this.getLeftValueForSelect()}
+						ref={( control )=>this.control = control}
+					/>
+				</div>
+				<div className="node-filter-item node-filter-item--small">
+					<SelectBox notNull={true} showID={false} value={this.getOpValue()}  onChange={( v )=>this.selectOperator( v )} allowCustomValue={false} dataTypeChoices={choices} />
+				</div>
+				<div className="node-filter-item node-filter-item--large">
+					{ simpleDataType ?
+						( simpleDataType.ajax  ?
+							<AutoSuggest notNull={true} value={this.getRightValueForSelect()} showID={true} onChange={({id, text})=>this.selectRightValue( null, null, id, null, text )} allowSearch={true}  allowCustomValue={false} type={this.state.fieldType} />  :
+							<SelectBox allowSearch={! isBool} value={this.getRightValueForSelect()} onChange={( v )=>this.selectRightValue( null, null, v, null, null )} showID={false} allowCustomValue={false} notNull={isBool} type={this.state.fieldType} />
+						) : (
+							<input type="text" value={this.getRightValueId()} onChange={( e )=>this.selectRightValue( null, null, e.target.value, null, e.target.value )} />
+						)
+					}
+				</div>
 			</div>
-			<div className="node-filter-item node-filter-item--small">
-			<SelectBox notNull={true} showID={false} value={this.getOpValue()}  onChange={( v )=>this.selectOperator( v )} allowCustomValue={false} dataTypeChoices={choices} />
-			</div>
-			<div className="node-filter-item node-filter-item--large">
-			{ simpleDataType ?
-
-				( simpleDataType.ajax  ?
-					<AutoSuggest notNull={true} value={this.getRightValueForSelect()} showID={true} onChange={({id, text})=>this.selectRightValue( null, null, id, null, text )} allowSearch={true}  allowCustomValue={false} type={this.state.fieldType} />  :
-					<SelectBox allowSearch={! isBool} value={this.getRightValueForSelect()} onChange={( v )=>this.selectRightValue( null, null, v, null, null )} showID={false} allowCustomValue={false} notNull={isBool} type={this.state.fieldType} />
-				  ) :
-				<input type="text" value={this.getRightValueId()} onChange={( e )=>this.selectRightValue( null, null, e.target.value, null, e.target.value )} />
-			}
-			</div>
-			</div> );
+		);
 	}
 }
 

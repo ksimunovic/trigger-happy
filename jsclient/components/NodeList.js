@@ -5,11 +5,13 @@ import {
 } from 'react-redux';
 
 function renderAddPlaceholder( createNewClick ) {
-	return ( <div onClick={createNewClick}>
-	  <section  className='node node--add-new' >
-	<span className='button node-title button-large'><i className='fa fa-plus'></i> &nbsp; Add new Action</span>
-  </section>
-  </div> );
+	return (
+		<div onClick={createNewClick}>
+			<section  className='node node--add-new' >
+				<span className='button node-title button-large'><i className='fa fa-plus'></i> &nbsp; Add new Action</span>
+			</section>
+		</div>
+	);
 
 }
 

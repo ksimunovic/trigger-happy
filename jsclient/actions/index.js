@@ -109,7 +109,7 @@ return new Promise( ( resolve, reject ) => {
 	let nId = nid || Object.values( state.nodes ).reduce( function( acc, next ) {
 		return next.nid > acc ? next.nid : acc;
 	}, 0 ) + 1;
-	let newNode =   {
+	let newNode = {
 		cat: node.cat || '',
 		description: node.description || '',
 		name: node.name,
@@ -215,8 +215,8 @@ return new Promise( ( resolve, reject ) => {
 	}
 	state = getState();
 
-  	let nextStep = state.steps[newNode.nid] && state.steps[newNode.nid].filter( r=>! r.isReturn )[0];
-  	if ( state.ui.prevStep ) {
+	let nextStep = state.steps[newNode.nid] && state.steps[newNode.nid].filter( r=>! r.isReturn )[0];
+	if ( state.ui.prevStep ) {
 		nextStep = state.ui.prevStep;
 	}
 	if ( nextStep ) {
