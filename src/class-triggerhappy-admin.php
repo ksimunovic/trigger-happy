@@ -18,7 +18,7 @@ class TriggerHappyAdmin {
 
     }
     public function load_external_plugins( $plugins ) {
-        $plugins['wpflowexpression'] = plugin_dir_url( dirname( __FILE__ ) ) . '/../build/tinymce/nodesettings.js';
+        $plugins['wpflowexpression'] = plugin_dir_url( dirname( __FILE__ ) ) . '/../assets/tinymce/nodesettings.js';
         return $plugins;
     }
 
@@ -30,10 +30,14 @@ class TriggerHappyAdmin {
         $is_editing_post = $hook == 'post-new.php' || $hook == 'post.php';
 
         if ( $is_editing_post && 'th_flow' === $post->post_type ) {
-            wp_enqueue_script(  'wpflowscript',  plugins_url( '../build/index.js', __FILE__ ), array(), '1.0',true );
-            wp_enqueue_style(  'wpflowscript',  plugins_url( '../build/node-simple.css', __FILE__ ) );
-            wp_enqueue_style(  'codemirror',  plugins_url( '../build/codemirror.css', __FILE__ ) );
-            wp_enqueue_style('font-awesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+            wp_enqueue_script(  'wpflowscript',  plugins_url( 'assets/trigger-happy.js', dirname(__FILE__) ), array(), '1.0',true );
+            wp_enqueue_style(  'trigger-happy-css',  plugins_url( 'assets/trigger-happy.css', dirname(__FILE__) ) );
+            wp_enqueue_style(  'codemirror',  plugins_url( 'assets/codemirror.css', dirname(__FILE__) ) );
+            wp_enqueue_style( 'font-awesome',  plugins_url( 'assets/font-awesome/font-awesome.min.css', dirname(__FILE__) ), '4.7.0' );
+            //'//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+            wp_localize_script( 'wpflowscript', 'TH', array(
+                'expression_css_url' => plugins_url( 'build/expression.css', dirname(__FILE__) )
+            ));
             wp_enqueue_editor();
         }
     }

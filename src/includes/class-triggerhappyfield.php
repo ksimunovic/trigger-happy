@@ -16,7 +16,7 @@ class TriggerHappyField {
 	}
 	public function getCompiler() {
 		if ( $this->compiler == null ) {
-			$this->compiler = $this->getNode()->graph->compiler; // new TriggerHappyExpressionCompiler( array($this->getNode()->graph,'resolveNodeProperty'));
+			$this->compiler = $this->getNode()->graph->compiler;
 		}
 		return $this->compiler;
 	}

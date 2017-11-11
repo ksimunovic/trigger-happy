@@ -201,7 +201,6 @@ class TriggerHappyNode {
 		}
 		if ( isset( $this->graph->nodedata->mapFields ) && isset( $this->graph->nodedata->mapFields->{$this->id} ) ) {
 			$fieldsToMapToParentContext = $this->graph->nodedata->mapFields->{$this->id};
-			// print_r($fieldsToMapToParentContext);
 			$parentData = $context->parentContext->getData( $context->parentNodeId,$data );
 			foreach ( $fieldsToMapToParentContext as $from => $to ) {
 				if ( isset( $data->{$from} ) ) {

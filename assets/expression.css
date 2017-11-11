@@ -1,0 +1,31 @@
+@import url('font-awesome/css/font-awesome.min.css');
+.node-expression-data-tag {
+    padding: 2px 4px;
+    line-height: 18px;
+    font-size: 12px;
+    font-family: arial;
+    margin: 0px 4px;
+    display: inline-block;
+    background: #f8f8f8;
+    color: #666;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
+}
+.node-expression-data-tag__prop {
+    font-family: arial;
+    color: #006799;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-weight: 600;
+}
+.node-expression-data-tag img {
+    width: 14px;
+    vertical-align: top;
+    border-radius: 3px;
+    margin-top: 2px;
+}
+span.node-expression-data-tag i.fa {
+    font-size: 10px;
+}
+.node-expression-data-tag__node {
+    padding-right: 8px;
+}

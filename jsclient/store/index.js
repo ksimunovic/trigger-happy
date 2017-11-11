@@ -1,13 +1,13 @@
-import { combineReducers } from 'redux'
-import nodes from './nodes'
-import expressions from './expressions'
-import definitions from './definitions'
-import connections from './definitions'
-import fieldTypes from './fieldTypes'
-import datatypes from './datatypes'
-import globals from './globals'
-import steps from './steps'
-import ui from './ui'
+import { combineReducers } from 'redux';
+import nodes from './nodes';
+import expressions from './expressions';
+import definitions from './definitions';
+import connections from './definitions';
+import fieldTypes from './fieldTypes';
+import datatypes from './datatypes';
+import globals from './globals';
+import steps from './steps';
+import ui from './ui';
 
 function plugins(
   state = {
@@ -17,24 +17,25 @@ function plugins(
   },
   action
 ) {
-  switch (action.type) {
+    switch ( action.type ) {
 
-    case 'REQUEST_PLUGINS':
-      return Object.assign({}, state, {
-        isFetching: true,
-        didInvalidate: false
-      })
-      case 'RECEIVED_PLUGINS':
-        return Object.assign({}, state, {
-          isFetching: false,
-          didInvalidate: false,
-          plugins: action.plugins
-        })
+        case 'REQUEST_PLUGINS':
+            return Object.assign({}, state, {
+                isFetching: true,
+                didInvalidate: false
+            });
+
+        case 'RECEIVED_PLUGINS':
+            return Object.assign({}, state, {
+              didInvalidate: false,
+              isFetching: false,
+              plugins: action.plugins
+            });
 
 
-    default:
-      return state
-  }
+        default:
+            return state;
+    }
 }
 
 function actions(
@@ -45,26 +46,25 @@ function actions(
   },
   action
 ) {
-  switch (action.type) {
+    switch ( action.type ) {
 
-    case 'REQUEST_ACTIONS':
-      return Object.assign({}, state, {
-        isFetching: true,
-        didInvalidate: false
-      })
-      case 'RECEIVED_ACTIONS':
-        return Object.assign({}, state, {
-          isFetching: false,
-          didInvalidate: false,
-          actions: action.actions
-        })
+        case 'REQUEST_ACTIONS':
+            return Object.assign({}, state, {
+                isFetching: true,
+                didInvalidate: false
+            });
+        case 'RECEIVED_ACTIONS':
+            return Object.assign({}, state, {
+                isFetching: false,
+                didInvalidate: false,
+                actions: action.actions
+            });
 
 
-    default:
-      return state
-  }
+        default:
+          return state;
+    }
 }
 
 
-
-export default combineReducers({ expressions, nodes, definitions,  fieldTypes, ui,plugins,actions, datatypes,steps, globals });
+export default combineReducers({ expressions, nodes, definitions, fieldTypes, ui, plugins, actions, datatypes, steps, globals });
