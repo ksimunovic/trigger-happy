@@ -32,19 +32,21 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 			triggerhappy_field( 'section', 'string', array(
 				'label'=>'Section',
 				'description' => 'Select the section of the page you attach this flow to',
-				'dir'=>'in', 'choices'=>array(
-				array('id'=>'woocommerce_before_single_product','text'=>'Top of the page (before single product)'),
-				array('id'=>'woocommerce_before_single_product_summary','text'=>'Before the summary'),
-				array('id'=>'woocommerce_single_product_summary','text'=>'Inside the summary'),
-				array('id'=>'woocommerce_before_add_to_cart_form','text'=>'Before the add to cart form'),
-				array('id'=>'woocommerce_before_add_to_cart_button','text'=>'Before the add to cart button'),
-				array('id'=>'woocommerce_after_add_to_cart_button','text'=>'After the add to cart button'),
-				array('id'=>'woocommerce_after_add_to_cart_form','text'=>'After the add to cart form'),
-				array('id'=>'woocommerce_product_meta_start','text'=>'Before the product meta data'),
-				array('id'=>'woocommerce_product_meta_end','text'=>'After the product meta data'),
-				array('id'=>'woocommerce_share','text'=>'Before the share buttons'),
-				array('id'=>'woocommerce_after_single_product_summary','text'=>'Below the product summary (above description)'),
-			)) ),
+				'dir'=>'in',
+				'choices'=>array(
+					array('id'=>'woocommerce_before_single_product','text'=>'Top of the page (before single product)'),
+					array('id'=>'woocommerce_before_single_product_summary','text'=>'Before the summary'),
+					array('id'=>'woocommerce_single_product_summary','text'=>'Inside the summary'),
+					array('id'=>'woocommerce_before_add_to_cart_form','text'=>'Before the add to cart form'),
+					array('id'=>'woocommerce_before_add_to_cart_button','text'=>'Before the add to cart button'),
+					array('id'=>'woocommerce_after_add_to_cart_button','text'=>'After the add to cart button'),
+					array('id'=>'woocommerce_after_add_to_cart_form','text'=>'After the add to cart form'),
+					array('id'=>'woocommerce_product_meta_start','text'=>'Before the product meta data'),
+					array('id'=>'woocommerce_product_meta_end','text'=>'After the product meta data'),
+					array('id'=>'woocommerce_share','text'=>'Before the share buttons'),
+					array('id'=>'woocommerce_after_single_product_summary','text'=>'Below the product summary (above description)')
+				)
+			) ),
 		),
 		'callback' => 'triggerhappy_action_hook',
 	);
