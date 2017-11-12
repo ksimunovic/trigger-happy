@@ -782,7 +782,6 @@ input[type=text].node-quick-search__search-input:focus {
     position: absolute;
     border: 1px solid #ccc;
     background: white;
-    transform: translateX(-50%);
     z-index: 100;
     width: 200px;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);

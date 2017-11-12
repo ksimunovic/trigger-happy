@@ -12,7 +12,15 @@ const nodes = ( state = {}, action ) => {
 			let obj = {};
 			obj[nid + '.' + pin] = expr;
 			return Object.assign({}, state, obj );
-
+		case 'REMOVE_NODE':
+			let removedNode = action.nodeId
+			let newState = {};
+			for (let s in state) {
+				if (s.indexOf(removedNode + ".") === 0)
+					continue;
+				newState[s] = state[s];
+			}
+			return newState;
 		default:
 			return state;
 

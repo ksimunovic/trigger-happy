@@ -163,7 +163,7 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 			),
 		),
 	);
-	$nodes['th_woocommerce_wc_add_fee' = array(
+	$nodes['th_woocommerce_wc_add_fee'] = array(
 		'name' => 'Add Fee',
 		'plugin' => 'woocommerce',
 		'cat' => 'woocommerce',

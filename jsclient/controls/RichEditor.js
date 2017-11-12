@@ -1,21 +1,13 @@
 import ReactDOM from 'react-dom';
-import {
-	Provider
-} from 'react-redux';
+import { Provider } from 'react-redux';
 import OperationsPanel from './OperationsPanel';
 import React from 'react';
-import {
-	buildExpression,
-	parseExpression,
-	stringifyExpression
-} from '../lib/util';
-import {
-	connect
-} from 'react-redux';
+import { buildExpression, parseExpression, stringifyExpression } from '../lib/util';
+import { connect } from 'react-redux';
 import QuickSearch from './QuickSearch';
-import {
-	loadDataType
-} from '../actions';
+import { loadDataType } from '../actions';
+
+
 class RichEditor extends React.Component {
 	constructor( props ) {
 		super( props );
@@ -185,7 +177,7 @@ class RichEditor extends React.Component {
 					});
 
 					editor.on( 'beforesetcontent', function( e ) {
-						e.content = self.replaceSpecialCharsWithTags( event.content, true );
+						e.content = self.replaceSpecialCharsWithTags( e.content, true );
 					});
 					editor.on( 'postProcess', function( e ) {
 						e.content = self.unreplaceTags( e.content );

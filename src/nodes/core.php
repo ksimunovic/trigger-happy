@@ -37,6 +37,40 @@ function triggerhappy_load_core_nodes( $nodes ) {
 		),
 		'advanced' => true
 	);
+
+	$nodes['th_core_create_post'] = array(
+		'name' => 'Create a new post',
+		'plugin' => 'WordPress',
+		'nodeType' => 'action',
+		'description' => 'Creates (or updates) a page or post',
+		'cat' => 'Posts',
+		'callback' => 'triggerhappy_create_post',
+		'fields' => array(
+			triggerhappy_field( 'post_id', 'string', array(
+				'label' => 'Post ID',
+				'description' => 'Specify the post ID to update an existing post. Leave blank to create a new post',
+				'dir' => 'in',
+			) ),
+			triggerhappy_field(	'post_type', 'wp_post_type', array(
+				'label' => 'Post Type',
+				'description' => 'Specify the type of post to create',
+				'dir' => 'in',
+			) ),
+			triggerhappy_field('post_title', 'string', array(
+				'label' => 'Post Title',
+				'dir' => 'in',
+			) ),
+			triggerhappy_field('post_content', 'string', array(
+				'label' => 'Content',
+				'dir' => 'in',
+			) )
+			,
+			triggerhappy_field('post_status', 'wp_post_status', array(
+				'label' => 'Post Status',
+				'dir' => 'in',
+			) )
+		)
+	);
 	$nodes['th_core_wp_nav_menu_items'] = array(
 		'name' => 'Nav Menu Items',
 		'plugin' => 'WordPress',
@@ -946,6 +980,47 @@ function triggerhappy_load_core_schema() {
 				}, $data
 			);
 		}, true
+	);
+
+	triggerhappy_register_value_type(
+		'wp_post_type', 'string', function ( $search ) {
+			$result = get_post_types( );
+			$post_types = array();
+			foreach ( $result as $post_type ) {
+				array_push( $post_types, array(
+					'id' => $post_type,
+					'text' => $post_type
+				) );
+			}
+		}, false
+	);
+
+	triggerhappy_register_value_type(
+		'wp_post_type', 'string', function ( ) {
+			$result = get_post_types( );
+			$post_types = array();
+			foreach ( $result as $post_type ) {
+				array_push( $post_types, array(
+					'id' => $post_type,
+					'text' => $post_type
+				) );
+			}
+			return $post_types;
+		}, false
+	);
+
+	triggerhappy_register_value_type(
+		'wp_post_status', 'string', function ( ) {
+			$result = get_post_stati( );
+			$post_statuses = array();
+			foreach ( $result as $poststatus ) {
+				array_push( $post_statuses, array(
+					'id' => $poststatus,
+					'text' => $poststatus
+				) );
+			}
+			return $post_statuses;
+		}, false
 	);
 
 

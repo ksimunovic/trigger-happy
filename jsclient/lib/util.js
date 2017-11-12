@@ -142,7 +142,6 @@ export function parseExpression( expression, nodeId = null, fieldName = null, ty
 				};
 				walkExpression( expr, ( ast ) => {
 					if ( 'string' === typeof ast && ! isNumeric( ast ) && -1 === allowedStrings.indexOf( ast ) && 0 != ast.indexOf( '{{_N' ) ) {
-						debugger;
 						errorMessage = 'The expression is invalid';
 					} else if ( 'Compound' == ast.type ) {
 						errorMessage = 'The expression is invalid';
@@ -150,7 +149,6 @@ export function parseExpression( expression, nodeId = null, fieldName = null, ty
 				});
 				let state = store.getState();
 				if ( ! state.ui.errors || ! state.ui.errors[nodeId] || state.ui.errors[nodeId][fieldName] !== errorMessage ) {
-					debugger;
 					store.dispatch({
 						type: 'SET_ERROR_MESSAGE',
 						nodeId: nodeId,

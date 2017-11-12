@@ -66,7 +66,7 @@ export default class QuickSearch extends React.Component {
 
 					return (
 				<li className="node-quick-search__item">
-				<a href="javascript:void(0);" onClick={( e )=>this.props.insertField( n, f )}>
+				<a href="javascript:void(0);" onClick={( e )=>this.props.insertField( n, f,null, f.type )}>
 				<strong>{f.label || f.name}</strong>
 				{schemaList && <i onClick={( e )=>this.toggleList( n, f, e )} className={ this.canShowList( n, f ) ? 'fa fa-chevron-up' : 'fa fa-chevron-down'}></i>}
 				</a>

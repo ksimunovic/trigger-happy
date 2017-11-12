@@ -156,7 +156,6 @@ class NodeInputListItem extends React.Component {
 		getType() {
 			let derivedType = this.props.itemType;
 			if ( 0 == this.props.itemType.indexOf( '$' ) ) {
-				debugger;
 				derivedType = this.props.fieldTypes[this.props.nodeid + '.' + this.props.itemType.replace( '$', '' )] || this.props.itemType;
 			}
 			return derivedType;

@@ -97,18 +97,8 @@ class TriggerHappy {
 	 */
 	public function load_nodes() {
 		require_once( dirname( __FILE__ ) . '/nodes/core.php' );
-		$active_plugins = get_option( 'active_plugins' );
-		$all_plugins = get_plugins();
-		foreach ( $active_plugins as $dir ) {
-			$plugin_info = $all_plugins[ $dir ];
-			$plugin_slug = sanitize_title( $plugin_info['Name'] );
-
-			$node_file_name = dirname( __FILE__ ) . '/nodes/' . $plugin_slug . '.php';
-			if ( file_exists( $node_file_name ) ) {
-
-				//require_once( $node_file_name );
-			}
-		}
+		require_once( dirname( __FILE__ ) . '/nodes/woocommerce.php' );
+		require_once( dirname( __FILE__ ) . '/nodes/forms.php' );
 	}
 
 	/**

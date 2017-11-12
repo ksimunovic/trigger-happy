@@ -53,8 +53,6 @@ class ExpressionEditor extends React.Component {
 		});
 	}
 	insertField( node, field, subprop, subType ) {
-
-
 		let expression = '{{_N' + node.nid + '.' + field.name;
 		if ( subprop ) {
 			if ( ! _.isArray( subprop ) ) {
@@ -125,6 +123,7 @@ class ExpressionEditor extends React.Component {
 		if ( ! nodeTag.nodeId ) {
 			showChevron = false;
 		}
+
 		React.render( (
 			<span data-tag='' className='node-expression-data-tag'>
 				{nodeTag.icon && <img src={nodeTag.icon} className="expression-icon" />}
@@ -407,12 +406,9 @@ class ExpressionEditor extends React.Component {
 
 const mapStateToProps = ( state, ownProps ) => {
 	let schemas = {};
-	for ( let i in ownProps.availableFields ) {
-		let fields = ownProps.availableFields[i];
-		for ( let f in fields.fields ) {
-			let type = fields.fields[f].type;
-			schemas[type] = state.datatypes[type] && state.datatypes[type].schema || null;
-		}
+	for ( let type in  state.datatypes ) {
+		let fields =  state.datatypes[type];
+		schemas[type] = state.datatypes[type] && state.datatypes[type].schema || null;
 	}
 	return {
 		values: state.datatypes && state.datatypes[ownProps.type] && state.datatypes[ownProps.type].choices,

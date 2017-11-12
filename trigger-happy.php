@@ -2,8 +2,8 @@
 /*
 Plugin Name: Trigger Happy
 Plugin URI: http://hotsource.io/
-Description: Get your plugins working together using Trigger Happy - a powerful flow-based visual scripting and automation tool
-Version: 0.1.0
+Description: Connect your plugins and automate your workflow with Trigger Happy - a powerful flow-based visual scripting and automation tool
+Version: 1.0.0
 Text Domain: trigger-happy
 */
 // Include class declarations

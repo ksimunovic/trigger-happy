@@ -487,6 +487,385 @@ module.exports = ExecutionEnvironment;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.selectTrigger = exports.setFilters = exports.setExpression = exports.showSelectPluginActions = exports.resetUI = exports.showCreateNew = exports.addNode = exports.deleteNode = exports.nextStep = exports.navigate = exports.testNode = exports.loadDataType = exports.setNodeTitle = exports.setFieldType = exports.clearErrorMessage = exports.setErrorMessage = exports.editNode = undefined;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+exports.fetchActions = fetchActions;
+exports.fetchPlugins = fetchPlugins;
+exports.requestPlugins = requestPlugins;
+exports.receivePlugins = receivePlugins;
+exports.requestActions = requestActions;
+exports.receiveActions = receiveActions;
+
+var _axios = __webpack_require__(127);
+
+var _axios2 = _interopRequireDefault(_axios);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var editNode = exports.editNode = function editNode(node, type) {
+	return {
+		type: 'EDIT_NODE',
+		node: node,
+		editType: type || ''
+	};
+};
+var setErrorMessage = exports.setErrorMessage = function setErrorMessage(nodeId, fieldName, error) {
+	return {
+		type: 'SET_ERROR_MESSAGE',
+		nodeId: nodeId,
+		fieldName: fieldName,
+		message: error
+	};
+};
+var clearErrorMessage = exports.clearErrorMessage = function clearErrorMessage(nodeId, fieldName) {
+	return {
+		type: 'SET_ERROR_MESSAGE',
+		nodeId: nodeId,
+		fieldName: fieldName,
+		message: ''
+	};
+};
+var setFieldType = exports.setFieldType = function setFieldType(nodeId, fieldName, fieldType) {
+	return {
+		type: 'SET_FIELD_TYPE',
+		nodeId: nodeId,
+		fieldName: fieldName,
+		fieldType: fieldType
+	};
+};
+
+var setNodeTitle = exports.setNodeTitle = function setNodeTitle(nodeId, nodeTitle) {
+	return {
+		type: 'SET_NODE_TITLE',
+		nodeId: nodeId,
+		nodeTitle: nodeTitle
+	};
+};
+
+var loadingDataType = function loadingDataType(dataTypeId) {
+	return { type: 'LOADING_DATA_TYPE', dataTypeId: dataTypeId };
+};
+var loadedDataType = function loadedDataType(dataTypeId, json) {
+	return { type: 'LOADED_DATA_TYPE', dataTypeId: dataTypeId, datatype: json };
+};
+var dataTypesBeingLoaded = {};
+var loadDataType = exports.loadDataType = function loadDataType(dataTypeId) {
+	return function (dispatch) {
+		if (null == dataTypeId || dataTypesBeingLoaded[dataTypeId]) {
+			return;
+		}
+		dataTypesBeingLoaded[dataTypeId] = true;
+		dispatch(loadingDataType(dataTypeId));
+		return fetch('/wp-json/wpflow/v1/types/' + dataTypeId + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, { credentials: 'same-origin' }).then(function (response) {
+			if (200 != response.status) {
+				return null;
+			}
+			return response.json();
+		}).then(function (json) {
+			return dispatch(loadedDataType(dataTypeId, json));
+		});
+	};
+};
+
+var testNode = exports.testNode = function testNode(node) {
+	return {
+		type: 'TEST_NODE',
+		node: node
+	};
+};
+var navigate = exports.navigate = function navigate(page, options) {
+	return {
+		type: 'NAVIGATE',
+		page: page,
+		options: options
+	};
+};
+var nextStep = exports.nextStep = function nextStep() {
+	return function (dispatch, getState) {
+		var state = getState();
+		var panelType = state.ui.panelType;
+		var panelOptions = state.ui.panelOptions;
+
+		var next = false;
+		var found = null;
+		var allSteps = [].concat.apply([], Object.values(state.steps));
+
+		var _loop = function _loop(s) {
+			var step = allSteps[s];
+			if (next) {
+				return {
+					v: dispatch(navigate(step.page, step.options))
+				};
+			}
+			next = panelType == step.page && Object.keys(panelOptions).reduce(function (p, k) {
+				return p && step.options[k] && panelOptions[k] == step.options[k];
+			}, true);
+		};
+
+		for (var s in allSteps) {
+			var _ret = _loop(s);
+
+			if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+		}
+		return dispatch(navigate('CreateNew'));
+	};
+};
+
+var deleteNode = exports.deleteNode = function deleteNode(nodeId) {
+	return function (dispatch, getState) {
+		dispatch(navigate('CreateNew'));
+		dispatch({
+			type: 'REMOVE_NODE',
+			nodeId: nodeId
+		});
+	};
+};
+var addNode = exports.addNode = function addNode(node, nid) {
+	return function (dispatch, getState) {
+
+		return new Promise(function (resolve, reject) {
+
+			var state = getState();
+
+			var nId = nid || Object.values(state.nodes).reduce(function (acc, next) {
+				return next.nid > acc ? next.nid : acc;
+			}, 0) + 1;
+			var newNode = {
+				cat: node.cat || '',
+				description: node.description || '',
+				name: node.name,
+				type: node.type,
+				nodeType: node.nodeType || 'data',
+				nid: nId,
+				fields: [].concat(_toConsumableArray(node.fields || []))
+			};
+
+			dispatch({
+				type: 'ADD_NODE',
+				node: newNode
+			});
+
+			dispatch({
+				type: 'CLEAR_STEPS',
+				nodeId: newNode.nid
+			});
+
+			var autoImport = state.definitions[node.type] && state.definitions[node.type].autoImport;
+			if (autoImport) {
+				for (var i in autoImport) {
+					var autoImportDef = state.definitions[autoImport[i]];
+					if (autoImportDef) {
+						dispatch(addNode(autoImportDef));
+					}
+				}
+			}
+			if (node.expressions) {
+				for (var x in node.expressions) {
+					var expr = node.expressions[x];
+					expr = expr.replace('{{.', '{{_N' + newNode.nid + '.');
+					dispatch({
+						type: 'SET_NODE_EXPRESSION',
+						nodeId: newNode.nid,
+						connectorId: x,
+						expr: expr
+					});
+				}
+			}
+			if (node.filters) {
+				dispatch({
+					type: 'SET_NODE_FILTERS',
+					nodeId: newNode.nid,
+					filters: node.filters
+				});
+			}
+			if (newNode.fields.return !== undefined) {
+				dispatch({
+					type: 'ADD_STEP',
+					nodeId: newNode.nid,
+
+					step: {
+						isReturn: true,
+						text: 'Edit Value',
+						icon: 'fa-pencil',
+						page: 'NodeSettings',
+						options: {
+							editType: 'return',
+							title: 'Edit Value',
+							node: newNode.nid
+						}
+					}
+				});
+			}
+
+			if ('trigger' == newNode.nodeType && 0 == newNode.fields.filter(function (r) {
+				return 'in' == r.dir;
+			}).length) {} else if (newNode.fields && 0 < newNode.fields.length) {
+				dispatch({
+					type: 'ADD_STEP',
+					nodeId: newNode.nid,
+					step: {
+						text: 'Edit Settings',
+						icon: 'fa-pencil',
+						page: 'NodeSettings',
+						options: {
+							editType: 'in',
+							title: 'Edit Node',
+							node: newNode.nid
+						}
+					}
+				});
+			}
+			if (node.allowFilters) {
+				dispatch({
+					type: 'ADD_STEP',
+					nodeId: newNode.nid,
+
+					step: {
+						text: 'Edit filters',
+						icon: 'fa-filter',
+						page: 'NodeFilters',
+						options: {
+							editType: 'in',
+							title: 'Edit Filters',
+							node: newNode.nid
+						}
+					}
+				});
+			}
+			state = getState();
+
+			var nextStep = state.steps[newNode.nid] && state.steps[newNode.nid].filter(function (r) {
+				return !r.isReturn;
+			})[0];
+			if (state.ui.prevStep) {
+				nextStep = state.ui.prevStep;
+			}
+			if (nextStep) {
+				dispatch(navigate(nextStep.page, nextStep.options));
+			}
+
+			resolve();
+		});
+	};
+};
+
+var showCreateNew = exports.showCreateNew = function showCreateNew() {
+	return {
+		type: 'SHOW_CREATE_NEW'
+	};
+};
+
+var resetUI = exports.resetUI = function resetUI() {
+	return {
+		type: 'RESET_UI'
+	};
+};
+
+var showSelectPluginActions = exports.showSelectPluginActions = function showSelectPluginActions(plugin) {
+
+	return {
+		type: 'SHOW_SELECT_ACTION',
+		plugin: plugin
+	};
+};
+
+var setExpression = exports.setExpression = function setExpression(nodeId, connectorId, expr) {
+
+	return function (dispatch) {
+
+		dispatch({
+			type: 'SET_NODE_EXPRESSION',
+			nodeId: nodeId,
+			connectorId: connectorId,
+			expr: expr
+		});
+	};
+};
+var setFilters = exports.setFilters = function setFilters(nodeId, filters) {
+
+	return {
+		type: 'SET_NODE_FILTERS',
+		filters: filters,
+		nodeId: nodeId
+	};
+};
+
+function fetchActions(plugin) {
+	if (!plugin) {
+		plugin = '';
+	}
+
+	return function (dispatch) {
+		dispatch(requestActions());
+
+		return fetch('/wp-json/wpflow/v1/nodes/?plugin=' + plugin + '&_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, { credentials: 'same-origin' }).then(function (response) {
+			return response.json();
+		}).then(function (json) {
+			return dispatch(receiveActions(json));
+		});
+	};
+}
+function fetchPlugins() {
+	return function (dispatch) {
+		dispatch(requestPlugins());
+
+		return fetch('/wp-json/wpflow/v1/plugins' + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, { credentials: 'same-origin' }).then(function (response) {
+			return response.json();
+		}).then(function (json) {
+			return dispatch(receivePlugins(json));
+		});
+	};
+}
+function requestPlugins() {
+
+	return {
+		type: 'REQUEST_PLUGINS'
+	};
+}
+
+var selectTrigger = exports.selectTrigger = function selectTrigger() {
+	return function (dispatch, getState) {
+		dispatch({ type: 'ADD_TRIGGER' });
+	};
+};
+
+function receivePlugins(plugins) {
+
+	return {
+		type: 'RECEIVED_PLUGINS',
+		plugins: plugins
+	};
+}
+
+function requestActions() {
+
+	return {
+		type: 'REQUEST_ACTIONS'
+	};
+}
+
+function receiveActions(actions) {
+
+	return {
+		type: 'RECEIVED_ACTIONS',
+		actions: actions
+	};
+}
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /* WEBPACK VAR INJECTION */(function(process) {/**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -1338,385 +1717,6 @@ ReactPerf.measureMethods(ReactMount, 'ReactMount', {
 
 module.exports = ReactMount;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.selectTrigger = exports.setFilters = exports.setExpression = exports.showSelectPluginActions = exports.resetUI = exports.showCreateNew = exports.addNode = exports.deleteNode = exports.nextStep = exports.navigate = exports.testNode = exports.loadDataType = exports.setNodeTitle = exports.setFieldType = exports.clearErrorMessage = exports.setErrorMessage = exports.editNode = undefined;
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-exports.fetchActions = fetchActions;
-exports.fetchPlugins = fetchPlugins;
-exports.requestPlugins = requestPlugins;
-exports.receivePlugins = receivePlugins;
-exports.requestActions = requestActions;
-exports.receiveActions = receiveActions;
-
-var _axios = __webpack_require__(127);
-
-var _axios2 = _interopRequireDefault(_axios);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var editNode = exports.editNode = function editNode(node, type) {
-	return {
-		type: 'EDIT_NODE',
-		node: node,
-		editType: type || ''
-	};
-};
-var setErrorMessage = exports.setErrorMessage = function setErrorMessage(nodeId, fieldName, error) {
-	return {
-		type: 'SET_ERROR_MESSAGE',
-		nodeId: nodeId,
-		fieldName: fieldName,
-		message: error
-	};
-};
-var clearErrorMessage = exports.clearErrorMessage = function clearErrorMessage(nodeId, fieldName) {
-	return {
-		type: 'SET_ERROR_MESSAGE',
-		nodeId: nodeId,
-		fieldName: fieldName,
-		message: ''
-	};
-};
-var setFieldType = exports.setFieldType = function setFieldType(nodeId, fieldName, fieldType) {
-	return {
-		type: 'SET_FIELD_TYPE',
-		nodeId: nodeId,
-		fieldName: fieldName,
-		fieldType: fieldType
-	};
-};
-
-var setNodeTitle = exports.setNodeTitle = function setNodeTitle(nodeId, nodeTitle) {
-	return {
-		type: 'SET_NODE_TITLE',
-		nodeId: nodeId,
-		nodeTitle: nodeTitle
-	};
-};
-
-var loadingDataType = function loadingDataType(dataTypeId) {
-	return { type: 'LOADING_DATA_TYPE', dataTypeId: dataTypeId };
-};
-var loadedDataType = function loadedDataType(dataTypeId, json) {
-	return { type: 'LOADED_DATA_TYPE', dataTypeId: dataTypeId, datatype: json };
-};
-var dataTypesBeingLoaded = {};
-var loadDataType = exports.loadDataType = function loadDataType(dataTypeId) {
-	return function (dispatch) {
-		if (null == dataTypeId || dataTypesBeingLoaded[dataTypeId]) {
-			return;
-		}
-		dataTypesBeingLoaded[dataTypeId] = true;
-		dispatch(loadingDataType(dataTypeId));
-		return fetch('/wp-json/wpflow/v1/types/' + dataTypeId + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, { credentials: 'same-origin' }).then(function (response) {
-			if (200 != response.status) {
-				return null;
-			}
-			return response.json();
-		}).then(function (json) {
-			return dispatch(loadedDataType(dataTypeId, json));
-		});
-	};
-};
-
-var testNode = exports.testNode = function testNode(node) {
-	return {
-		type: 'TEST_NODE',
-		node: node
-	};
-};
-var navigate = exports.navigate = function navigate(page, options) {
-	return {
-		type: 'NAVIGATE',
-		page: page,
-		options: options
-	};
-};
-var nextStep = exports.nextStep = function nextStep() {
-	return function (dispatch, getState) {
-		var state = getState();
-		var panelType = state.ui.panelType;
-		var panelOptions = state.ui.panelOptions;
-
-		var next = false;
-		var found = null;
-		var allSteps = [].concat.apply([], Object.values(state.steps));
-
-		var _loop = function _loop(s) {
-			var step = allSteps[s];
-			if (next) {
-				return {
-					v: dispatch(navigate(step.page, step.options))
-				};
-			}
-			next = panelType == step.page && Object.keys(panelOptions).reduce(function (p, k) {
-				return p && step.options[k] && panelOptions[k] == step.options[k];
-			}, true);
-		};
-
-		for (var s in allSteps) {
-			var _ret = _loop(s);
-
-			if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-		}
-		return dispatch(navigate('CreateNew'));
-	};
-};
-
-var deleteNode = exports.deleteNode = function deleteNode(nodeId) {
-	return function (dispatch, getState) {
-		dispatch(navigate('CreateNew'));
-		dispatch({
-			type: 'REMOVE_NODE',
-			nodeId: nodeId
-		});
-	};
-};
-var addNode = exports.addNode = function addNode(node, nid) {
-	return function (dispatch, getState) {
-
-		return new Promise(function (resolve, reject) {
-
-			var state = getState();
-
-			var nId = nid || Object.values(state.nodes).reduce(function (acc, next) {
-				return next.nid > acc ? next.nid : acc;
-			}, 0) + 1;
-			var newNode = {
-				cat: node.cat || '',
-				description: node.description || '',
-				name: node.name,
-				type: node.type,
-				nodeType: node.nodeType || 'data',
-				nid: nId,
-				fields: [].concat(_toConsumableArray(node.fields || []))
-			};
-
-			dispatch({
-				type: 'ADD_NODE',
-				node: newNode
-			});
-
-			dispatch({
-				type: 'CLEAR_STEPS',
-				nodeId: newNode.nid
-			});
-
-			var autoImport = state.definitions[node.type] && state.definitions[node.type].autoImport;
-			if (autoImport) {
-				for (var i in autoImport) {
-					var autoImportDef = state.definitions[autoImport[i]];
-					if (autoImportDef) {
-						dispatch(addNode(autoImportDef));
-					}
-				}
-			}
-			if (node.expressions) {
-				for (var x in node.expressions) {
-					var expr = node.expressions[x];
-					expr = expr.replace('{{.', '{{_N' + newNode.nid + '.');
-					dispatch({
-						type: 'SET_NODE_EXPRESSION',
-						nodeId: newNode.nid,
-						connectorId: x,
-						expr: expr
-					});
-				}
-			}
-			if (node.filters) {
-				dispatch({
-					type: 'SET_NODE_FILTERS',
-					nodeId: newNode.nid,
-					filters: node.filters
-				});
-			}
-			if (newNode.fields.return !== undefined) {
-				dispatch({
-					type: 'ADD_STEP',
-					nodeId: newNode.nid,
-
-					step: {
-						isReturn: true,
-						text: 'Edit Value',
-						icon: 'fa-pencil',
-						page: 'NodeSettings',
-						options: {
-							editType: 'return',
-							title: 'Edit Value',
-							node: newNode.nid
-						}
-					}
-				});
-			}
-
-			if ('trigger' == newNode.nodeType && 0 == newNode.fields.filter(function (r) {
-				return 'in' == r.dir;
-			}).length) {} else if (newNode.fields && 0 < newNode.fields.length) {
-				dispatch({
-					type: 'ADD_STEP',
-					nodeId: newNode.nid,
-					step: {
-						text: 'Edit Settings',
-						icon: 'fa-pencil',
-						page: 'NodeSettings',
-						options: {
-							editType: 'in',
-							title: 'Edit Node',
-							node: newNode.nid
-						}
-					}
-				});
-			}
-			if (node.allowFilters) {
-				dispatch({
-					type: 'ADD_STEP',
-					nodeId: newNode.nid,
-
-					step: {
-						text: 'Edit filters',
-						icon: 'fa-filter',
-						page: 'NodeFilters',
-						options: {
-							editType: 'in',
-							title: 'Edit Filters',
-							node: newNode.nid
-						}
-					}
-				});
-			}
-			state = getState();
-
-			var nextStep = state.steps[newNode.nid] && state.steps[newNode.nid].filter(function (r) {
-				return !r.isReturn;
-			})[0];
-			if (state.ui.prevStep) {
-				nextStep = state.ui.prevStep;
-			}
-			if (nextStep) {
-				dispatch(navigate(nextStep.page, nextStep.options));
-			}
-
-			resolve();
-		});
-	};
-};
-
-var showCreateNew = exports.showCreateNew = function showCreateNew() {
-	return {
-		type: 'SHOW_CREATE_NEW'
-	};
-};
-
-var resetUI = exports.resetUI = function resetUI() {
-	return {
-		type: 'RESET_UI'
-	};
-};
-
-var showSelectPluginActions = exports.showSelectPluginActions = function showSelectPluginActions(plugin) {
-
-	return {
-		type: 'SHOW_SELECT_ACTION',
-		plugin: plugin
-	};
-};
-
-var setExpression = exports.setExpression = function setExpression(nodeId, connectorId, expr) {
-
-	return function (dispatch) {
-
-		dispatch({
-			type: 'SET_NODE_EXPRESSION',
-			nodeId: nodeId,
-			connectorId: connectorId,
-			expr: expr
-		});
-	};
-};
-var setFilters = exports.setFilters = function setFilters(nodeId, filters) {
-
-	return {
-		type: 'SET_NODE_FILTERS',
-		filters: filters,
-		nodeId: nodeId
-	};
-};
-
-function fetchActions(plugin) {
-	if (!plugin) {
-		plugin = '';
-	}
-
-	return function (dispatch) {
-		dispatch(requestActions());
-
-		return fetch('/wp-json/wpflow/v1/nodes/?plugin=' + plugin + '&_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, { credentials: 'same-origin' }).then(function (response) {
-			return response.json();
-		}).then(function (json) {
-			return dispatch(receiveActions(json));
-		});
-	};
-}
-function fetchPlugins() {
-	return function (dispatch) {
-		dispatch(requestPlugins());
-
-		return fetch('/wp-json/wpflow/v1/plugins' + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, { credentials: 'same-origin' }).then(function (response) {
-			return response.json();
-		}).then(function (json) {
-			return dispatch(receivePlugins(json));
-		});
-	};
-}
-function requestPlugins() {
-
-	return {
-		type: 'REQUEST_PLUGINS'
-	};
-}
-
-var selectTrigger = exports.selectTrigger = function selectTrigger() {
-	return function (dispatch, getState) {
-		dispatch({ type: 'ADD_TRIGGER' });
-	};
-};
-
-function receivePlugins(plugins) {
-
-	return {
-		type: 'RECEIVED_PLUGINS',
-		plugins: plugins
-	};
-}
-
-function requestActions() {
-
-	return {
-		type: 'REQUEST_ACTIONS'
-	};
-}
-
-function receiveActions(actions) {
-
-	return {
-		type: 'RECEIVED_ACTIONS',
-		actions: actions
-	};
-}
 
 /***/ }),
 /* 8 */
@@ -3152,7 +3152,6 @@ function parseExpression(expression) {
 				};
 				walkExpression(expr, function (ast) {
 					if ('string' === typeof ast && !isNumeric(ast) && -1 === allowedStrings.indexOf(ast) && 0 != ast.indexOf('{{_N')) {
-						debugger;
 						errorMessage = 'The expression is invalid';
 					} else if ('Compound' == ast.type) {
 						errorMessage = 'The expression is invalid';
@@ -3160,7 +3159,6 @@ function parseExpression(expression) {
 				});
 				var state = store.getState();
 				if (!state.ui.errors || !state.ui.errors[nodeId] || state.ui.errors[nodeId][fieldName] !== errorMessage) {
-					debugger;
 					store.dispatch({
 						type: 'SET_ERROR_MESSAGE',
 						nodeId: nodeId,
@@ -22316,7 +22314,7 @@ var QuickSearch = function (_React$Component) {
 										_react2.default.createElement(
 											'a',
 											{ href: 'javascript:void(0);', onClick: function onClick(e) {
-													return _this2.props.insertField(n, f);
+													return _this2.props.insertField(n, f, null, f.type);
 												} },
 											_react2.default.createElement(
 												'strong',
@@ -33816,7 +33814,7 @@ module.exports = LinkedValueUtils;
 
 
 var ReactDOMIDOperations = __webpack_require__(56);
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 
 /**
  * Abstracts away all functionality of the reconciler that requires knowledge of
@@ -33923,7 +33921,7 @@ module.exports = ReactComponentEnvironment;
 
 var DOMChildrenOperations = __webpack_require__(89);
 var DOMPropertyOperations = __webpack_require__(52);
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 var ReactPerf = __webpack_require__(11);
 
 var invariant = __webpack_require__(1);
@@ -34308,7 +34306,7 @@ module.exports = '0.14.9';
 
 var ReactCurrentOwner = __webpack_require__(15);
 var ReactInstanceMap = __webpack_require__(28);
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 
 var invariant = __webpack_require__(1);
 var warning = __webpack_require__(3);
@@ -35786,7 +35784,7 @@ var _codemirror2 = _interopRequireDefault(_codemirror);
 
 var _reactRedux = __webpack_require__(8);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(6);
 
 var _reactOnclickoutside = __webpack_require__(49);
 
@@ -38307,7 +38305,7 @@ var ReactCurrentOwner = __webpack_require__(15);
 var ReactDOMTextComponent = __webpack_require__(97);
 var ReactDefaultInjection = __webpack_require__(99);
 var ReactInstanceHandles = __webpack_require__(23);
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 var ReactPerf = __webpack_require__(11);
 var ReactReconciler = __webpack_require__(20);
 var ReactUpdates = __webpack_require__(12);
@@ -38425,7 +38423,7 @@ module.exports = ReactDOMFeatureFlags;
 
 
 var LinkedValueUtils = __webpack_require__(53);
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 var ReactUpdates = __webpack_require__(12);
 
 var assign = __webpack_require__(2);
@@ -38623,7 +38621,7 @@ module.exports = ReactDOMSelect;
 var DOMChildrenOperations = __webpack_require__(89);
 var DOMPropertyOperations = __webpack_require__(52);
 var ReactComponentBrowserEnvironment = __webpack_require__(54);
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 
 var assign = __webpack_require__(2);
 var escapeTextContentForBrowser = __webpack_require__(39);
@@ -38841,7 +38839,7 @@ var ReactDOMTextComponent = __webpack_require__(97);
 var ReactEventListener = __webpack_require__(231);
 var ReactInjection = __webpack_require__(232);
 var ReactInstanceHandles = __webpack_require__(23);
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 var ReactReconcileTransaction = __webpack_require__(236);
 var SelectEventPlugin = __webpack_require__(242);
 var ServerReactRootIndex = __webpack_require__(243);
@@ -41177,7 +41175,7 @@ module.exports = function(module) {
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -41194,11 +41192,11 @@ var _store = __webpack_require__(165);
 
 var _store2 = _interopRequireDefault(_store);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(6);
 
 var _util = __webpack_require__(18);
 
-var _actions2 = __webpack_require__(7);
+var _actions2 = __webpack_require__(6);
 
 var _reduxThunk = __webpack_require__(276);
 
@@ -41219,255 +41217,250 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 // import ReactNodeGraph from 'react-node-graph';
 
 var App = function (_Component) {
-    _inherits(App, _Component);
+	_inherits(App, _Component);
 
-    function App(props) {
-        _classCallCheck(this, App);
+	function App(props) {
+		_classCallCheck(this, App);
 
-        var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
-        _this.state = { errors: '' };
-        var graph = _this.stringifyExpressionsInGraph(_this.props.graph);
+		_this.state = { errors: '' };
+		var graph = _this.stringifyExpressionsInGraph(_this.props.graph);
 
-        var composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || _redux.compose;
-        var loadedNodes = graph.nodes;
-        _this.state = graph;
+		var composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || _redux.compose;
+		var loadedNodes = graph.nodes;
+		_this.state = graph;
 
-        var nodeStore = (0, _redux.createStore)(_store2.default, {
-            fieldTypes: graph.fieldTypes,
-            datatypes: {
-                'boolean': {
-                    base: null,
-                    choices: [{ id: false, text: 'No' }, { id: true, text: 'Yes' }],
-                    ajax: false
-                },
-                'string': {
-                    base: null,
-                    schema: {
-                        methods: {
-                            'toUpperCase': {
-                                description: 'To Upper Case',
-                                'type': 'string',
-                                'fields': {}
-                            },
-                            'toLowerCase': {
-                                description: 'To Lower Case',
-                                'type': 'string',
-                                'fields': {}
-                            }
-                        }
-                    }
-                },
-                'array': {
-                    base: null,
-                    schema: {
-                        methods: {
-                            'getItem': {
-                                description: 'Get Item',
-                                'type': 'number',
-                                'fields': {
-                                    'key': {
-                                        'type': 'string',
-                                        'description': 'The item key'
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }, composeEnhancers((0, _redux.applyMiddleware)(_reduxThunk2.default)));
+		var nodeStore = (0, _redux.createStore)(_store2.default, {
+			fieldTypes: graph.fieldTypes,
+			datatypes: {
+				'boolean': {
+					base: null,
+					choices: [{ id: false, text: 'No' }, { id: true, text: 'Yes' }],
+					ajax: false
+				},
+				'string': {
+					base: null,
+					schema: {
+						methods: {
+							'toUpperCase': {
+								description: 'To Upper Case',
+								'type': 'string',
+								'fields': {}
+							},
+							'toLowerCase': {
+								description: 'To Lower Case',
+								'type': 'string',
+								'fields': {}
+							}
+						}
+					}
+				},
+				'array': {
+					base: null,
+					schema: {
+						methods: {
+							'getItem': {
+								description: 'Get Item',
+								'type': 'number',
+								'fields': {
+									'key': {
+										'type': 'string',
+										'description': 'The item key'
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}, composeEnhancers((0, _redux.applyMiddleware)(_reduxThunk2.default)));
 
-        nodeStore.dispatch((0, _actions2.fetchPlugins)());
+		nodeStore.dispatch((0, _actions2.fetchPlugins)());
 
-        _this.nodeStore = nodeStore;
-        window.TH.nodeStore = nodeStore;
-        _this.saveGraph();
-        return _this;
-    }
+		_this.nodeStore = nodeStore;
+		window.TH.nodeStore = nodeStore;
+		_this.saveGraph();
+		return _this;
+	}
 
-    _createClass(App, [{
-        key: 'stringifyExpressionsInGraph',
-        value: function stringifyExpressionsInGraph(graph) {
-            for (var g in graph.nodes) {
-                for (var e in graph.nodes[g].expressions) {
-                    var expr = graph.nodes[g].expressions[e];
-                    graph.nodes[g].expressions[e] = (0, _util.stringifyExpression)(expr);
-                }
-                graph.nodes[g].filters = this.stringifyFilters(graph.nodes[g].filters);
-            }
-            return graph;
-        }
-    }, {
-        key: 'parseExpression',
-        value: function parseExpression(nodeId, fieldName, expression, fieldType) {
+	_createClass(App, [{
+		key: 'stringifyExpressionsInGraph',
+		value: function stringifyExpressionsInGraph(graph) {
+			for (var g in graph.nodes) {
+				for (var e in graph.nodes[g].expressions) {
+					var expr = graph.nodes[g].expressions[e];
+					graph.nodes[g].expressions[e] = (0, _util.stringifyExpression)(expr);
+				}
+				graph.nodes[g].filters = this.stringifyFilters(graph.nodes[g].filters);
+			}
+			return graph;
+		}
+	}, {
+		key: 'parseExpression',
+		value: function parseExpression(nodeId, fieldName, expression, fieldType) {
 
-            var oType = fieldType;
+			var oType = fieldType;
 
-            while ('number' !== fieldType && 'boolean' !== fieldType && 'string' !== fieldType && 'html' !== fieldType) {
-                if (!this.nodeStore.getState().datatypes[fieldType]) {
-                    this.nodeStore.dispatch((0, _actions.loadDataType)(fieldType));
-                    break;
-                } else {
-                    if (!this.nodeStore.getState().datatypes[fieldType].base) {
-                        break;
-                    }
-                    fieldType = this.nodeStore.getState().datatypes[fieldType].base;
-                }
-            }
+			while ('number' !== fieldType && 'boolean' !== fieldType && 'string' !== fieldType && 'html' !== fieldType) {
+				if (!this.nodeStore.getState().datatypes[fieldType]) {
+					this.nodeStore.dispatch((0, _actions.loadDataType)(fieldType));
+					break;
+				} else {
+					if (!this.nodeStore.getState().datatypes[fieldType].base) {
+						break;
+					}
+					fieldType = this.nodeStore.getState().datatypes[fieldType].base;
+				}
+			}
 
-            if ('string' !== fieldType && 'boolean' !== fieldType && 'html' !== fieldType) {
-                if ('number' == fieldType) {
-                    if (!isNaN(parseFloat(expression)) && isFinite(expression)) {
-                        return expression;
-                    }
-                }
-                return (0, _util.parseExpression)(expression, nodeId, fieldName, fieldType, nodeStore);
-            } else {
-                return expression;
-            }
-        }
-    }, {
-        key: 'parseExpressions',
-        value: function parseExpressions(nodeId, expressions) {
-            if (!expressions) {
-                return null;
-            }
-            var parsedExpressions = {};
-            var fieldType = null;
+			if ('string' !== fieldType && 'boolean' !== fieldType && 'html' !== fieldType) {
+				if ('number' == fieldType) {
+					if (!isNaN(parseFloat(expression)) && isFinite(expression)) {
+						return expression;
+					}
+				}
+				return (0, _util.parseExpression)(expression, nodeId, fieldName, fieldType, this.nodeStore);
+			} else {
+				return expression;
+			}
+		}
+	}, {
+		key: 'parseExpressions',
+		value: function parseExpressions(nodeId, expressions) {
+			if (!expressions) {
+				return null;
+			}
+			var parsedExpressions = {};
+			var fieldType = null;
 
-            for (var i in expressions) {
-                var expression = expressions[i];
+			for (var i in expressions) {
+				var expression = expressions[i];
 
-                if (this.nodeStore.getState().nodes[nodeId].fields) {
-                    for (var f in this.nodeStore.getState().nodes[nodeId].fields) {
-                        if (this.nodeStore.getState().nodes[nodeId].fields[f].name == i) {
-                            fieldType = this.nodeStore.getState().nodes[nodeId].fields[f].type;
-                            break;
-                        }
-                    }
-                }
+				if (this.nodeStore.getState().nodes[nodeId].fields) {
+					for (var f in this.nodeStore.getState().nodes[nodeId].fields) {
+						if (this.nodeStore.getState().nodes[nodeId].fields[f].name == i) {
+							fieldType = this.nodeStore.getState().nodes[nodeId].fields[f].type;
+							break;
+						}
+					}
+				}
 
-                if (fieldType) {
-                    var existingType = this.nodeStore.getState().fieldTypes[nodeId + '.' + i];
-                    if (0 === fieldType.indexOf('$')) {
-                        fieldType = this.nodeStore.getState().fieldTypes[nodeId + '.' + fieldType.substring(1)];
-                    }
-                }
+				if (fieldType) {
+					var existingType = this.nodeStore.getState().fieldTypes[nodeId + '.' + i];
+					if (0 === fieldType.indexOf('$')) {
+						fieldType = this.nodeStore.getState().fieldTypes[nodeId + '.' + fieldType.substring(1)];
+					}
+				}
 
-                parsedExpressions[i] = this.parseExpression(nodeId, i, expression, fieldType);
-            }
+				parsedExpressions[i] = this.parseExpression(nodeId, i, expression, fieldType);
+			}
 
-            return parsedExpressions;
-        }
-    }, {
-        key: 'parseFilterExpressions',
-        value: function parseFilterExpressions(nodeId, filterGroups) {
-            if (!filterGroups) {
-                return null;
-            }
-            var parseFilters = [];
-            var fieldType = null;
-            for (var i in filterGroups) {
-                parseFilters[i] = [];
-                for (var j in filterGroups[i]) {
-                    var newFilter = {};
-                    newFilter.op = filterGroups[i][j].op;
-                    if (!filterGroups[i][j].left || !filterGroups[i][j].left.expr) {
-                        continue;
-                    }
-                    if (filterGroups[i][j].left.expr.type) {
-                        newFilter.left = filterGroups[i][j].left.expr;
-                    } else {
+			return parsedExpressions;
+		}
+	}, {
+		key: 'parseFilterExpressions',
+		value: function parseFilterExpressions(nodeId, filterGroups) {
+			if (!filterGroups) {
+				return null;
+			}
+			var parseFilters = [];
+			var fieldType = null;
+			for (var i in filterGroups) {
+				parseFilters[i] = [];
+				for (var j in filterGroups[i]) {
+					var newFilter = {};
+					newFilter.op = filterGroups[i][j].op;
+					if (!filterGroups[i][j].left || !filterGroups[i][j].left.expr) {
+						continue;
+					}
+					if (filterGroups[i][j].left.expr.type) {
+						newFilter.left = filterGroups[i][j].left.expr;
+					} else {
+						newFilter.left = { expr: this.parseExpression(nodeId, '', filterGroups[i][j].left.expr, 'object'), display: filterGroups[i][j].left.display };
+					}
+					newFilter.right = filterGroups[i][j].right;
+					parseFilters[i].push(newFilter);
+				}
+			}
+			return parseFilters;
+		}
+	}, {
+		key: 'stringifyFilters',
+		value: function stringifyFilters(filterGroups) {
+			if (!filterGroups) {
+				return null;
+			}
+			var parseFilters = [];
+			var fieldType = null;
+			for (var i in filterGroups) {
+				parseFilters[i] = [];
+				for (var j in filterGroups[i]) {
+					var newFilter = {};
+					newFilter.op = filterGroups[i][j].op;
+					newFilter.left = { expr: (0, _util.stringifyExpression)(filterGroups[i][j].left.expr), display: filterGroups[i][j].left.display };
+					newFilter.right = filterGroups[i][j].right;
+					parseFilters[i].push(newFilter);
+				}
+			}
+			return parseFilters;
+		}
+	}, {
+		key: 'getNodesForSave',
+		value: function getNodesForSave(nodes, defs) {
+			var _this2 = this;
 
-                        newFilter.left = { expr: this.parseExpression(nodeId, '', filterGroups[i][j].left.expr, 'object'), display: filterGroups[i][j].left.display };
-                    }
-                    newFilter.right = filterGroups[i][j].right;
-                    parseFilters[i].push(newFilter);
-                }
-            }
-            return parseFilters;
-        }
-    }, {
-        key: 'stringifyFilters',
-        value: function stringifyFilters(filterGroups) {
-            if (!filterGroups) {
-                return null;
-            }
-            var parseFilters = [];
-            var fieldType = null;
-            for (var i in filterGroups) {
-                parseFilters[i] = [];
-                for (var j in filterGroups[i]) {
-                    var newFilter = {};
-                    newFilter.op = filterGroups[i][j].op;
+			var prevNode = null;
+			var newNodes = Object.values(nodes).map(function (n) {
+				var def = defs && defs[n.type] || false;
+				var newNode = {
+					nid: n.nid,
+					x: n.x,
+					y: n.y,
+					type: n.type,
+					expressions: _this2.parseExpressions(n.nid, n.expressions),
+					filters: _this2.parseFilterExpressions(n.nid, n.filters)
+				};
+				return newNode;
+			});
+			var actionOrTriggerNodes = newNodes.filter(function (n) {
+				return defs && n.type && defs[n.type] && ('action' == defs[n.type].nodeType || 'condition' == defs[n.type].nodeType || 'trigger' == defs[n.type].nodeType);
+			});
+			for (var i = 1; i < actionOrTriggerNodes.length; i++) {
+				actionOrTriggerNodes[i - 1].next = [actionOrTriggerNodes[i].nid];
+			}
+			return newNodes;
+		}
+	}, {
+		key: 'saveGraph',
+		value: function saveGraph() {
+			var self = this;
 
-                    newFilter.left = { expr: (0, _util.stringifyExpression)(filterGroups[i][j].left.expr), display: filterGroups[i][j].left.display };
+			this.props.linkedField.value = JSON.stringify({
+				nodes: self.getNodesForSave(self.nodeStore.getState().nodes, self.nodeStore.getState().definitions),
+				fieldTypes: self.nodeStore.getState().fieldTypes
+			});
+		}
+	}, {
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			this.nodeStore.subscribe(this.saveGraph.bind(this));
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			return _react2.default.createElement(
+				_reactRedux.Provider,
+				{ store: this.nodeStore },
+				_react2.default.createElement(_jsclient2.default, {
+					graph: this.state,
+					errors: this.state.errors
+				})
+			);
+		}
+	}]);
 
-                    newFilter.right = filterGroups[i][j].right;
-                    parseFilters[i].push(newFilter);
-                }
-            }
-            return parseFilters;
-        }
-    }, {
-        key: 'getNodesForSave',
-        value: function getNodesForSave(nodes, defs) {
-            var _this2 = this;
-
-            var prevNode = null;
-            var newNodes = Object.values(nodes).map(function (n) {
-                var def = defs && defs[n.type] || false;
-                var newNode = {
-                    nid: n.nid,
-                    x: n.x,
-                    y: n.y,
-                    type: n.type,
-                    expressions: _this2.parseExpressions(n.nid, n.expressions),
-                    filters: _this2.parseFilterExpressions(n.nid, n.filters)
-                };
-                return newNode;
-            });
-            var actionOrTriggerNodes = newNodes.filter(function (n) {
-                return defs && n.type && defs[n.type] && ('action' == defs[n.type].nodeType || 'condition' == defs[n.type].nodeType || 'trigger' == defs[n.type].nodeType);
-            });
-            for (var i = 1; i < actionOrTriggerNodes.length; i++) {
-
-                actionOrTriggerNodes[i - 1].next = [actionOrTriggerNodes[i].nid];
-            }
-            return newNodes;
-        }
-    }, {
-        key: 'saveGraph',
-        value: function saveGraph() {
-            var self = this;
-
-            this.props.linkedField.value = JSON.stringify({
-                nodes: self.getNodesForSave(self.nodeStore.getState().nodes, self.nodeStore.getState().definitions),
-                fieldTypes: self.nodeStore.getState().fieldTypes
-            });
-        }
-    }, {
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            this.nodeStore.subscribe(this.saveGraph.bind(this));
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-
-            return _react2.default.createElement(
-                _reactRedux.Provider,
-                { store: this.nodeStore },
-                _react2.default.createElement(_jsclient2.default, {
-                    graph: this.state,
-                    errors: this.state.errors
-                })
-            );
-        }
-    }]);
-
-    return App;
+	return App;
 }(_react.Component);
 
 exports.default = App;
@@ -42424,7 +42417,7 @@ var _NodeFieldList = __webpack_require__(31);
 
 var _NodeFieldList2 = _interopRequireDefault(_NodeFieldList);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(6);
 
 var _lodash = __webpack_require__(24);
 
@@ -42756,7 +42749,7 @@ var _util = __webpack_require__(18);
 
 var _controls = __webpack_require__(158);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(6);
 
 var _reactRedux = __webpack_require__(8);
 
@@ -42941,7 +42934,6 @@ var NodeInputListItem = function (_React$Component) {
 		value: function getType() {
 			var derivedType = this.props.itemType;
 			if (0 == this.props.itemType.indexOf('$')) {
-				debugger;
 				derivedType = this.props.fieldTypes[this.props.nodeid + '.' + this.props.itemType.replace('$', '')] || this.props.itemType;
 			}
 			return derivedType;
@@ -43160,7 +43152,7 @@ var _NodeFieldList = __webpack_require__(31);
 
 var _NodeFieldList2 = _interopRequireDefault(_NodeFieldList);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(6);
 
 var _reactRedux = __webpack_require__(8);
 
@@ -43414,7 +43406,7 @@ var _SimpleNode2 = _interopRequireDefault(_SimpleNode);
 
 var _reactRedux = __webpack_require__(8);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(6);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -43575,7 +43567,7 @@ var _NodeFieldList = __webpack_require__(31);
 
 var _NodeFieldList2 = _interopRequireDefault(_NodeFieldList);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(6);
 
 var _reactRedux = __webpack_require__(8);
 
@@ -43730,7 +43722,7 @@ var _reactOnclickoutside = __webpack_require__(49);
 
 var _reactOnclickoutside2 = _interopRequireDefault(_reactOnclickoutside);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(6);
 
 var _reactRedux = __webpack_require__(8);
 
@@ -44064,7 +44056,7 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactRedux = __webpack_require__(8);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(6);
 
 var _lodash = __webpack_require__(24);
 
@@ -44380,7 +44372,7 @@ var _codemirror2 = _interopRequireDefault(_codemirror);
 
 var _reactRedux = __webpack_require__(8);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(6);
 
 var _reactOnclickoutside = __webpack_require__(49);
 
@@ -44449,7 +44441,6 @@ var ExpressionEditor = function (_React$Component) {
 	}, {
 		key: 'insertField',
 		value: function insertField(node, field, subprop, subType) {
-
 			var expression = '{{_N' + node.nid + '.' + field.name;
 			if (subprop) {
 				if (!_.isArray(subprop)) {
@@ -44530,6 +44521,7 @@ var ExpressionEditor = function (_React$Component) {
 			if (!nodeTag.nodeId) {
 				showChevron = false;
 			}
+
 			_react2.default.render(_react2.default.createElement(
 				'span',
 				{ 'data-tag': '', className: 'node-expression-data-tag' },
@@ -44863,12 +44855,9 @@ var ExpressionEditor = function (_React$Component) {
 
 var mapStateToProps = function mapStateToProps(state, ownProps) {
 	var schemas = {};
-	for (var i in ownProps.availableFields) {
-		var fields = ownProps.availableFields[i];
-		for (var f in fields.fields) {
-			var type = fields.fields[f].type;
-			schemas[type] = state.datatypes[type] && state.datatypes[type].schema || null;
-		}
+	for (var type in state.datatypes) {
+		var fields = state.datatypes[type];
+		schemas[type] = state.datatypes[type] && state.datatypes[type].schema || null;
 	}
 	return {
 		values: state.datatypes && state.datatypes[ownProps.type] && state.datatypes[ownProps.type].choices,
@@ -44926,7 +44915,7 @@ var _QuickSearch = __webpack_require__(32);
 
 var _QuickSearch2 = _interopRequireDefault(_QuickSearch);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(6);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -45379,7 +45368,7 @@ var _QuickSearch = __webpack_require__(32);
 
 var _QuickSearch2 = _interopRequireDefault(_QuickSearch);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(6);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -45572,7 +45561,7 @@ var RichEditor = function (_React$Component) {
 						});
 
 						editor.on('beforesetcontent', function (e) {
-							e.content = self.replaceSpecialCharsWithTags(event.content, true);
+							e.content = self.replaceSpecialCharsWithTags(e.content, true);
 						});
 						editor.on('postProcess', function (e) {
 							e.content = self.unreplaceTags(e.content);
@@ -45786,7 +45775,7 @@ var _codemirror2 = _interopRequireDefault(_codemirror);
 
 var _reactRedux = __webpack_require__(8);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(6);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -46190,7 +46179,7 @@ var _components = __webpack_require__(152);
 
 var _components2 = _interopRequireDefault(_components);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(6);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -46449,7 +46438,14 @@ var nodes = function nodes() {
 			var obj = {};
 			obj[nid + '.' + pin] = expr;
 			return Object.assign({}, state, obj);
-
+		case 'REMOVE_NODE':
+			var removedNode = action.nodeId;
+			var newState = {};
+			for (var s in state) {
+				if (s.indexOf(removedNode + ".") === 0) continue;
+				newState[s] = state[s];
+			}
+			return newState;
 		default:
 			return state;
 
@@ -50310,7 +50306,7 @@ module.exports = function hoistNonReactStatics(targetComponent, sourceComponent,
 
 
 
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 
 var findDOMNode = __webpack_require__(59);
 var focusNode = __webpack_require__(118);
@@ -51490,7 +51486,7 @@ var EventConstants = __webpack_require__(14);
 var EventPropagators = __webpack_require__(27);
 var SyntheticMouseEvent = __webpack_require__(36);
 
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 var keyOf = __webpack_require__(17);
 
 var topLevelTypes = EventConstants.topLevelTypes;
@@ -53151,7 +53147,7 @@ var ReactDOMInput = __webpack_require__(223);
 var ReactDOMOption = __webpack_require__(224);
 var ReactDOMSelect = __webpack_require__(96);
 var ReactDOMTextarea = __webpack_require__(227);
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 var ReactMultiChild = __webpack_require__(234);
 var ReactPerf = __webpack_require__(11);
 var ReactUpdateQueue = __webpack_require__(57);
@@ -54291,7 +54287,7 @@ module.exports = ReactDOMFactories;
 
 var ReactDOMIDOperations = __webpack_require__(56);
 var LinkedValueUtils = __webpack_require__(53);
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 var ReactUpdates = __webpack_require__(12);
 
 var assign = __webpack_require__(2);
@@ -54918,7 +54914,7 @@ module.exports = ReactDOMTextarea;
 
 var DOMProperty = __webpack_require__(19);
 var ReactDefaultPerfAnalysis = __webpack_require__(229);
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 var ReactPerf = __webpack_require__(11);
 
 var performanceNow = __webpack_require__(274);
@@ -55414,7 +55410,7 @@ var EventListener = __webpack_require__(116);
 var ExecutionEnvironment = __webpack_require__(5);
 var PooledClass = __webpack_require__(16);
 var ReactInstanceHandles = __webpack_require__(23);
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 var ReactUpdates = __webpack_require__(12);
 
 var assign = __webpack_require__(2);
@@ -57183,7 +57179,7 @@ module.exports = ServerReactRootIndex;
 var EventConstants = __webpack_require__(14);
 var EventListener = __webpack_require__(116);
 var EventPropagators = __webpack_require__(27);
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 var SyntheticClipboardEvent = __webpack_require__(245);
 var SyntheticEvent = __webpack_require__(21);
 var SyntheticFocusEvent = __webpack_require__(248);
@@ -58675,7 +58671,7 @@ module.exports = quoteAttributeValueForBrowser;
 
 
 
-var ReactMount = __webpack_require__(6);
+var ReactMount = __webpack_require__(7);
 
 module.exports = ReactMount.renderSubtreeIntoContainer;
 
