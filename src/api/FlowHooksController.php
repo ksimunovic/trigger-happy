@@ -147,18 +147,17 @@ class FlowHooksController extends WP_REST_Controller {
 			$byplugin = $request['plugin'];
 		}
 		$data = array();
-		foreach ( $items as $ns => $nodeList ) {
-			if ( $byplugin && $ns != $byplugin)  {
+		foreach ( $items as $type => $nodeData ) {
+			if ( $byplugin && ( ! isset( $nodeData['plugin'] ) || $nodeData['plugin'] != $byplugin ) )  {
 				continue;
 			}
-			foreach ( $nodeList as $type => $nodeData ) {
-				if ( ! $advanced && isset($nodeData['advanced']) && $nodeData['advanced'] ) {
-					continue;
-				}
-				$nodeData['type'] = $type;
-				$itemdata =  $nodeData;
-				$data[] = $this->prepare_response_for_collection( $nodeData );
+			if ( ! $advanced && isset($nodeData['advanced']) && $nodeData['advanced'] ) {
+				continue;
 			}
+			$nodeData['type'] = $type;
+			$itemdata =  $nodeData;
+			$data[] = $this->prepare_response_for_collection( $nodeData );
+
 		}
 
 		return new WP_REST_Response( $data, 200 );

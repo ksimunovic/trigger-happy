@@ -1,9 +1,18 @@
 <?php
+/**
+ * TriggerHappyNodeManager class
+ * Keeps track of the registered nodes
+ * Can be overridden to store nodes in the database
+ */
 class TriggerHappyNodeManager {
     public $nodes = array();
     public function __construct() {
         $this->triggerhappy_init_nodes();
     }
+
+	/**
+	 * Gets the definition for the specified node
+	 */
     public function get_node( $id, $ns = null ) {
     	if ( $ns !== null ) {
     		return $this->nodes[ $ns ][ $id ];
@@ -15,7 +24,9 @@ class TriggerHappyNodeManager {
     		}
     	}
     }
-
+	/***
+	 * Registers a custom node for use within the Trigger Happy editor
+	 */
     public function register_node( $id, $ns, $options ) {
 
     	if ( ! isset( $this->nodes[ $ns ] ) ) {

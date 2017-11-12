@@ -60,7 +60,7 @@ class TriggerHappyAdmin {
         add_meta_box('triggerhappy_editor', 'Flow Editor', array($this,'render_editor'), 'th_flow' );
 
     }
-    public function render_editor($post) {
+    public function render_editor( $post ) {
         ?>
         <div id="flow-editor-errors" style="display:none"></div>
         <div id="flow-editor-container"></div>
@@ -76,7 +76,7 @@ class TriggerHappyAdmin {
 
     public function add_editor_style() {
 
-      add_editor_style( plugins_url( '../build/expression.css', __FILE__ )  );
+      add_editor_style( plugins_url( 'assets/expression.css', dirname( __FILE__ ) )  );
     }
 
 }

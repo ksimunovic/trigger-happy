@@ -91,7 +91,6 @@ class TriggerHappyFlow{
 			}
 		} else {
 
-			// die('triggerhappy_resolve_field_' . $context->fieldType . '__' . $prop);
 			$newValue = apply_filters( 'triggerhappy_resolve_field_' . $context->fieldType . '__' . $prop,null, $obj, $prop, $context );
 
 			if ( $newValue != null ) {

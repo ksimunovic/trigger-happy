@@ -125,7 +125,7 @@ class ExpressionEditor extends React.Component {
 		if ( ! nodeTag.nodeId ) {
 			showChevron = false;
 		}
-		React.render(
+		React.render( (
 			<span data-tag='' className='node-expression-data-tag'>
 				{nodeTag.icon && <img src={nodeTag.icon} className="expression-icon" />}
 				{nodeTag.nodeId && <span  className="node-expression-data-tag__node">#{nodeTag.nodeId}</span>}
@@ -149,12 +149,13 @@ class ExpressionEditor extends React.Component {
 							<span className='node-expression-data-tag__prop'>{finalResult}</span>
 						</span>
 					);
-		})}
+				})}
 
-		{this.props.schemas[nodeTag.fieldType] && this.props.schemas[nodeTag.fieldType].methods &&
-
-		( <span className="settings-button" onClick={( e )=>this.toggleOperations( e, tagId )}><i className="fa fa-cogs"></i></span> )}
-		</span>, node );
+				{this.props.schemas[nodeTag.fieldType] && this.props.schemas[nodeTag.fieldType].methods && (
+					<span className="settings-button" onClick={( e )=>this.toggleOperations( e, tagId )}><i className="fa fa-cogs"></i></span>
+				)}
+			</span>
+		), node );
 		return node;
 	}
 	componentDidMount() {

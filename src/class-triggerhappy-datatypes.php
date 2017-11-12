@@ -30,11 +30,12 @@ class TriggerHappyDataTypes {
     	if ( ! isset( $triggerhappy['types'] ) ) {
     		$triggerhappy['types'] = array();
     	}
-    	if ( !isset(	$triggerhappy['types'][ $id ] ))
+    	if ( !isset(	$triggerhappy['types'][ $id ] ) ) {
     		$triggerhappy['types'][ $id ] = array(
     			'id' => $id,
     			'base' => 'object'
     		);
+		}
     	$schema = array(
     		'$schema' => 'http://json-schema.org/draft-04/schema#',
     		'title' => $jsonSchema['title'],

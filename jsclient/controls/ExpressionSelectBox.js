@@ -227,9 +227,7 @@ class ExpressionSelectBox extends React.Component {
 		return (
 			<div>
 				<div className={'node-control-container node-control-expr-select ' + ( this.props.errorMessage && 'node-error' || '' )}>
-					<div ref={( el ) => {
- this.element = el;
-}}  className="node-editable-setting">
+					<div ref={( el ) => this.element = el }  className="node-editable-setting">
 						<input type="text" readOnly={this.props.lookupOnly} value={this.state.text} className="node-editable-text" onBlur={( v )=>this.ensureSelected()} onChange={( v )=>this.updateValue( v )} />
 					</div>
 					{operations && <a href="javascript:void(0)" className="insert-button" onClick={()=>this.toggleOperations()}><i className="fa fa-cogs"></i></a>}

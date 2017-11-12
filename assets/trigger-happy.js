@@ -43414,6 +43414,8 @@ var _SimpleNode2 = _interopRequireDefault(_SimpleNode);
 
 var _reactRedux = __webpack_require__(8);
 
+var _actions = __webpack_require__(7);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -43532,19 +43534,9 @@ var mapStateToProps = function mapStateToProps(state) {
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 	return {
-		navigate: function (_navigate) {
-			function navigate(_x, _x2) {
-				return _navigate.apply(this, arguments);
-			}
-
-			navigate.toString = function () {
-				return _navigate.toString();
-			};
-
-			return navigate;
-		}(function (step, options) {
-			return dispatch(navigate(step, options));
-		}),
+		navigate: function navigate(step, options) {
+			return dispatch((0, _actions.navigate)(step, options));
+		},
 		onNodeEdit: function onNodeEdit(id, type) {
 
 			dispatch(editNode(id, type));
@@ -43554,7 +43546,7 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 			dispatch(testNode(id));
 		},
 		showCreateNew: function showCreateNew() {
-			return dispatch(navigate('CreateNew'));
+			return dispatch((0, _actions.navigate)('CreateNew'));
 		}
 
 	};
@@ -43875,8 +43867,7 @@ var SimpleNode = function (_React$Component) {
 			);
 			nodeContent = '';
 
-			var icon = this.state.canCollapse ? _react2.default.createElement('i', { className: 'collapse-icon fa  fa-chevron-circle-' + (this.state.collapsed ? 'down' : 'up'),
-				onClick: this.toggleCollapsed.bind(this) }) : '';
+			var icon = this.state.canCollapse ? _react2.default.createElement('i', { className: 'collapse-icon fa  fa-chevron-circle-' + (this.state.collapsed ? 'down' : 'up'), onClick: this.toggleCollapsed.bind(this) }) : '';
 			if (!this.state.canCollapse) {
 				icon = _react2.default.createElement('i', { className: 'collapse-icon fa fa-sign-out' });
 			}
@@ -43885,7 +43876,7 @@ var SimpleNode = function (_React$Component) {
 			return _react2.default.createElement(
 				'div',
 				{ onDoubleClick: function onDoubleClick(e) {
-						_this4.handleClick(e);
+						return _this4.handleClick(e);
 					}, className: 'node-wrapper' },
 				_react2.default.createElement(
 					'section',
@@ -44241,18 +44232,16 @@ var AutoSuggest = function (_React$Component) {
 				_react2.default.createElement(
 					'div',
 					{ className: 'node-control-container' },
-					' ',
 					_react2.default.createElement(
 						'div',
 						{ ref: function ref(el) {
-								_this5.element = el;
+								return _this5.element = el;
 							}, className: 'node-editable-setting' },
 						_react2.default.createElement('input', { placeholder: 'Type to search...', type: 'text', value: this.state.text, className: 'node-editable-text', onBlur: function onBlur(v) {
 								return _this5.ensureSelected();
 							}, onChange: function onChange(v) {
 								return _this5.toggleSearch(v.target.value);
-							} }),
-						' '
+							} })
 					),
 					this.props.value && !this.props.notNull && _react2.default.createElement(
 						'a',
@@ -44303,10 +44292,8 @@ var AutoSuggest = function (_React$Component) {
 									)
 								);
 							})
-						),
-						' '
+						)
 					),
-					'    ',
 					this.props.allowCustomValue && _react2.default.createElement(
 						'div',
 						null,
@@ -44813,13 +44800,11 @@ var ExpressionEditor = function (_React$Component) {
 					_react2.default.createElement(
 						'div',
 						{ ref: function ref(el) {
-								_this4.element = el;
+								return _this4.element = el;
 							}, className: 'node-editable-setting' },
-						' ',
 						_react2.default.createElement('textarea', { id: 'expr_' + this.props.nodeId + '__' + this.props.name, name: 'expr_' + this.props.nodeId + '__' + this.props.name, type: 'text', ref: function ref(el) {
 								return _this4.textbox = el;
-							}, value: this.getValue() }),
-						' '
+							}, value: this.getValue() })
 					),
 					this.props.value && _react2.default.createElement(
 						'a',
@@ -44853,7 +44838,6 @@ var ExpressionEditor = function (_React$Component) {
 					schemas: this.props.schemas,
 					getNodeIcon: this.props.getNodeIcon,
 					canUseField: function canUseField(field, node) {
-
 						return !field.visibleTo || 0 <= field.visibleTo.indexOf(_this4.props.name) && node.nid == _this4.props.nodeId;
 					}
 				}),
@@ -45204,28 +45188,23 @@ var ExpressionSelectBox = function (_React$Component) {
 				_react2.default.createElement(
 					'div',
 					{ className: 'node-control-container node-control-expr-select ' + (this.props.errorMessage && 'node-error' || '') },
-					' ',
 					_react2.default.createElement(
 						'div',
 						{ ref: function ref(el) {
-								_this3.element = el;
+								return _this3.element = el;
 							}, className: 'node-editable-setting' },
 						_react2.default.createElement('input', { type: 'text', readOnly: this.props.lookupOnly, value: this.state.text, className: 'node-editable-text', onBlur: function onBlur(v) {
 								return _this3.ensureSelected();
 							}, onChange: function onChange(v) {
 								return _this3.updateValue(v);
-							} }),
-						' '
+							} })
 					),
-					' ',
 					operations && _react2.default.createElement(
 						'a',
 						{ href: 'javascript:void(0)', className: 'insert-button', onClick: function onClick() {
 								return _this3.toggleOperations();
 							} },
-						'  ',
-						_react2.default.createElement('i', { className: 'fa fa-cogs' }),
-						'  '
+						_react2.default.createElement('i', { className: 'fa fa-cogs' })
 					),
 					allowExpressions && _react2.default.createElement(
 						'a',
@@ -45242,80 +45221,73 @@ var ExpressionSelectBox = function (_React$Component) {
 						_react2.default.createElement('i', { className: 'fa fa-caret-down' })
 					)
 				),
-				'    ',
 				this.state.showOperations && _react2.default.createElement(
 					'div',
 					{ className: 'triggerhappy-operations' },
-					'    ',
 					_react2.default.createElement(
 						'label',
 						null,
 						'Operation Type'
 					),
-					'    ',
 					_react2.default.createElement(
 						'select',
 						{ onChange: function onChange(e) {
 								return _this3.updateSelectedOperation(e.target.value);
 							} },
-						' ',
 						_react2.default.createElement(
 							'option',
 							{ value: '' },
 							'None'
 						),
-						' ',
 						Object.keys(fieldTypeMethods).map(function (m) {
 							return _react2.default.createElement(
 								'option',
 								{ value: m },
 								fieldTypeMethods[m].description
 							);
-						}),
-						'    '
+						})
 					),
-					'    ',
 					this.state.selectedOperation && null != this.state.selectedOperation && _react2.default.createElement(
 						'div',
 						null,
-						'    ',
 						_react2.default.createElement('hr', null),
-						'    ',
 						Object.keys(fieldTypeMethods[this.state.selectedOperation].fields).map(function (f) {
 							return _react2.default.createElement(
 								'div',
 								null,
-								'    ',
 								_react2.default.createElement(
 									'label',
 									null,
 									f
 								),
-								' ',
 								_react2.default.createElement('input', { type: 'text', onChange: function onChange(e) {
 										return _this3.setOperationValue(f, e.target.value);
 									}, value: _this3.state.operationValues && _this3.state.operationValues[f] || '' }),
-								' ',
 								_react2.default.createElement(
 									'div',
 									{ className: 'desc' },
 									fieldTypeMethods[_this3.state.selectedOperation].fields[f].description
-								),
-								'    '
+								)
 							);
-						}),
-						'    '
+						})
 					),
-					' ',
 					_react2.default.createElement(
 						'a',
 						{ className: 'button button-small' },
 						'OK'
-					),
-					' '
+					)
 				),
-				'    ',
-				_react2.default.createElement(_QuickSearch2.default, { allowTypes: this.props.type, allowExpressions: allowExpressions, className: 'node-quick-search', insertField: this.insertField.bind(this), resetControlTypeClicked: this.props.resetControlTypeClicked, show: this.state.quickSearch, availableFields: this.props.availableFields, schemas: this.props.schemas, getNodeIcon: this.props.getNodeIcon })
+				_react2.default.createElement('quickSearch', {
+					allowTypes: this.props.type,
+					allowExpressions: allowExpressions,
+					className: 'node-quick-search',
+					insertField: this.insertField.bind(this),
+					resetControlTypeClicked: this.props.resetControlTypeClicked,
+					show: this.state.quickSearch,
+					availableFields: this.props.availableFields,
+					schemas: this.props.schemas,
+					getNodeIcon: this.props.getNodeIcon
+				})
 			);
 		}
 	}]);

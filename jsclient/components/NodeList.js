@@ -3,6 +3,7 @@ import SimpleNode from './SimpleNode';
 import {
 	connect
 } from 'react-redux';
+import {navigate} from '../actions';
 
 function renderAddPlaceholder( createNewClick ) {
 	return (
