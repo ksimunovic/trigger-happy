@@ -182,10 +182,6 @@ class TriggerHappyFlow{
 				$node->addField( $portDef['name'],$portDef['type'] );
 			}
 		}
-		if ( $hasOutFlow && ! $hasInFlow ) {
-			array_push( $this->startNodes,$node->id );
-		}
-
 	}
 	public function initialize() {
 		if ( ! isset( $this->nodedata->nodes ) ) {

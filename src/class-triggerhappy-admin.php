@@ -50,7 +50,7 @@ class TriggerHappyAdmin {
 			wp_enqueue_style(  'codemirror',  plugins_url( 'assets/codemirror.css', dirname(__FILE__) ) );
 			wp_enqueue_style( 'font-awesome',  plugins_url( 'assets/font-awesome/font-awesome.min.css', dirname(__FILE__) ), '4.7.0' );
 			wp_localize_script( 'wpflowscript', 'TH', array(
-				'expression_css_url' => plugins_url( 'build/expression.css', dirname(__FILE__) )
+				'expression_css_url' => plugins_url( 'assets/expression.css', dirname(__FILE__) )
 			));
 			wp_enqueue_editor();
 		}
