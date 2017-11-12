@@ -52,7 +52,6 @@ class TriggerHappyFlow{
 			$nodeId = str_replace( '_N','',$obj );
 
 			if ( is_numeric( $nodeId ) ) {
-				// print_r($this->nodes);
 				$node = null;
 
 				if ( $nodeId == 0 ) {
@@ -62,10 +61,7 @@ class TriggerHappyFlow{
 				} else {
 					$node = $this->getNode( $nodeId );
 				}
-				//$node->execute( $context );
-				// $this->getNode(0)->execute($context);
 				$field_data = $this->findField( $node->def, $prop );
-				// $field_data2 = $this->findField($this->getNode(0)->def, $prop);
 				$type = $field_data != null ? $field_data['type'] : null;
 				$context->fieldType = $type;
 
@@ -75,7 +71,7 @@ class TriggerHappyFlow{
 					$data = array(
 						'type' => $type,
 						'val' => $val[$prop],
-					);// ->resolveExpression();
+					);
 					return $data['val'];
 				}
 				return null;
@@ -147,7 +143,6 @@ class TriggerHappyFlow{
 	}
 	public function resolveExpression( $expression, $context ) {
 		$compiler = $this->compiler;
-//die('done' . $expression);
 		if ( $expression !== null ) {
 
 			if ( is_string( $expression ) ) {
@@ -180,9 +175,6 @@ class TriggerHappyFlow{
 		$id = $id ?? $node->id;
 		$this->nodes[ $id ] = $node;
 
-		// Also load ports
-		$hasOutFlow = false;
-		$hasInFlow = false;
 		$def = TriggerHappy::get_node( $node->type );
 
 		if ( isset( $def['fields'] ) ) {
@@ -190,7 +182,6 @@ class TriggerHappyFlow{
 				$node->addField( $portDef['name'],$portDef['type'] );
 			}
 		}
-		// print_r($node);
 		if ( $hasOutFlow && ! $hasInFlow ) {
 			array_push( $this->startNodes,$node->id );
 		}
@@ -237,8 +228,6 @@ class TriggerHappyFlow{
 		if ( isset( $this->nodes[ $id ] ) ) {
 			return $this->nodes[ $id ];
 		}
-		print_r( $this->nodes );
-		die( 'invalid node id' . $id );
 		return null;
 	}
 	public function start( $context = null ) {

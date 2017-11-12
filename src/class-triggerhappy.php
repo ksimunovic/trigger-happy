@@ -77,6 +77,9 @@ class TriggerHappy {
 		register_post_type( 'th_flow', $args );
 
 	}
+	/**
+	 * Initialize the REST API endpoints for Trigger Happy
+	 */
 	public function rest_api_init() {
 		require_once( dirname(__FILE__) ."/api/FlowHooksController.php" );
 		require_once( dirname(__FILE__) ."/api/FlowController.php" );
@@ -89,7 +92,9 @@ class TriggerHappy {
 		$controller2->register_routes();
 	}
 
-
+	/**
+	 * Load nodes from Trigger Happy and third-party plugins
+	 */
 	public function load_nodes() {
 		require_once( dirname( __FILE__ ) . '/nodes/core.php' );
 		$active_plugins = get_option( 'active_plugins' );
@@ -106,7 +111,10 @@ class TriggerHappy {
 		}
 	}
 
-
+	/**
+	 * Create a Field definition array - doesn't add it to the global fields
+	 * list, this needs to be done manually
+	 */
 	function create_field_def( $name, $type = 'flow', $opts = array() ) {
 		$opts = array_merge(
 			array(
@@ -120,20 +128,21 @@ class TriggerHappy {
 		$opts['type'] = $type;
 		return $opts;
 	}
-	function fetch_node( $id, $ns = null ) {
+	/**
+	 * Find a node definition by ID
+	 */
+	function fetch_node( $id ) {
 
-		if ( $ns !== null ) {
-			return $this->nodes[ $ns ][ $id ];
+
+		if ( isset( $this->nodes[ $id ] ) ) {
+			return $this->nodes[ $id ];
 		}
 
-		foreach ( $this->nodes as $ns => $v ) {
-			if ( isset( $this->nodes[ $ns ][ $id ] ) ) {
-				return $this->nodes[ $ns ][ $id ];
-			}
-		}
 	}
 
-
+	/*
+	 * FInd a registered global variable by ID
+	 */
 	function get_global( $id  ) {
 
 
@@ -144,7 +153,13 @@ class TriggerHappy {
 		}
 			return null;
 	}
-
+	/**
+	 * Register a Value Type (eg: wc_order)
+	 * @param ID The ID of the value type
+	 * @param parentType The base type (eg: number for wp_post)
+	 * @param getOptions A callable function returning the available options (used in dropdowns)
+	 * @param ajax Whether or not the getOptions function should be called via AJAX
+	 */
 	function register_value_type( $id, $parentType, $getOptions = null, $ajax = false ) {
 
 			if ( !isset($this->types[ $id ] )) {
@@ -163,6 +178,11 @@ class TriggerHappy {
 		$this->types[ $id ]['ajax'] = $ajax;
 
 	}
+	/**
+	 * Register a JSON Schema for a value type (eg: wc_order)
+	 * @param ID The ID of the value type
+	 * @param jsonSchema The JSON schema for this type
+	 */
 	function register_json_schema( $id, $jsonSchema ) {
 
 		if ( !isset(	$this->types[ $id ] ))
@@ -179,6 +199,11 @@ class TriggerHappy {
 		$this->types_schema[ $id ] = apply_filters('triggerhappy_json_schema_' . $id,$schema);
 
 	}
+	/**
+	* Fetches a JSON schema from the REST API and register a schema for a value type
+	* @param ID The ID of the value type
+	* @param $apiRoute The API Route to use
+	*/
 	function register_api_schema( $id, $apiRoute ) {
 
 		$this->types_schema[ $id ] = function() use ( $apiRoute ) {
@@ -190,10 +215,13 @@ class TriggerHappy {
 			return null;
 		};
 	}
-	function register_type_schema( $id, $schemaCallback ) {
-
-		$this->types_schema[ $id ] = $schemaCallback;
-	}
+	/**
+	* Registers a global field
+	* @param name The Name/ID of the global field
+	* @param type THe type of the global field (number, string, bool, date or custom value type)
+	* @param description The description to show in the UI
+	* @param callable A function providing the value of the global field
+	*/
 	function register_global_field(   $name, $type, $description, $callable = false ) {
 
 		array_push($this->globals, array(
@@ -206,22 +234,9 @@ class TriggerHappy {
 			add_filter('triggerhappy_global_'. $name, $callable);
 		}
 	}
-
-	function register_node( $id, $ns, $options ) {
-
-
-		$options = array_merge(
-			array(
-				'name' => $id,
-				'id' => $id,
-				'description' => '',
-				'cat' => '',
-				'plugin' => '',
-			),$options
-		);
-		$this->nodes[ $ns ][ $id ] = $options;
-		$new_node = $this->nodes[ $ns ][ $id ];
-	}
+	/**
+	* Initializes the node definitions
+	*/
 	function init_nodes() {
 
 
@@ -237,12 +252,16 @@ class TriggerHappy {
 
 		}
 	}
-
-	public static function get_node( $id, $ns = null ) {
-		return self::get_instance()->fetch_node($id, $ns);
+	/**
+	* Gets a node definition by ID
+	*/
+	public static function get_node( $id ) {
+		return self::get_instance()->fetch_node( $id );
 	}
 
-
+	/**
+	 * Creates a field definition (Does not register it)
+	 */
 	public static function create_field( $name, $type = 'flow', $opts = array() ) {
 		return self::get_instance()->create_field_def($name,$type,$opts);
 	}

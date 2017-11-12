@@ -119,9 +119,9 @@ function getDefinitionsByCategory( definitions ) {
 }
 const mapStateToProps = state => {
 	let isTrigger = ( state.ui.addTrigger || 0 == Object.keys( state.nodes ).filter( r => 'trigger' == state.nodes[r].nodeType ).length );
-	let preferredNodeTypes = Object.keys( state.nodes ).filter( r => state.definitions[state.nodes[r].type].triggerType || state.definitions[state.nodes[r].type].actionType );
+	let preferredNodeTypes = Object.keys( state.nodes ).filter( r => state.definitions[ state.nodes[r].type ].triggerType || state.definitions[ state.nodes[r].type ].actionType );
 	if ( 0 < preferredNodeTypes.length ) {
-		preferredNodeTypes = preferredNodeTypes.map( r => state.definitions[state.nodes[r].type].triggerType || state.definitions[state.nodes[r].type].actionType );
+		preferredNodeTypes = preferredNodeTypes.map( r => state.definitions[ state.nodes[r].type ].triggerType || state.definitions[ state.nodes[r].type ].actionType );
 	} else {
 		preferredNodeTypes = false;
 	}

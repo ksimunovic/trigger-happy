@@ -14,8 +14,6 @@ require_once( dirname( __FILE__ ) . '/src/includes/class-triggerhappynode.php' )
 require_once( dirname( __FILE__ ) . '/src/includes/class-triggerhappyexpressioncompiler.php' );
 
 require_once( dirname( __FILE__ ) . '/src/class-triggerhappy-admin.php' );
-require_once( dirname( __FILE__ ) . '/src/class-triggerhappy-datatypes.php' );
-require_once( dirname( __FILE__ ) . '/src/class-triggerhappy-nodemanager.php' );
 require_once( dirname( __FILE__ ) . '/src/class-triggerhappy.php' );
 require_once( dirname( __FILE__ ) . '/src/functions.php' );
 
