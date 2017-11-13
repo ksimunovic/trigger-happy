@@ -503,6 +503,8 @@ exports.receivePlugins = receivePlugins;
 exports.requestActions = requestActions;
 exports.receiveActions = receiveActions;
 
+var _util = __webpack_require__(16);
+
 var _axios = __webpack_require__(127);
 
 var _axios2 = _interopRequireDefault(_axios);
@@ -681,10 +683,22 @@ var addNode = exports.addNode = function addNode(node, nid) {
 				}
 			}
 			if (node.filters) {
+				var filters = [];
+				for (var g in node.filters) {
+					var filterGroup = [];
+					filters.push(filterGroup);
+					for (var _i in node.filters[g]) {
+						filterGroup.push({
+							left: { expr: (0, _util.replaceSelfInExpression)(node.filters[g][_i].left.expr, newNode.nid) },
+							op: node.filters[g][_i].op,
+							right: { expr: (0, _util.replaceSelfInExpression)(node.filters[g][_i].right.expr, newNode.nid) }
+						});
+					}
+				}
 				dispatch({
 					type: 'SET_NODE_FILTERS',
 					nodeId: newNode.nid,
-					filters: node.filters
+					filters: filters
 				});
 			}
 			if (newNode.fields.return !== undefined) {
@@ -816,6 +830,7 @@ function fetchActions(plugin) {
 }
 function fetchPlugins() {
 	return function (dispatch) {
+
 		dispatch(requestPlugins());
 
 		return fetch('/wp-json/wpflow/v1/plugins' + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, { credentials: 'same-origin' }).then(function (response) {
@@ -2423,7 +2438,7 @@ module.exports = ReactPerf;
 
 
 var CallbackQueue = __webpack_require__(51);
-var PooledClass = __webpack_require__(16);
+var PooledClass = __webpack_require__(17);
 var ReactPerf = __webpack_require__(11);
 var ReactReconciler = __webpack_require__(20);
 var Transaction = __webpack_require__(37);
@@ -2817,173 +2832,6 @@ module.exports = ReactCurrentOwner;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(process) {/**
- * Copyright 2013-2015, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- * @providesModule PooledClass
- */
-
-
-
-var invariant = __webpack_require__(1);
-
-/**
- * Static poolers. Several custom versions for each potential number of
- * arguments. A completely generic pooler is easy to implement, but would
- * require accessing the `arguments` object. In each of these, `this` refers to
- * the Class itself, not an instance. If any others are needed, simply add them
- * here, or in their own files.
- */
-var oneArgumentPooler = function (copyFieldsFrom) {
-  var Klass = this;
-  if (Klass.instancePool.length) {
-    var instance = Klass.instancePool.pop();
-    Klass.call(instance, copyFieldsFrom);
-    return instance;
-  } else {
-    return new Klass(copyFieldsFrom);
-  }
-};
-
-var twoArgumentPooler = function (a1, a2) {
-  var Klass = this;
-  if (Klass.instancePool.length) {
-    var instance = Klass.instancePool.pop();
-    Klass.call(instance, a1, a2);
-    return instance;
-  } else {
-    return new Klass(a1, a2);
-  }
-};
-
-var threeArgumentPooler = function (a1, a2, a3) {
-  var Klass = this;
-  if (Klass.instancePool.length) {
-    var instance = Klass.instancePool.pop();
-    Klass.call(instance, a1, a2, a3);
-    return instance;
-  } else {
-    return new Klass(a1, a2, a3);
-  }
-};
-
-var fourArgumentPooler = function (a1, a2, a3, a4) {
-  var Klass = this;
-  if (Klass.instancePool.length) {
-    var instance = Klass.instancePool.pop();
-    Klass.call(instance, a1, a2, a3, a4);
-    return instance;
-  } else {
-    return new Klass(a1, a2, a3, a4);
-  }
-};
-
-var fiveArgumentPooler = function (a1, a2, a3, a4, a5) {
-  var Klass = this;
-  if (Klass.instancePool.length) {
-    var instance = Klass.instancePool.pop();
-    Klass.call(instance, a1, a2, a3, a4, a5);
-    return instance;
-  } else {
-    return new Klass(a1, a2, a3, a4, a5);
-  }
-};
-
-var standardReleaser = function (instance) {
-  var Klass = this;
-  !(instance instanceof Klass) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Trying to release an instance into a pool of a different type.') : invariant(false) : undefined;
-  instance.destructor();
-  if (Klass.instancePool.length < Klass.poolSize) {
-    Klass.instancePool.push(instance);
-  }
-};
-
-var DEFAULT_POOL_SIZE = 10;
-var DEFAULT_POOLER = oneArgumentPooler;
-
-/**
- * Augments `CopyConstructor` to be a poolable class, augmenting only the class
- * itself (statically) not adding any prototypical fields. Any CopyConstructor
- * you give this may have a `poolSize` property, and will look for a
- * prototypical `destructor` on instances (optional).
- *
- * @param {Function} CopyConstructor Constructor that can be used to reset.
- * @param {Function} pooler Customizable pooler.
- */
-var addPoolingTo = function (CopyConstructor, pooler) {
-  var NewKlass = CopyConstructor;
-  NewKlass.instancePool = [];
-  NewKlass.getPooled = pooler || DEFAULT_POOLER;
-  if (!NewKlass.poolSize) {
-    NewKlass.poolSize = DEFAULT_POOL_SIZE;
-  }
-  NewKlass.release = standardReleaser;
-  return NewKlass;
-};
-
-var PooledClass = {
-  addPoolingTo: addPoolingTo,
-  oneArgumentPooler: oneArgumentPooler,
-  twoArgumentPooler: twoArgumentPooler,
-  threeArgumentPooler: threeArgumentPooler,
-  fourArgumentPooler: fourArgumentPooler,
-  fiveArgumentPooler: fiveArgumentPooler
-};
-
-module.exports = PooledClass;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2013-2015, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- * @providesModule keyOf
- */
-
-/**
- * Allows extraction of a minified key. Let's the build system minify keys
- * without losing the ability to dynamically use key strings as values
- * themselves. Pass in an object with a single key/val pair and it will return
- * you the string key of that single record. Suppose you want to grab the
- * value for a key 'className' inside of an object. Key/val minification may
- * have aliased that key to be 'xa12'. keyOf({className: null}) will return
- * 'xa12' in that case. Resolve keys you want to use once at startup time, then
- * reuse those resolutions.
- */
-
-
-var keyOf = function (oneKeyObj) {
-  var key;
-  for (key in oneKeyObj) {
-    if (!oneKeyObj.hasOwnProperty(key)) {
-      continue;
-    }
-    return key;
-  }
-  return null;
-};
-
-module.exports = keyOf;
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -2995,6 +2843,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 exports.buildExpressionFromValue = buildExpressionFromValue;
 exports.buildExpression = buildExpression;
 exports.parseExpression = parseExpression;
+exports.replaceSelfInExpression = replaceSelfInExpression;
 exports.stringifyExpression = stringifyExpression;
 
 var _react = __webpack_require__(4);
@@ -3135,6 +2984,7 @@ function parseExpression(expression) {
 	var type = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 	var store = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 
+	if (typeof expression == 'boolean' || typeof expression == 'number') return expression;
 	if (expression.replace) {
 		expression = expression.replace(/\{\{(_N[^\}]*)\}\}/i, function (match, p1) {
 			return p1;
@@ -3183,7 +3033,11 @@ function parseExpression(expression) {
 		return expression;
 	}
 }
-
+function replaceSelfInExpression(expression, nodeId) {
+	var str = stringifyExpression(expression);
+	if (typeof str === "string") str = str.replace("_self.", "_N" + nodeId + ".");
+	return parseExpression(str);
+}
 function stringifyExpression(expression) {
 	if (null == expression) {
 		return null;
@@ -3205,6 +3059,173 @@ function stringifyExpression(expression) {
 	}
 	return rebuiltExpression;
 }
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {/**
+ * Copyright 2013-2015, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule PooledClass
+ */
+
+
+
+var invariant = __webpack_require__(1);
+
+/**
+ * Static poolers. Several custom versions for each potential number of
+ * arguments. A completely generic pooler is easy to implement, but would
+ * require accessing the `arguments` object. In each of these, `this` refers to
+ * the Class itself, not an instance. If any others are needed, simply add them
+ * here, or in their own files.
+ */
+var oneArgumentPooler = function (copyFieldsFrom) {
+  var Klass = this;
+  if (Klass.instancePool.length) {
+    var instance = Klass.instancePool.pop();
+    Klass.call(instance, copyFieldsFrom);
+    return instance;
+  } else {
+    return new Klass(copyFieldsFrom);
+  }
+};
+
+var twoArgumentPooler = function (a1, a2) {
+  var Klass = this;
+  if (Klass.instancePool.length) {
+    var instance = Klass.instancePool.pop();
+    Klass.call(instance, a1, a2);
+    return instance;
+  } else {
+    return new Klass(a1, a2);
+  }
+};
+
+var threeArgumentPooler = function (a1, a2, a3) {
+  var Klass = this;
+  if (Klass.instancePool.length) {
+    var instance = Klass.instancePool.pop();
+    Klass.call(instance, a1, a2, a3);
+    return instance;
+  } else {
+    return new Klass(a1, a2, a3);
+  }
+};
+
+var fourArgumentPooler = function (a1, a2, a3, a4) {
+  var Klass = this;
+  if (Klass.instancePool.length) {
+    var instance = Klass.instancePool.pop();
+    Klass.call(instance, a1, a2, a3, a4);
+    return instance;
+  } else {
+    return new Klass(a1, a2, a3, a4);
+  }
+};
+
+var fiveArgumentPooler = function (a1, a2, a3, a4, a5) {
+  var Klass = this;
+  if (Klass.instancePool.length) {
+    var instance = Klass.instancePool.pop();
+    Klass.call(instance, a1, a2, a3, a4, a5);
+    return instance;
+  } else {
+    return new Klass(a1, a2, a3, a4, a5);
+  }
+};
+
+var standardReleaser = function (instance) {
+  var Klass = this;
+  !(instance instanceof Klass) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Trying to release an instance into a pool of a different type.') : invariant(false) : undefined;
+  instance.destructor();
+  if (Klass.instancePool.length < Klass.poolSize) {
+    Klass.instancePool.push(instance);
+  }
+};
+
+var DEFAULT_POOL_SIZE = 10;
+var DEFAULT_POOLER = oneArgumentPooler;
+
+/**
+ * Augments `CopyConstructor` to be a poolable class, augmenting only the class
+ * itself (statically) not adding any prototypical fields. Any CopyConstructor
+ * you give this may have a `poolSize` property, and will look for a
+ * prototypical `destructor` on instances (optional).
+ *
+ * @param {Function} CopyConstructor Constructor that can be used to reset.
+ * @param {Function} pooler Customizable pooler.
+ */
+var addPoolingTo = function (CopyConstructor, pooler) {
+  var NewKlass = CopyConstructor;
+  NewKlass.instancePool = [];
+  NewKlass.getPooled = pooler || DEFAULT_POOLER;
+  if (!NewKlass.poolSize) {
+    NewKlass.poolSize = DEFAULT_POOL_SIZE;
+  }
+  NewKlass.release = standardReleaser;
+  return NewKlass;
+};
+
+var PooledClass = {
+  addPoolingTo: addPoolingTo,
+  oneArgumentPooler: oneArgumentPooler,
+  twoArgumentPooler: twoArgumentPooler,
+  threeArgumentPooler: threeArgumentPooler,
+  fourArgumentPooler: fourArgumentPooler,
+  fiveArgumentPooler: fiveArgumentPooler
+};
+
+module.exports = PooledClass;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2013-2015, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule keyOf
+ */
+
+/**
+ * Allows extraction of a minified key. Let's the build system minify keys
+ * without losing the ability to dynamically use key strings as values
+ * themselves. Pass in an object with a single key/val pair and it will return
+ * you the string key of that single record. Suppose you want to grab the
+ * value for a key 'className' inside of an object. Key/val minification may
+ * have aliased that key to be 'xa12'. keyOf({className: null}) will return
+ * 'xa12' in that case. Resolve keys you want to use once at startup time, then
+ * reuse those resolutions.
+ */
+
+
+var keyOf = function (oneKeyObj) {
+  var key;
+  for (key in oneKeyObj) {
+    if (!oneKeyObj.hasOwnProperty(key)) {
+      continue;
+    }
+    return key;
+  }
+  return null;
+};
+
+module.exports = keyOf;
 
 /***/ }),
 /* 19 */
@@ -3579,7 +3600,7 @@ module.exports = ReactReconciler;
 
 
 
-var PooledClass = __webpack_require__(16);
+var PooledClass = __webpack_require__(17);
 
 var assign = __webpack_require__(2);
 var emptyFunction = __webpack_require__(13);
@@ -33340,7 +33361,7 @@ function warning(message) {
 
 
 
-var PooledClass = __webpack_require__(16);
+var PooledClass = __webpack_require__(17);
 
 var assign = __webpack_require__(2);
 var invariant = __webpack_require__(1);
@@ -35776,7 +35797,7 @@ var _QuickSearch = __webpack_require__(32);
 
 var _QuickSearch2 = _interopRequireDefault(_QuickSearch);
 
-var _util = __webpack_require__(18);
+var _util = __webpack_require__(16);
 
 var _codemirror = __webpack_require__(44);
 
@@ -37204,7 +37225,7 @@ module.exports = EventPluginRegistry;
 
 
 
-var PooledClass = __webpack_require__(16);
+var PooledClass = __webpack_require__(17);
 var ReactElement = __webpack_require__(9);
 
 var emptyFunction = __webpack_require__(13);
@@ -37402,7 +37423,7 @@ var assign = __webpack_require__(2);
 var emptyObject = __webpack_require__(30);
 var invariant = __webpack_require__(1);
 var keyMirror = __webpack_require__(41);
-var keyOf = __webpack_require__(17);
+var keyOf = __webpack_require__(18);
 var warning = __webpack_require__(3);
 
 var MIXINS_KEY = keyOf({ mixins: null });
@@ -41194,7 +41215,7 @@ var _store2 = _interopRequireDefault(_store);
 
 var _actions = __webpack_require__(6);
 
-var _util = __webpack_require__(18);
+var _util = __webpack_require__(16);
 
 var _actions2 = __webpack_require__(6);
 
@@ -42558,11 +42579,11 @@ var CreateNewPanel = function (_React$Component) {
 	}, {
 		key: 'checkIfCanShow',
 		value: function checkIfCanShow(action) {
-			if ('condition' == action.nodeType && false !== this.props.preferredNodeTypes) {
-				return !action.conditionType || false !== this.props.preferredNodeTypes && false !== this.props.preferredNodeTypes.indexOf(action.conditionType);
+			if ('condition' == action.nodeType && this.props.preferredNodeTypes !== false) {
+				return !action.conditionType || this.props.preferredNodeTypes !== false && this.props.preferredNodeTypes.indexOf(action.conditionType) >= 0;
 			} else if ('action' == action.nodeType && (action.actionType || this.props.preferredNodeTypes) && !this.state.showAll) {
 				var nodeTypes = this.props.preferredNodeTypes;
-				return action.actionType && false !== this.props.preferredNodeTypes && false !== this.props.preferredNodeTypes.indexOf(action.actionType);
+				return action.actionType && this.props.preferredNodeTypes !== false && this.props.preferredNodeTypes.indexOf(action.actionType) >= 0;
 			}
 			return true;
 		}
@@ -42745,7 +42766,7 @@ var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _util = __webpack_require__(18);
+var _util = __webpack_require__(16);
 
 var _controls = __webpack_require__(158);
 
@@ -44364,7 +44385,7 @@ var _OperationsPanel = __webpack_require__(79);
 
 var _OperationsPanel2 = _interopRequireDefault(_OperationsPanel);
 
-var _util = __webpack_require__(18);
+var _util = __webpack_require__(16);
 
 var _codemirror = __webpack_require__(44);
 
@@ -44907,7 +44928,7 @@ var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _util = __webpack_require__(18);
+var _util = __webpack_require__(16);
 
 var _reactRedux = __webpack_require__(8);
 
@@ -45362,7 +45383,7 @@ var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _util = __webpack_require__(18);
+var _util = __webpack_require__(16);
 
 var _QuickSearch = __webpack_require__(32);
 
@@ -45432,7 +45453,7 @@ var RichEditor = function (_React$Component) {
 	}, {
 		key: 'componentWillUnmount',
 		value: function componentWillUnmount() {
-			if (this.editor) {
+			if (this.editor && this.editor.dom) {
 				this.editor.remove();
 			}
 		}
@@ -45481,102 +45502,103 @@ var RichEditor = function (_React$Component) {
 			var id = this.textbox.getAttribute('id');
 			var self = this;
 
-			wp.editor.initialize(id, {
-				wpautop: false,
+			window.setTimeout(function () {
+				wp.editor.initialize(id, {
+					wpautop: false,
 
-				tinymce: {
-					plugins: wp.editor.getDefaultSettings().tinymce.plugins + ',wpflowexpression',
+					tinymce: {
+						plugins: wp.editor.getDefaultSettings().tinymce.plugins + ',wpflowexpression',
 
-					setup: function setup(editor) {
-						self.editor = editor;
-						self.editor.mountOperationsPanel = function (selectedExpressionElement, mountElement) {
-							var currentExpression = '{{' + self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-tag') + '}}';
-							var _updateSelectedOperation = function _updateSelectedOperation(op) {
-								self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values', '');
-								self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-operation', op);
-								var newExpr = self.updateExpressionWithOperation(self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-tag'), op, {});
-								self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-tag', newExpr.replace('{{', '').replace('}}', ''));
-								var newHtml = self.replaceSpecialCharsWithTags(newExpr, true);
-								selectedExpressionElement.innerHTML = self.editor.dom.$(newHtml).html();
+						setup: function setup(editor) {
+							self.editor = editor;
+							self.editor.mountOperationsPanel = function (selectedExpressionElement, mountElement) {
+								var currentExpression = '{{' + self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-tag') + '}}';
+								var _updateSelectedOperation = function _updateSelectedOperation(op) {
+									self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values', '');
+									self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-operation', op);
+									var newExpr = self.updateExpressionWithOperation(self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-tag'), op, {});
+									self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-tag', newExpr.replace('{{', '').replace('}}', ''));
+									var newHtml = self.replaceSpecialCharsWithTags(newExpr, true);
+									selectedExpressionElement.innerHTML = self.editor.dom.$(newHtml).html();
+									renderOp();
+								};
+								var _setOperationValue = function _setOperationValue(f, v) {
+									var values = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values');
+									if (values) {
+										values = JSON.parse(values);
+									} else {
+										values = {};
+									}
+									values[f] = v;
+									var op = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation');
+									self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values', JSON.stringify(values));
+									var newExpr = self.updateExpressionWithOperation(self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-tag'), op, values);
+									self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-tag', newExpr.replace('{{', '').replace('}}', ''));
+									var newHtml = self.replaceSpecialCharsWithTags(newExpr, true);
+									selectedExpressionElement.innerHTML = self.editor.dom.$(newHtml).html();
+									renderOp();
+								};
+								var renderOp = function renderOp() {
+
+									var selectedType = self.editor.dom.getAttrib(selectedExpressionElement, 'data-type');
+									var fieldTypeMethods = self.props.schemas[selectedType] && self.props.schemas[selectedType].methods;
+									var opType = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation') || '';
+									var opValues = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values') || '{}';
+									opValues = JSON.parse(opValues);
+
+									if (fieldTypeMethods) {
+										_reactDom2.default.render(_react2.default.createElement(
+											_reactRedux.Provider,
+											{ store: window.TH.nodeStore },
+											_react2.default.createElement(_OperationsPanel2.default, {
+												updateSelectedOperation: function updateSelectedOperation(op) {
+													return _updateSelectedOperation(op);
+												},
+												selectedOperation: opType,
+												operationX: 0,
+												fieldType: selectedType,
+												operationY: 0,
+												operationValues: opValues,
+												setOperationValue: function setOperationValue(f, v) {
+													return _setOperationValue(f, v);
+												}
+											})
+										), mountElement);
+									}
+								};
 								renderOp();
 							};
-							var _setOperationValue = function _setOperationValue(f, v) {
-								var values = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values');
-								if (values) {
-									values = JSON.parse(values);
-								} else {
-									values = {};
+							editor.settings.toolbar1 += ',insertExpr';
+							editor.settings.content_css += ',' + TH.expression_css_url; // eslint-disable-line camelcase
+
+							editor.addButton('insertExpr', {
+								text: '',
+								icon: 'crosshairs',
+								onclick: function onclick() {
+									self.setState({
+										quickSearch: !self.state.quickSearch,
+										quickSearchText: ''
+									});
 								}
-								values[f] = v;
-								var op = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation');
-								self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values', JSON.stringify(values));
-								var newExpr = self.updateExpressionWithOperation(self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-tag'), op, values);
-								self.editor.dom.setAttrib(selectedExpressionElement, 'data-triggerhappy-tag', newExpr.replace('{{', '').replace('}}', ''));
-								var newHtml = self.replaceSpecialCharsWithTags(newExpr, true);
-								selectedExpressionElement.innerHTML = self.editor.dom.$(newHtml).html();
-								renderOp();
-							};
-							var renderOp = function renderOp() {
+							});
 
-								var selectedType = self.editor.dom.getAttrib(selectedExpressionElement, 'data-type');
-								var fieldTypeMethods = self.props.schemas[selectedType] && self.props.schemas[selectedType].methods;
-								var opType = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation') || '';
-								var opValues = self.editor.dom.getAttrib(selectedExpressionElement, 'data-triggerhappy-operation-values') || '{}';
-								opValues = JSON.parse(opValues);
-
-								if (fieldTypeMethods) {
-									_reactDom2.default.render(_react2.default.createElement(
-										_reactRedux.Provider,
-										{ store: window.TH.nodeStore },
-										_react2.default.createElement(_OperationsPanel2.default, {
-											updateSelectedOperation: function updateSelectedOperation(op) {
-												return _updateSelectedOperation(op);
-											},
-											selectedOperation: opType,
-											operationX: 0,
-											fieldType: selectedType,
-											operationY: 0,
-											operationValues: opValues,
-											setOperationValue: function setOperationValue(f, v) {
-												return _setOperationValue(f, v);
-											}
-										})
-									), mountElement);
-								}
-							};
-							renderOp();
-						};
-						editor.settings.toolbar1 += ',insertExpr';
-						editor.settings.content_css += ',' + TH.expression_css_url; // eslint-disable-line camelcase
-
-						editor.addButton('insertExpr', {
-							text: '',
-							icon: 'crosshairs',
-							onclick: function onclick() {
-								self.setState({
-									quickSearch: !self.state.quickSearch,
-									quickSearchText: ''
-								});
-							}
-						});
-
-						editor.on('beforesetcontent', function (e) {
-							e.content = self.replaceSpecialCharsWithTags(e.content, true);
-						});
-						editor.on('postProcess', function (e) {
-							e.content = self.unreplaceTags(e.content);
-						});
-						editor.on('change', function (event, v) {
-							self.props.onChange(editor.getContent());
-						});
-						editor.on('keyup', function (event, v) {
-							self.props.onChange(editor.getContent());
-						});
-					}
-				},
-				quicktags: true
-			});
-
+							editor.on('beforesetcontent', function (e) {
+								e.content = self.replaceSpecialCharsWithTags(e.content, true);
+							});
+							editor.on('postProcess', function (e) {
+								e.content = self.unreplaceTags(e.content);
+							});
+							editor.on('change', function (event, v) {
+								self.props.onChange(editor.getContent());
+							});
+							editor.on('keyup', function (event, v) {
+								self.props.onChange(editor.getContent());
+							});
+						}
+					},
+					quicktags: true
+				});
+			}, 10);
 			for (var i in this.props.availableFields) {
 				for (var f in this.props.availableFields[i].fields) {
 					this.props.loadDataType(this.props.availableFields[i].fields[f].type);
@@ -45767,7 +45789,7 @@ var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _util = __webpack_require__(18);
+var _util = __webpack_require__(16);
 
 var _codemirror = __webpack_require__(44);
 
@@ -50355,7 +50377,7 @@ var FallbackCompositionState = __webpack_require__(214);
 var SyntheticCompositionEvent = __webpack_require__(246);
 var SyntheticInputEvent = __webpack_require__(249);
 
-var keyOf = __webpack_require__(17);
+var keyOf = __webpack_require__(18);
 
 var END_KEYCODES = [9, 13, 27, 32]; // Tab, Return, Esc, Space
 var START_KEYCODE = 229;
@@ -50950,7 +50972,7 @@ var SyntheticEvent = __webpack_require__(21);
 var getEventTarget = __webpack_require__(62);
 var isEventSupported = __webpack_require__(65);
 var isTextInputElement = __webpack_require__(115);
-var keyOf = __webpack_require__(17);
+var keyOf = __webpack_require__(18);
 
 var topLevelTypes = EventConstants.topLevelTypes;
 
@@ -51448,7 +51470,7 @@ module.exports = Danger;
 
 
 
-var keyOf = __webpack_require__(17);
+var keyOf = __webpack_require__(18);
 
 /**
  * Module that is injectable into `EventPluginHub`, that specifies a
@@ -51487,7 +51509,7 @@ var EventPropagators = __webpack_require__(27);
 var SyntheticMouseEvent = __webpack_require__(36);
 
 var ReactMount = __webpack_require__(7);
-var keyOf = __webpack_require__(17);
+var keyOf = __webpack_require__(18);
 
 var topLevelTypes = EventConstants.topLevelTypes;
 var getFirstReactDOM = ReactMount.getFirstReactDOM;
@@ -51821,7 +51843,7 @@ module.exports = EventPluginUtils;
 
 
 
-var PooledClass = __webpack_require__(16);
+var PooledClass = __webpack_require__(17);
 
 var assign = __webpack_require__(2);
 var getTextContentAccessor = __webpack_require__(114);
@@ -53157,7 +53179,7 @@ var canDefineProperty = __webpack_require__(38);
 var escapeTextContentForBrowser = __webpack_require__(39);
 var invariant = __webpack_require__(1);
 var isEventSupported = __webpack_require__(65);
-var keyOf = __webpack_require__(17);
+var keyOf = __webpack_require__(18);
 var setInnerHTML = __webpack_require__(40);
 var setTextContent = __webpack_require__(66);
 var shallowEqual = __webpack_require__(121);
@@ -55408,7 +55430,7 @@ module.exports = ReactEventEmitterMixin;
 
 var EventListener = __webpack_require__(116);
 var ExecutionEnvironment = __webpack_require__(5);
-var PooledClass = __webpack_require__(16);
+var PooledClass = __webpack_require__(17);
 var ReactInstanceHandles = __webpack_require__(23);
 var ReactMount = __webpack_require__(7);
 var ReactUpdates = __webpack_require__(12);
@@ -56350,7 +56372,7 @@ module.exports = ReactOwner;
 
 
 var CallbackQueue = __webpack_require__(51);
-var PooledClass = __webpack_require__(16);
+var PooledClass = __webpack_require__(17);
 var ReactBrowserEventEmitter = __webpack_require__(33);
 var ReactDOMFeatureFlags = __webpack_require__(95);
 var ReactInputSelection = __webpack_require__(104);
@@ -56709,7 +56731,7 @@ module.exports = {
 
 
 
-var PooledClass = __webpack_require__(16);
+var PooledClass = __webpack_require__(17);
 var CallbackQueue = __webpack_require__(51);
 var Transaction = __webpack_require__(37);
 
@@ -56942,7 +56964,7 @@ var SyntheticEvent = __webpack_require__(21);
 
 var getActiveElement = __webpack_require__(119);
 var isTextInputElement = __webpack_require__(115);
-var keyOf = __webpack_require__(17);
+var keyOf = __webpack_require__(18);
 var shallowEqual = __webpack_require__(121);
 
 var topLevelTypes = EventConstants.topLevelTypes;
@@ -57193,7 +57215,7 @@ var SyntheticWheelEvent = __webpack_require__(252);
 var emptyFunction = __webpack_require__(13);
 var getEventCharCode = __webpack_require__(60);
 var invariant = __webpack_require__(1);
-var keyOf = __webpack_require__(17);
+var keyOf = __webpack_require__(18);
 
 var topLevelTypes = EventConstants.topLevelTypes;
 

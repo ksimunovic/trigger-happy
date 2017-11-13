@@ -1,3 +1,4 @@
+import {replaceSelfInExpression} from '../lib/util';
 import axios from 'axios';
 export const editNode = ( node, type ) => {
 	return {
@@ -152,10 +153,22 @@ return new Promise( ( resolve, reject ) => {
 		}
 	}
 	if ( node.filters ) {
+		let filters = [];
+		for (let g in node.filters) {
+			let filterGroup = [];
+			filters.push(filterGroup);
+			for (let i in node.filters[g]) {
+				filterGroup.push({
+					left: { expr: replaceSelfInExpression(node.filters[g][i].left.expr, newNode.nid) },
+					op:node.filters[g][i].op,
+					right: { expr: replaceSelfInExpression(node.filters[g][i].right.expr, newNode.nid) }
+				});
+			}
+		}
 		dispatch({
 			type: 'SET_NODE_FILTERS',
 			nodeId: newNode.nid,
-			filters: node.filters
+			filters: filters
 		});
 	}
 	if ( newNode.fields.return !== undefined ) {
@@ -284,6 +297,7 @@ export function fetchActions( plugin ) {
 }
 export function fetchPlugins() {
 	return dispatch => {
+
 	dispatch( requestPlugins() );
 
 	return fetch( '/wp-json/wpflow/v1/plugins' + '?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, { credentials: 'same-origin' })

@@ -30,19 +30,26 @@ class FlowPluginsController extends WP_REST_Controller {
 
 		$items = TriggerHappy::get_instance()->nodes;
 		$data = array();
-		$options = get_option( 'triggerhappy_plugin_data' );
+		$options =  get_option( 'triggerhappy_plugin_data' );
 		if ( ! $options ) {
 			$options = array();
 		}
-		foreach ( $items as $pluginName => $nodeList ) {
-
-			if ( ! isset( $options[ $pluginName ] ) ) {
-				$pluginDataReq = wp_remote_get( 'https://api.wordpress.org/plugins/info/1.0/' . $pluginName . '.json' );
+		$skip = array();
+		foreach ( $items as $nodeId => $nodeList ) {
+			if (!isset($nodeList['plugin'])) {
+				continue;
+			}
+			$pluginName = $nodeList['plugin'];
+			if ( $pluginName && ! isset( $options[ $pluginName ] ) && ! isset( $skip[ $pluginName ] ) ) {
+				
+				$pluginDataReq = wp_remote_get( 'https://api.wordpress.org/plugins/info/1.0/' . strtolower($pluginName) . '.json' );
 				if ( is_wp_error( $pluginDataReq ) ) {
+					$skip[ $pluginName ] = true;
 					continue;
 				}
 				$pluginData = json_decode( wp_remote_retrieve_body( $pluginDataReq ) );
 				if ( $pluginData == null ) {
+					$skip[ $pluginName ] = true;
 					continue;
 				}
 
@@ -56,9 +63,10 @@ class FlowPluginsController extends WP_REST_Controller {
 					'icon' => $iconUrl,
 				);
 			}
-			if ( isset( $options[ $pluginName ] ) ) {
-				array_push( $data,$options[ $pluginName ] );
-			}
+
+		}
+		foreach ($options as $plugin=>$plugindata) {
+			array_push( $data, $plugindata );
 		}
 		update_option( 'triggerhappy_plugin_data',$options );
 

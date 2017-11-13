@@ -237,9 +237,7 @@ class TriggerHappy {
 
 		$flows = get_posts(array('post_type' =>'th_flow'));
 		foreach ($flows as $flow) {
-
 			$f = new TriggerHappyFlow($flow->ID,json_decode($flow->post_content));
-
 		}
 	}
 	/**

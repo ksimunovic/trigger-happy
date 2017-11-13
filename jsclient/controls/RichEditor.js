@@ -51,7 +51,7 @@ class RichEditor extends React.Component {
 		return expr;
 	}
 	componentWillUnmount() {
-		if ( this.editor ) {
+		if ( this.editor && this.editor.dom ) {
 			this.editor.remove();
 		}
 	}
@@ -99,7 +99,7 @@ class RichEditor extends React.Component {
 		let id = ( this.textbox.getAttribute( 'id' ) );
 		let self = this;
 
-
+		window.setTimeout(function() {
 		wp.editor.initialize( id, {
 			wpautop: false,
 
@@ -194,7 +194,7 @@ class RichEditor extends React.Component {
 			},
 			quicktags: true
 		});
-
+	},10);
 		for ( let i in this.props.availableFields ) {
 			for ( let f in this.props.availableFields[i].fields ) {
 				this.props.loadDataType( this.props.availableFields[i].fields[f].type );

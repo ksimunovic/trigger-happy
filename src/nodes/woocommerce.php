@@ -1,4 +1,5 @@
 <?php
+include( dirname(__FILE__) . "/functions/woocommerce_functions.php" );
 
 function triggerhappy_load_woocommerce_nodes( $nodes ) {
 
@@ -18,11 +19,32 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 		'callback' => 'triggerhappy_filter_hook',
 	);
 
-	$nodes['th_woocommerce_before_single_product_summary'] = array(
-		'description' => 'Add content to a single product page',
-		'name' => 'View Single Product page',
-		'plugin' => 'woocommerce',
+	$nodes['th_woocommerce_single_product'] = array(
+		'description' => 'When a single product is being viewed on the front-end',
+		'name' => 'When a Single Product is viewed',
+		'plugin' => '',
+		'triggerType'=>'product_render',
 		'nodeType' => 'trigger',
+		'hook'=>'template_redirect',
+		'callback'=>'triggerhappy_action_hook',
+		'cat' => 'Front-end - WooCommerce',
+		'globals'=>array('post'=>'post'),
+		'fields' => array(
+			triggerhappy_field( 'post', 'wp_post', array('dir'=>'start') ),
+		),
+		'nodeFilters'=> array(
+			array(
+				TH::Filter(TH::Expression("_N.wpPageFunctions.is_single"),'equals',true),
+				TH::Filter(TH::Expression("_N.wpPageFunctions.get_post_type"),'equals','product'),
+			)
+		)
+	);
+	$nodes['th_woocommerce_insert_html_single_product'] = array(
+		'description' => 'Add content to a single product page',
+		'name' => 'Add HTML to Single Product template',
+		'plugin' => 'woocommerce',
+		'nodeType' => 'action',
+		'actionType'=>'product_render',
 		'hook'=>'$section',
 		'cat' => 'woocommerce',
 		'globals'=>array('product'=>'product'),
@@ -34,21 +56,27 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 				'description' => 'Select the section of the page you attach this flow to',
 				'dir'=>'in',
 				'choices'=>array(
-					array('id'=>'woocommerce_before_single_product','text'=>'Top of the page (before single product)'),
-					array('id'=>'woocommerce_before_single_product_summary','text'=>'Before the summary'),
-					array('id'=>'woocommerce_single_product_summary','text'=>'Inside the summary'),
-					array('id'=>'woocommerce_before_add_to_cart_form','text'=>'Before the add to cart form'),
-					array('id'=>'woocommerce_before_add_to_cart_button','text'=>'Before the add to cart button'),
-					array('id'=>'woocommerce_after_add_to_cart_button','text'=>'After the add to cart button'),
-					array('id'=>'woocommerce_after_add_to_cart_form','text'=>'After the add to cart form'),
-					array('id'=>'woocommerce_product_meta_start','text'=>'Before the product meta data'),
-					array('id'=>'woocommerce_product_meta_end','text'=>'After the product meta data'),
-					array('id'=>'woocommerce_share','text'=>'Before the share buttons'),
-					array('id'=>'woocommerce_after_single_product_summary','text'=>'Below the product summary (above description)')
+					array('id'=>'woocommerce_before_main_content','text'=>'Before the main content section'),
+					array('id'=>'woocommerce_after_main_content','text'=>'After the main content section'),
+					array('id'=>'woocommerce_before_single_product','text'=>'Top of the page (before product content)'),
+					array('id'=>'woocommerce_after_single_product','text'=>'Bottom of the page (after product content)'),
+
+					array('id'=>'woocommerce_before_single_product_summary','text'=>'Before the summary section'),
+					array('id'=>'woocommerce_single_product_summary:4','text'=>'Before the product title'),
+
+					array('id'=>'woocommerce_single_product_summary:6','text'=>'Before the product rating/price'),
+					array('id'=>'woocommerce_single_product_summary:15','text'=>'Before the product excerpt'),
+					array('id'=>'woocommerce_single_product_summary:25','text'=>'Before the add to cart buttons'),
+					array('id'=>'woocommerce_single_product_summary:35','text'=>'After the add to cart buttons'),
+					array('id'=>'woocommerce_single_product_summary:45','text'=>'Before the sharing buttons'),
+					array('id'=>'woocommerce_single_product_summary:55','text'=>'After the sharing buttons'),
+					array('id'=>'woocommerce_after_single_product_summary:5','text'=>'After the summary section - before tabs'),
+					array('id'=>'woocommerce_after_single_product_summary:25','text'=>'After the summary section - after related products'),
 				)
 			) ),
+			triggerhappy_field( 'html', 'html', array( 'label' => 'HTML', 'description'=>'The HTML to be inserted', 'dir' => 'in' ) )
 		),
-		'callback' => 'triggerhappy_action_hook',
+		'callback' => 'triggerhappy_woocommerce_output_html_single_product',
 	);
 
 	$nodes['th_woocommerce_checkout_fields'] = array(
@@ -84,11 +112,16 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 		'name' => 'Create coupon',
 		'plugin' => 'woocommerce',
 		'nodeType' => 'action',
+		'callback' => 'triggerhappy_wc_add_coupon',
 		'cat' => 'woocommerce',
 		'fields' => array(
 
-			triggerhappy_field( 'create' ),
 			triggerhappy_field( 'code', 'string' ),
+			triggerhappy_field( 'code', 'string' ),
+			triggerhappy_field( 'discount_type', 'string', array(
+				'choices'=> triggerhappy_assoc_to_choices(wc_get_coupon_types())
+			) ),
+			triggerhappy_field( 'amount', 'number' ),
 		),
 	);
 

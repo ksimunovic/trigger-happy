@@ -126,6 +126,8 @@ export function buildExpression( value, fetchConnectingNode, fieldType, node, pi
 
 }
 export function parseExpression( expression, nodeId = null, fieldName = null, type = null, store = null ) {
+	if ( typeof expression == 'boolean' || typeof expression == 'number' )
+		return expression;
 	if ( expression.replace ) {
 		expression = expression.replace( /\{\{(_N[^\}]*)\}\}/i, function( match, p1 ) {
 			return p1;
@@ -174,7 +176,12 @@ export function parseExpression( expression, nodeId = null, fieldName = null, ty
 	}
 
 }
-
+export function replaceSelfInExpression( expression, nodeId ) {
+	let str = stringifyExpression( expression );
+	if (typeof str === "string")
+		str = str.replace("_self.","_N" + nodeId + ".");
+	return parseExpression(str);
+}
 export function stringifyExpression( expression ) {
 	if ( null == expression ) {
 		return null;

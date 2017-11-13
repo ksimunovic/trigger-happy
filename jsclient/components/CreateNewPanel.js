@@ -54,11 +54,11 @@ class CreateNewPanel extends React.Component {
 })}	</div></div> );
 	}
 	checkIfCanShow( action ) {
-		if ( 'condition' == action.nodeType && false !== this.props.preferredNodeTypes ) {
-			return ! action.conditionType || false !== this.props.preferredNodeTypes && false !== this.props.preferredNodeTypes.indexOf( action.conditionType );
+		if ( 'condition' == action.nodeType &&  this.props.preferredNodeTypes !== false  ) {
+			return ! action.conditionType || this.props.preferredNodeTypes !== false &&  this.props.preferredNodeTypes.indexOf( action.conditionType ) >= 0;
 		} else if ( ( 'action' == action.nodeType ) && ( action.actionType || this.props.preferredNodeTypes ) && ! this.state.showAll ) {
 			let nodeTypes = this.props.preferredNodeTypes;
-			return action.actionType && false !== this.props.preferredNodeTypes && false !== this.props.preferredNodeTypes.indexOf( action.actionType );
+			return action.actionType && this.props.preferredNodeTypes !== false && this.props.preferredNodeTypes.indexOf( action.actionType ) >= 0;
 		}
 		return true;
 	}

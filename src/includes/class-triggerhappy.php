@@ -120,6 +120,10 @@ class TriggerHappyFlow{
 				}
 				elseif ( property_exists( $obj,$prop ) ) {
 					$res = $obj->{$prop};
+				} elseif ( method_exists( $obj,$prop ) ) {
+
+					$res = call_user_func(array($obj,$prop));
+
 				}
 			} elseif ( is_array( $obj ) ) {
 

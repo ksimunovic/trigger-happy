@@ -45,13 +45,20 @@ function triggerhappy_function_call( $node, $context ) {
 function triggerhappy_action_hook( $node, $context ) {
 
 	$hook = isset( $node->def['hook'] ) ? $node->def['hook'] : $node->def['id'];
+	$priority = 10;
 	if (strpos($hook,'$') === 0) {
 		$hookField = substr($hook,1);
 		$inputData = $node->getInputData($context);
 		$hook = $inputData[$hookField];
+		$hook_parts = explode( ':', $hook );
+		$hook = $hook_parts[0];
+		if (count($hook_parts) > 1) {
+			$priority = $hook_parts[1];
+		}
 	}
 	add_action(
 		$hook, function () use ( $hook, $node, $context ) {
+
 			$args = array();
 			$passed_args = new ArrayObject(func_get_args());
 
@@ -61,9 +68,10 @@ function triggerhappy_action_hook( $node, $context ) {
 					$args[$id] = $GLOBALS[$key];
 				}
 			}
+
 			$i = 0;
 			foreach ($node->def['fields'] as $i=>$field) {
-				if ($field['dir'] !== 'start')
+				if ($field['dir'] !== 'start' || isset($args[$field['name']]))
 					continue;
 
 				if (isset($passed_args[$i])) {
@@ -79,8 +87,35 @@ function triggerhappy_action_hook( $node, $context ) {
 			}
 
 			return $node->next( $context, $args );
-		}, 10, 9999
+		}, $priority, 9999
 	);
+}
+function triggerhappy_render_html_after_post_content( $node, $context ) {
+	$data = $node->getInputData( $context );
+	$position = $data['position'];
+	$hook = 'the_content';
+	if ( $position == 'before_title' || $position == 'after_title' ) {
+		$hook = 'the_title';
+	}
+	add_filter( $hook, function($existing) use( $position, $data ) {
+		if ( $position == 'before_title' || $position == 'before_content' ) {
+			return $data['html'] . $existing;
+		}
+		return $existing . $data['html'];
+	});
+	$node->next( $context, array() );
+}
+
+
+function triggerhappy_render_html_on_position_action( $node, $context ) {
+	$data = $node->getInputData( $context );
+	$position = $data['position'];
+
+	add_action( $position, function() use( $position, $data ) {
+		echo $data['html'];
+	});
+	$node->next( $context, array() );
+
 }
 function triggerhappy_custom_hook( $node, $context ) {
 	$data = $node->getInputData($context);
@@ -377,6 +412,7 @@ function triggerhappy_core_render_html( $node, $context ) {
 }
 
 function triggerhappy_query_param( $node, $context ) {
+
 	$args = $node->getInputData( $context );
 	$query = $args['query'];
 	$args = $node->getInputData( $context );

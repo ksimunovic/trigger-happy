@@ -117,6 +117,7 @@ class TriggerHappyNode {
 					$success &= ! empty( $resolvedLeft ) && $resolvedLeft != null;
 					break;
 				case "equals":
+				
 						if ( is_numeric( $resolvedRight ) && ! is_numeric( $resolvedLeft ) ) {
 							$success &= $resolvedLeft->id === $resolvedRight;
 						} else {
@@ -166,7 +167,6 @@ class TriggerHappyNode {
 		if ( $this->isExecuting ) {
 			return;
 		}
-
 		if ( isset( $this->def['callback'] ) ) {
 			 return call_user_func( $this->def['callback'] , $this, $context );
 
@@ -220,6 +220,7 @@ class TriggerHappyNode {
 
 			return false;
 		}
+
 
 		foreach ( $this->next as $i => $id ) {
 
