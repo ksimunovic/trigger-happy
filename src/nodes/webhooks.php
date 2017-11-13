@@ -64,10 +64,17 @@ function triggerhappy_load_webhook_nodes( $nodes ) {
 				),
 				triggerhappy_field(
 					'payload', 'array', array(
-						'label' => 'Payload',
+						'label' => 'Payload (JSON)',
+						'dir' => 'start',
+					)
+				),
+				triggerhappy_field(
+					'payload_raw', 'array', array(
+						'label' => 'Payload (Plain Text)',
 						'dir' => 'start',
 					)
 				)
+
 			)
 		);
 		return $nodes;
@@ -93,7 +100,7 @@ function triggerhappy_webhook_receive_ifttt( $node, $context ) {
 		if (isset($_GET['thwebhook']) && $_GET['thwebhook'] == $data['webhook_name']) {
 			$entityBody = file_get_contents('php://input');
 			$parsedBody = json_decode($entityBody);
-			$node->next( $context, array('payload' => $parsedBody ) );
+			$node->next( $context, array( 'payload' => $parsedBody, 'payload_raw' => $entityBody ) );
 			exit;
 		}
 	});
