@@ -192,21 +192,6 @@ return new Promise( ( resolve, reject ) => {
 
 	if ( 'trigger' == newNode.nodeType && 0 == newNode.fields.filter( r=>'in' == r.dir ).length ) {
 
-		dispatch({
-			type: 'ADD_STEP',
-			nodeId: newNode.nid,
-			step: {
-				text: 'Edit Filters',
-				icon: 'fa-filter',
-				page: 'NodeFilters',
-				options: {
-					editType: 'in',
-					title: 'Edit Filters',
-					node: newNode.nid
-				}
-			}
-		});
-
 	} else if ( newNode.fields && 0 < newNode.fields.length ) {
 		dispatch({
 			type: 'ADD_STEP',
@@ -222,20 +207,7 @@ return new Promise( ( resolve, reject ) => {
 				}
 			}
 		});
-		dispatch({
-			type: 'ADD_STEP',
-			nodeId: newNode.nid,
-			step: {
-				text: 'Edit Filters',
-				icon: 'fa-filter',
-				page: 'NodeFilters',
-				options: {
-					editType: 'in',
-					title: 'Edit Filters',
-					node: newNode.nid
-				}
-			}
-		});
+	
 	}
 	if ( node.allowFilters ) {
 		dispatch({
