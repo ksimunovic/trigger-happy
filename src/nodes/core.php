@@ -1186,8 +1186,14 @@ add_filter(	'triggerhappy_resolve_field_wp_post__meta_data', 'triggerhappy_resol
 
 
 add_filter(	'triggerhappy_expression_call_getItem', function ( $result, $obj, $methodName, $args ) {
+	if ( count($args) == 0 )
+		return null;
+
 	if ( is_array( $obj ) && isset( $obj[ $args[0] ] ) ) {
 		return $obj[ $args[0] ];
+	}
+	if ( is_object( $obj ) && isset( $obj->{$args[0]} ) )  {
+		return $obj->{$args[0]};
 	}
 	return null;
 }, 4, 4 );

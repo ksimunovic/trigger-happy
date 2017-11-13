@@ -213,7 +213,6 @@
 }
 .node-connector-list li {
     margin: 2em 0px;
-    white-space: nowrap;
 }
 .node-connector-list li a {
     cursor: default;

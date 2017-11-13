@@ -97,7 +97,9 @@ class TriggerHappy {
 	 */
 	public function load_nodes() {
 		require_once( dirname( __FILE__ ) . '/nodes/core.php' );
+		require_once( dirname( __FILE__ ) . '/nodes/webhooks.php' );
 		if ( class_exists( 'WooCommerce' ) ) {
+
 			require_once( dirname( __FILE__ ) . '/nodes/woocommerce.php' );
 		}
 		if ( function_exists( 'Ninja_Forms' ) ) {
