@@ -3,10 +3,13 @@ import React from 'react';
 import {
 	setExpression
 } from '../actions';
-import ExpressionSelectBox from './ExpressionSelectBox';
-import SelectBox from './SelectBox';
-import AutoSuggest from './AutoSuggest';
-
+import {
+	ExpressionEditor,
+	SelectBox,
+	ExpressionSelectBox,
+	RichEditor,
+	AutoSuggest
+} from '../controls';
 import {
 	loadDataType
 } from '../actions';

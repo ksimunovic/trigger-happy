@@ -116,11 +116,11 @@ class SelectBox extends React.Component {
 	}
 	loadOptions() {}
 	ensureSelected() {
-		if ( ! props.dataTypeChoices ) {
+		if ( ! this.props.dataTypeChoices ) {
 			return;
 		}
 
-		let avail = props.dataTypeChoices.filter( n => null == this.state.quickSearchFilter || 0 <= n.text.indexOf( this.state.quickSearchFilter ) );
+		let avail = this.props.dataTypeChoices.filter( n => null == this.state.quickSearchFilter || 0 <= n.text.indexOf( this.state.quickSearchFilter ) );
 		if ( 0 < avail.length ) {
 			this.selectChoice( avail[0]);
 		} else {

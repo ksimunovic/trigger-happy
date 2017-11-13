@@ -4,6 +4,7 @@ import {
 	setExpression,
 	setFilters
 } from '../actions';
+import NodeFilter from './NodeFilter';
 import {
 	connect
 } from 'react-redux';
@@ -41,7 +42,32 @@ class NodeSettings extends React.Component {
 		this.props.setFilters( this.props.selectedNode.nid, newState );
 	}
 	render() {
-		return ( <div>	<h5>Execute this flow if:</h5>	<div className="node-filter-container">	{this.state.filterGroups.map( ( group, i )=>(	<div className="node-filter-group">	{group.map( ( row, i2 ) =>(	<div>	{0 < i2 && <span className='node-filter-label--and'>AND</span>}	{0 == i2 && 0 < i && <span className='node-filter-label-or'>OR</span>}	<NodeFilter filter={row} availableFields={this.props.availableFields}	onChange={( data )=>this.setFilter( i, i2, data )}				fetchNode={this.props.fetchNode} filter={this.state.filterGroups[i][i2]} />	</div> ) )}	<a style={{marginLeft: 20}} className="button button-small" onClick={()=>this.addAndFilter( i )}>+ And</a>	</div> ) )}	<a className="button button-small" onClick={()=>this.addOrFilter()}>+ Or</a>	</div>	</div> );
+		return (
+			<div>
+				<h5>Execute this flow if:</h5>
+				<div className="node-filter-container">
+					{this.state.filterGroups.map( ( group, i ) => (
+						<div className="node-filter-group">
+							{group.map( ( row, i2 ) => (
+								<div>
+									{0 < i2 && <span className='node-filter-label--and'>AND</span>}
+									{0 == i2 && 0 < i && <span className='node-filter-label-or'>OR</span>}
+									<NodeFilter
+										filter={row}
+										availableFields={this.props.availableFields}
+										onChange={( data )=>this.setFilter( i, i2, data )}
+										fetchNode={this.props.fetchNode}
+										filter={this.state.filterGroups[i][i2]}
+									/>
+								</div>
+							) )}
+							<a style={{marginLeft: 20}} className="button button-small" onClick={()=>this.addAndFilter( i )}>+ And</a>
+						</div>
+					) )}
+					<a className="button button-small" onClick={()=>this.addOrFilter()}>+ Or</a>
+				</div>
+			</div>
+		);
 	}
 	addAndFilter( groupindex ) {
 		let groups = [ ...this.state.filterGroups ];

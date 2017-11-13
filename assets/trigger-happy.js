@@ -722,7 +722,23 @@ var addNode = exports.addNode = function addNode(node, nid) {
 
 			if ('trigger' == newNode.nodeType && 0 == newNode.fields.filter(function (r) {
 				return 'in' == r.dir;
-			}).length) {} else if (newNode.fields && 0 < newNode.fields.length) {
+			}).length) {
+
+				dispatch({
+					type: 'ADD_STEP',
+					nodeId: newNode.nid,
+					step: {
+						text: 'Edit Filters',
+						icon: 'fa-filter',
+						page: 'NodeFilters',
+						options: {
+							editType: 'in',
+							title: 'Edit Filters',
+							node: newNode.nid
+						}
+					}
+				});
+			} else if (newNode.fields && 0 < newNode.fields.length) {
 				dispatch({
 					type: 'ADD_STEP',
 					nodeId: newNode.nid,
@@ -733,6 +749,20 @@ var addNode = exports.addNode = function addNode(node, nid) {
 						options: {
 							editType: 'in',
 							title: 'Edit Node',
+							node: newNode.nid
+						}
+					}
+				});
+				dispatch({
+					type: 'ADD_STEP',
+					nodeId: newNode.nid,
+					step: {
+						text: 'Edit Filters',
+						icon: 'fa-filter',
+						page: 'NodeFilters',
+						options: {
+							editType: 'in',
+							title: 'Edit Filters',
 							node: newNode.nid
 						}
 					}
@@ -43175,6 +43205,10 @@ var _NodeFieldList2 = _interopRequireDefault(_NodeFieldList);
 
 var _actions = __webpack_require__(6);
 
+var _NodeFilter = __webpack_require__(286);
+
+var _NodeFilter2 = _interopRequireDefault(_NodeFilter);
+
 var _reactRedux = __webpack_require__(8);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -43248,67 +43282,59 @@ var NodeSettings = function (_React$Component) {
 			return _react2.default.createElement(
 				'div',
 				null,
-				' ',
 				_react2.default.createElement(
 					'h5',
 					null,
 					'Execute this flow if:'
 				),
-				' ',
 				_react2.default.createElement(
 					'div',
 					{ className: 'node-filter-container' },
-					' ',
 					this.state.filterGroups.map(function (group, i) {
 						return _react2.default.createElement(
 							'div',
 							{ className: 'node-filter-group' },
-							' ',
 							group.map(function (row, i2) {
 								return _react2.default.createElement(
 									'div',
 									null,
-									' ',
 									0 < i2 && _react2.default.createElement(
 										'span',
 										{ className: 'node-filter-label--and' },
 										'AND'
 									),
-									' ',
 									0 == i2 && 0 < i && _react2.default.createElement(
 										'span',
 										{ className: 'node-filter-label-or' },
 										'OR'
 									),
-									' ',
-									_react2.default.createElement(NodeFilter, _defineProperty({ filter: row, availableFields: _this3.props.availableFields, onChange: function onChange(data) {
+									_react2.default.createElement(_NodeFilter2.default, _defineProperty({
+										filter: row,
+										availableFields: _this3.props.availableFields,
+										onChange: function onChange(data) {
 											return _this3.setFilter(i, i2, data);
-										}, fetchNode: _this3.props.fetchNode }, 'filter', _this3.state.filterGroups[i][i2])),
-									' '
+										},
+										fetchNode: _this3.props.fetchNode
+									}, 'filter', _this3.state.filterGroups[i][i2]))
 								);
 							}),
-							' ',
 							_react2.default.createElement(
 								'a',
 								{ style: { marginLeft: 20 }, className: 'button button-small', onClick: function onClick() {
 										return _this3.addAndFilter(i);
 									} },
 								'+ And'
-							),
-							' '
+							)
 						);
 					}),
-					' ',
 					_react2.default.createElement(
 						'a',
 						{ className: 'button button-small', onClick: function onClick() {
 								return _this3.addOrFilter();
 							} },
 						'+ Or'
-					),
-					' '
-				),
-				' '
+					)
+				)
 			);
 		}
 	}, {
@@ -45287,7 +45313,7 @@ var ExpressionSelectBox = function (_React$Component) {
 						'OK'
 					)
 				),
-				_react2.default.createElement('quickSearch', {
+				_react2.default.createElement(_QuickSearch2.default, {
 					allowTypes: this.props.type,
 					allowExpressions: allowExpressions,
 					className: 'node-quick-search',
@@ -45947,11 +45973,11 @@ var SelectBox = function (_React$Component) {
 		value: function ensureSelected() {
 			var _this4 = this;
 
-			if (!props.dataTypeChoices) {
+			if (!this.props.dataTypeChoices) {
 				return;
 			}
 
-			var avail = props.dataTypeChoices.filter(function (n) {
+			var avail = this.props.dataTypeChoices.filter(function (n) {
 				return null == _this4.state.quickSearchFilter || 0 <= n.text.indexOf(_this4.state.quickSearchFilter);
 			});
 			if (0 < avail.length) {
@@ -60370,6 +60396,337 @@ function cleanCookies() {
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
+
+/***/ }),
+/* 286 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(4);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _actions = __webpack_require__(6);
+
+var _controls = __webpack_require__(158);
+
+var _reactRedux = __webpack_require__(8);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var NodeFilter = function (_React$Component) {
+	_inherits(NodeFilter, _React$Component);
+
+	function NodeFilter(props) {
+		_classCallCheck(this, NodeFilter);
+
+		var _this = _possibleConstructorReturn(this, (NodeFilter.__proto__ || Object.getPrototypeOf(NodeFilter)).call(this, props));
+
+		_this.state = {
+			value: {},
+			fieldType: 'string'
+		};
+		if (props.filter) {
+
+			_this.state = Object.assign({}, _this.state, props.filter);
+			if (props.filter.left) {
+				var fieldType = _this.getFieldTypeFromExpression(props.filter.left.expr);
+				_this.state = Object.assign({}, _this.state, {
+					fieldType: fieldType
+				});
+			}
+		}
+		return _this;
+	}
+
+	_createClass(NodeFilter, [{
+		key: 'componentWillReceiveProps',
+		value: function componentWillReceiveProps(props) {
+			if (props.filter) {
+				this.setState(props.filter);
+				if (props.filter.left) {
+					var fieldType = this.getFieldTypeFromExpression(props.filter.left.expr);
+
+					this.setState({
+						fieldType: fieldType
+					});
+				}
+			}
+		}
+	}, {
+		key: 'getFieldTypeFromExpression',
+		value: function getFieldTypeFromExpression(expr) {
+			var results = expr.match(/\{\{_N([0-9]*)\.([^\}]*)*\}\}/i);
+			if (!results) {
+				return '';
+			}
+			var nodeId = results[1];
+			var path = results[2].split('.');
+			var nextPart = path.shift();
+			var nodeType = '' == nodeId ? null : this.props.getNodeFieldType(nodeId, nextPart);
+
+			while (0 < path.length) {
+				nextPart = path.shift();
+				var schema = this.props.getPropsForType(nodeType);
+				if (null == schema) {
+					return nodeType;
+				}
+				nodeType = schema[nextPart] && schema[nextPart].type;
+			}
+			return nodeType;
+		}
+	}, {
+		key: 'selectLeftValue',
+		value: function selectLeftValue(n, v, e, t, text) {
+
+			var type = t || v.type;
+
+			this.setState({
+				fieldType: type
+			});
+			this.props.loadDataType(type);
+			var newState = {
+				left: {
+					expr: e,
+					display: text
+				}
+			};
+
+			if ('boolean' == type) {
+				newState.right = {
+					expr: true,
+					display: 'Yes'
+				};
+				newState.op = 'equals';
+			}
+			this.setState(newState);
+			this.updateFilter(newState);
+		}
+	}, {
+		key: 'selectRightValue',
+		value: function selectRightValue(n, v, e, t, text) {
+
+			this.setState({
+				right: {
+					expr: e,
+					display: text
+				}
+			});
+			this.updateFilter({
+				right: {
+					expr: e,
+					display: text
+				}
+			});
+		}
+	}, {
+		key: 'selectOperator',
+		value: function selectOperator(v) {
+			this.setState({
+				op: v
+			});
+			this.updateFilter({
+				op: v
+			});
+		}
+	}, {
+		key: 'updateFilter',
+		value: function updateFilter(filterState) {
+
+			var state = {
+				right: this.state.right,
+				left: this.state.left,
+				op: this.state.op
+			};
+
+			this.props.onChange(Object.assign(state, filterState));
+		}
+	}, {
+		key: 'getLeftValueForSelect',
+		value: function getLeftValueForSelect() {
+			if (this.state.left) {
+
+				return {
+					id: this.state.left.expr,
+					text: this.state.left.display
+				};
+			}
+			return {};
+		}
+	}, {
+		key: 'getRightValueForSelect',
+		value: function getRightValueForSelect() {
+			if (this.state.right) {
+
+				return {
+					id: this.state.right.expr,
+					text: this.state.right.display
+				};
+			}
+			return {};
+		}
+	}, {
+		key: 'getRightValueId',
+		value: function getRightValueId() {
+			return this.state.right && this.state.right.expr || '';
+		}
+	}, {
+		key: 'getOpValue',
+		value: function getOpValue() {
+			if (this.state.op) {
+
+				return {
+					id: this.state.op
+				};
+			}
+			return {};
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this2 = this;
+
+			var choices = [{
+				id: 'equals',
+				text: '='
+			}, {
+				id: 'notequals',
+				text: '<>'
+			}, {
+				id: 'greaterThan',
+				text: '<'
+			}, {
+				id: 'lessThan',
+				text: '>'
+			}, {
+				id: 'notnull',
+				text: 'Not Null'
+			}, {
+				id: 'contains',
+				text: 'Contains'
+			}, {
+				id: 'startsWith',
+				text: 'Starts With'
+			}, {
+				id: 'endsWith',
+				text: 'Ends With'
+			}];
+
+			var simpleDataType = this.props.dataTypes[this.state.fieldType];
+			var isBool = 'boolean' == this.state.fieldType;
+			return _react2.default.createElement(
+				'div',
+				{ className: 'node-filter-row' },
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-filter-item' },
+					_react2.default.createElement(_controls.ExpressionSelectBox, {
+						controlTypeOverrideText: this.state.controlTypeOverrideText,
+						customValueControlTypeClicked: function customValueControlTypeClicked() {
+							return _this2.useControlType('string');
+						},
+						resetControlTypeClicked: function resetControlTypeClicked() {
+							return _this2.useControlType(null);
+						},
+						availableFields: this.props.availableFields,
+
+						fetchNode: this.props.fetchNode,
+						nodeId: null,
+						onSelect: function onSelect(n, v, e, t, text) {
+							return _this2.selectLeftValue(n, v, e, t, text);
+						},
+						value: this.getLeftValueForSelect(),
+						ref: function ref(control) {
+							return _this2.control = control;
+						}
+					})
+				),
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-filter-item node-filter-item--small' },
+					_react2.default.createElement(_controls.SelectBox, { notNull: true, showID: false, value: this.getOpValue(), onChange: function onChange(v) {
+							return _this2.selectOperator(v);
+						}, allowCustomValue: false, dataTypeChoices: choices })
+				),
+				_react2.default.createElement(
+					'div',
+					{ className: 'node-filter-item node-filter-item--large' },
+					simpleDataType ? simpleDataType.ajax ? _react2.default.createElement(_controls.AutoSuggest, { notNull: true, value: this.getRightValueForSelect(), showID: true, onChange: function onChange(_ref) {
+							var id = _ref.id,
+							    text = _ref.text;
+							return _this2.selectRightValue(null, null, id, null, text);
+						}, allowSearch: true, allowCustomValue: false, type: this.state.fieldType }) : _react2.default.createElement(_controls.SelectBox, { allowSearch: !isBool, value: this.getRightValueForSelect(), onChange: function onChange(v) {
+							return _this2.selectRightValue(null, null, v, null, null);
+						}, showID: false, allowCustomValue: false, notNull: isBool, type: this.state.fieldType }) : _react2.default.createElement('input', { type: 'text', value: this.getRightValueId(), onChange: function onChange(e) {
+							return _this2.selectRightValue(null, null, e.target.value, null, e.target.value);
+						} })
+				)
+			);
+		}
+	}]);
+
+	return NodeFilter;
+}(_react2.default.Component);
+
+var mapStateToProps = function mapStateToProps(state, ownProps) {
+
+	return {
+		getPropsForType: function getPropsForType(type) {
+			if (null == type) {
+				return state.globals;
+			}
+			var dt = state.datatypes[type];
+			if (dt) {
+				return dt.schema && dt.schema.properties || null;
+			}
+			return null;
+		},
+		getNodeFieldType: function getNodeFieldType(nid, field) {
+			var allFields = [];
+			if (state.nodes[nid]) {
+				allFields = state.nodes[nid].fields;
+
+				for (var f in allFields) {
+					if (allFields[f].name == field) {
+						return allFields[f].type;
+					}
+				}
+			}
+			return '';
+		},
+		dataTypes: state.datatypes,
+		getNodeLabel: function getNodeLabel(nid) {
+			return state.nodes[nid].name;
+		}
+	};
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+	return {
+
+		loadDataType: function loadDataType(dataTypeId) {
+			return dispatch((0, _actions.loadDataType)(dataTypeId));
+		}
+	};
+};
+
+exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps, null, {
+	withRef: true
+})(NodeFilter);
 
 /***/ })
 /******/ ]);

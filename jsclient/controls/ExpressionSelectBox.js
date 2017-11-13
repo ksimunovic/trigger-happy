@@ -265,7 +265,7 @@ class ExpressionSelectBox extends React.Component {
 						<a className="button button-small">OK</a>
 					</div>
 				)}
-				<quickSearch
+				<QuickSearch
 					allowTypes={this.props.type}
 					allowExpressions={allowExpressions}
 					className="node-quick-search"
