@@ -95,7 +95,6 @@ class TriggerHappy {
 	/**
 	 * Load nodes from Trigger Happy and third-party plugins
 	 */
-	 */
 	public function load_nodes() {
 		require_once( dirname( __FILE__ ) . '/nodes/core.php' );
 		if ( class_exists( 'WooCommerce' ) ) {
