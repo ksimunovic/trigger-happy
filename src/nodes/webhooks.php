@@ -57,8 +57,8 @@ function triggerhappy_load_webhook_nodes( $nodes ) {
 			'fields' => array(
 				triggerhappy_field(
 					'webhook_name', 'string', array(
-						'label' => 'WebHook Name',
-						'description' => 'Give this webhook a unique name.\nWebhook will be available at ' .get_site_url() . "/?thwebhook=[eventname]",
+						'label' => 'Event Name',
+						'description' => 'Webhook will be available at ' .get_site_url() . "/?thwebhook=[eventname]",
 						'dir' => 'in',
 					)
 				),
