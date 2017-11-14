@@ -28,7 +28,7 @@ class CreateNewPanel extends React.Component {
 		});
 		this.props.loadActions( plugin );
 	}
-	renderActionList( actions ) {
+	renderActionList( actions, key ) {
 		let selectAction = ( p ) => {
 			this.setState({
 				'selectedPlugin': null,
@@ -40,18 +40,37 @@ class CreateNewPanel extends React.Component {
 			}
 			this.props.selectAction( p, id );
 		};
-		return ( <div className="action-list">	{_.sortBy( actions, i=>i.name ).map( function( p ) {
-	return (	<div className="action-item" onClick={()=>selectAction( p )}>	{'condition' == p.nodeType &&	<div className="action-tag">{p.nodeType}</div>	}	<strong>{p.name}</strong>	<div>{p.description}</div>	</div>	);
-})}	</div> );
+		return ( <div className="action-list" key={key}>
+			{_.sortBy( actions, i=>i.name ).map( function( p ) {
+				return (
+					<div key={p.name} className="action-item" onClick={()=>selectAction( p )}>
+						{'condition' == p.nodeType &&	<div className="action-tag">{p.nodeType}</div>	}
+						<strong>{p.name}</strong>
+						<div>{p.description}</div>
+					</div>
+				);
+		})}	</div> );
 	}
 	renderBrowseByPlugin() {
 		if ( this.state.search || 0 == this.props.plugins.length ) {
 			return null;
 		}
 		let selectPlugin = this.selectPlugin.bind( this );
-		return ( <div><h5>Browse by plugin</h5>	<div className="create-new-list">	{this.props.plugins.map( function( p ) {
-	return (	<div className="create-new-item" onClick={()=>selectPlugin( p.name )}>	<img src={p.icon} className="create-new-item__image" />	<p >{Entities.decode( p.label )}</p>	</div>	);
-})}	</div></div> );
+		return (
+			<div key="browse-by-plugin">
+				<h5>Browse by plugin</h5>
+				<div className="create-new-list">
+					{this.props.plugins.map( function( p ) {
+						return (
+								<div key={p.name} className="create-new-item" onClick={()=>selectPlugin( p.name )}>
+									<img src={p.icon} className="create-new-item__image" />
+									<p >{Entities.decode( p.label )}</p>
+								</div>
+						);
+					})}
+				</div>
+			</div>
+	);
 	}
 	checkIfCanShow( action ) {
 		if ( 'condition' == action.nodeType &&  this.props.preferredNodeTypes !== false  ) {
@@ -70,7 +89,7 @@ class CreateNewPanel extends React.Component {
 				if ( 0 == actions.length ) {
 					return null;
 				}
-				return ( <div><h5>Category: {c.name}</h5>{this.renderActionList( actions )}</div> );
+				return ( <div key={c.name}><h5>Category: {c.name}</h5>{this.renderActionList( actions, c.name )}</div> );
 			});
 		}
 		return [];
@@ -81,11 +100,11 @@ class CreateNewPanel extends React.Component {
 		});
 	}
 	renderFilterPanel() {
-		return <div className="node-filter-panel" ><input type="text" className="node-search-bar" value={this.state.search} placeholder="Search available actions..." onChange={( e )=>this.setSearch( e.target.value )} /></div>;
+		return <div  key="node-filter-panel" className="node-filter-panel" ><input type="text" className="node-search-bar" value={this.state.search} placeholder="Search available actions..." onChange={( e )=>this.setSearch( e.target.value )} /></div>;
 	}
 	renderParts() {
 		if ( this.state && this.state.selectedPlugin ) {
-			return this.renderActionList( this.props.actions );
+			return this.renderActionList( this.props.actions, 'plugin-parts' );
 		}
 		let cats = this.catParts();
 		return [ this.renderFilterPanel(), this.renderBrowseByPlugin(), ...cats ];
@@ -97,7 +116,14 @@ class CreateNewPanel extends React.Component {
 	}
 	render() {
 		let selectPlugin = this.selectPlugin;
-		return ( <div>	<div className="node-settings-plugin">Add New</div>	<h4 className="node-settings-title">{this.props.title}</h4>	{this.renderParts()}	{this.props.preferredNodeTypes && <a href="javascript:void(0)" onClick={()=>this.showAllNodes()}>Show All Actions</a>}	</div> );
+		return (
+			<div key="create-new-panel">
+			<div className="node-settings-plugin">Add New</div>
+			<h4 className="node-settings-title">{this.props.title}</h4>
+			{this.renderParts()}
+			{this.props.preferredNodeTypes && <a href="javascript:void(0)" onClick={()=>this.showAllNodes()}>Show All Actions</a>}
+			</div>
+		);
 	}
 }
 

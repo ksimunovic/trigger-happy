@@ -53,7 +53,7 @@ export const loadDataType = dataTypeId => {
 		}
 		dataTypesBeingLoaded[dataTypeId] = true;
 		dispatch( loadingDataType( dataTypeId ) );
-		return fetch( '/wp-json/wpflow/v1/types/' + dataTypeId + '?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, { credentials: 'same-origin' }).then( response => {
+		return fetch( TH.rest_api_url + 'wpflow/v1/types/' + dataTypeId + '?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, { credentials: 'same-origin' }).then( response => {
 			if ( 200 != response.status ) {
 				return null;
 			}
@@ -290,7 +290,7 @@ export function fetchActions( plugin ) {
 	return dispatch => {
 		dispatch( requestActions() );
 
-		return fetch( '/wp-json/wpflow/v1/nodes/?plugin=' + plugin + '&_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, { credentials: 'same-origin' })
+		return fetch( TH.rest_api_url + 'wpflow/v1/nodes/?plugin=' + plugin + '&_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, { credentials: 'same-origin' })
 			.then( response => response.json() )
 			.then( json => dispatch( receiveActions( json ) ) );
 	};
@@ -300,7 +300,7 @@ export function fetchPlugins() {
 
 	dispatch( requestPlugins() );
 
-	return fetch( '/wp-json/wpflow/v1/plugins' + '?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, { credentials: 'same-origin' })
+	return fetch( TH.rest_api_url + 'wpflow/v1/plugins' + '?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, { credentials: 'same-origin' })
 		.then( response => response.json() )
 		.then( json => dispatch( receivePlugins( json ) ) );
 	};

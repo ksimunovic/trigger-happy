@@ -37,7 +37,7 @@ Some examples of what can be achieved using Trigger Happy:
 5. Select the actions you want to attach to this trigger (eg: Send an email, or Create a post)
 
 == Upgrade Notice ==
-Version 1.0.0.1 - Now with IFTTT WebHook support
+Version 1.0.1 - Now with IFTTT WebHook support
 
 == Frequently Asked Questions ==
 
@@ -71,7 +71,7 @@ Not yet - but this is currently being worked on.
 
 == Changelog ==
 
-= 1.0.0.1 =
+= 1.0.1 =
 * Added IFTTT WebHook Support
 
 = 1.0 =

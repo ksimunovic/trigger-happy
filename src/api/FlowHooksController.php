@@ -144,11 +144,12 @@ class FlowHooksController extends WP_REST_Controller {
 		$advanced = $request->get_param( 'advanced' );
 		$byplugin = false;
 		if ( $request['plugin'] ) {
-			$byplugin = $request['plugin'];
+			$byplugin = sanitize_title($request['plugin']);
 		}
 		$data = array();
 		foreach ( $items as $type => $nodeData ) {
-			if ( $byplugin && ( ! isset( $nodeData['plugin'] ) || $nodeData['plugin'] != $byplugin ) )  {
+			
+			if ( $byplugin && ( ! isset( $nodeData['plugin'] ) || $nodeData['plugin'] == '' || sanitize_title( $nodeData['plugin'] ) != $byplugin ) )  {
 				continue;
 			}
 			if ( ! $advanced && isset($nodeData['advanced']) && $nodeData['advanced'] ) {

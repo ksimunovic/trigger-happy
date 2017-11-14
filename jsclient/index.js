@@ -11,7 +11,7 @@ function loadDefinitions() {
 		return {
 			then: function( cb ) {
 				let completed = 0;
-				fetch( '/wp-json/wpflow/v1/nodes/?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, {
+				fetch( TH.rest_api_url + 'wpflow/v1/nodes/?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, {
 					credentials: 'same-origin'
 				}).then( response => response.json() ).then( data => {
 					dispatch({
@@ -23,7 +23,7 @@ function loadDefinitions() {
 						cb();
 					}
 				});
-				fetch( '/wp-json/wpflow/v1/globals/?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, {
+				fetch( TH.rest_api_url + 'wpflow/v1/globals/?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, {
 					credentials: 'same-origin'
 				}).then( response => response.json() ).then( data => {
 					dispatch({

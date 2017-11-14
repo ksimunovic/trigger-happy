@@ -10,11 +10,10 @@ let json = {
   'connections': []
 };
 try {
-
-    json = JSON.parse( document.getElementById( 'flow-editor-data-source' ).innerText );
-
+	if ( document.getElementById( 'flow-editor-data-source' ).innerText.length > 0) {
+    	json = JSON.parse( document.getElementById( 'flow-editor-data-source' ).innerText );
+	}
 } catch ( e ) {
-    console.log( 'Error parsing JSON', e );
     window.attemptedJson = element.innerText;
 }
 let field = document.getElementById( 'flow-editor-data' );

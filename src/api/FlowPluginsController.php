@@ -34,14 +34,16 @@ class FlowPluginsController extends WP_REST_Controller {
 		if ( ! $options ) {
 			$options = array();
 		}
+		$avail = array();
 		$skip = array();
 		foreach ( $items as $nodeId => $nodeList ) {
 			if (!isset($nodeList['plugin'])) {
 				continue;
 			}
 			$pluginName = $nodeList['plugin'];
+			$avail[$pluginName] = 1;
 			if ( $pluginName && ! isset( $options[ $pluginName ] ) && ! isset( $skip[ $pluginName ] ) ) {
-				
+
 				$pluginDataReq = wp_remote_get( 'https://api.wordpress.org/plugins/info/1.0/' . strtolower($pluginName) . '.json' );
 				if ( is_wp_error( $pluginDataReq ) ) {
 					$skip[ $pluginName ] = true;
@@ -66,6 +68,9 @@ class FlowPluginsController extends WP_REST_Controller {
 
 		}
 		foreach ($options as $plugin=>$plugindata) {
+			if ( ! isset( $avail[ $plugin ] ) ) {
+				continue;
+			}
 			array_push( $data, $plugindata );
 		}
 		update_option( 'triggerhappy_plugin_data',$options );

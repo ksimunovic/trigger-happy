@@ -567,7 +567,7 @@ var loadDataType = exports.loadDataType = function loadDataType(dataTypeId) {
 		}
 		dataTypesBeingLoaded[dataTypeId] = true;
 		dispatch(loadingDataType(dataTypeId));
-		return fetch('/wp-json/wpflow/v1/types/' + dataTypeId + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, { credentials: 'same-origin' }).then(function (response) {
+		return fetch(TH.rest_api_url + 'wpflow/v1/types/' + dataTypeId + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, { credentials: 'same-origin' }).then(function (response) {
 			if (200 != response.status) {
 				return null;
 			}
@@ -821,7 +821,7 @@ function fetchActions(plugin) {
 	return function (dispatch) {
 		dispatch(requestActions());
 
-		return fetch('/wp-json/wpflow/v1/nodes/?plugin=' + plugin + '&_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, { credentials: 'same-origin' }).then(function (response) {
+		return fetch(TH.rest_api_url + 'wpflow/v1/nodes/?plugin=' + plugin + '&_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, { credentials: 'same-origin' }).then(function (response) {
 			return response.json();
 		}).then(function (json) {
 			return dispatch(receiveActions(json));
@@ -833,7 +833,7 @@ function fetchPlugins() {
 
 		dispatch(requestPlugins());
 
-		return fetch('/wp-json/wpflow/v1/plugins' + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, { credentials: 'same-origin' }).then(function (response) {
+		return fetch(TH.rest_api_url + 'wpflow/v1/plugins' + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, { credentials: 'same-origin' }).then(function (response) {
 			return response.json();
 		}).then(function (json) {
 			return dispatch(receivePlugins(json));
@@ -42439,22 +42439,22 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var element = document.getElementById('flow-editor-container');
 
 var json = {
-    'nodes': {},
-    'connections': []
+  'nodes': {},
+  'connections': []
 };
 try {
-
+  if (document.getElementById('flow-editor-data-source').innerText.length > 0) {
     json = JSON.parse(document.getElementById('flow-editor-data-source').innerText);
+  }
 } catch (e) {
-    console.log('Error parsing JSON', e);
-    window.attemptedJson = element.innerText;
+  window.attemptedJson = element.innerText;
 }
 var field = document.getElementById('flow-editor-data');
 
 _reactDom2.default.render(_react2.default.createElement(
-    _reactCookie.CookiesProvider,
-    null,
-    _react2.default.createElement(_App2.default, { graph: json, linkedField: field })
+  _reactCookie.CookiesProvider,
+  null,
+  _react2.default.createElement(_App2.default, { graph: json, linkedField: field })
 ), element);
 
 /***/ }),
@@ -42525,7 +42525,7 @@ var CreateNewPanel = function (_React$Component) {
 		}
 	}, {
 		key: 'renderActionList',
-		value: function renderActionList(actions) {
+		value: function renderActionList(actions, key) {
 			var _this2 = this;
 
 			var selectAction = function selectAction(p) {
@@ -42541,35 +42541,30 @@ var CreateNewPanel = function (_React$Component) {
 			};
 			return _react2.default.createElement(
 				'div',
-				{ className: 'action-list' },
-				' ',
+				{ className: 'action-list', key: key },
 				_lodash2.default.sortBy(actions, function (i) {
 					return i.name;
 				}).map(function (p) {
 					return _react2.default.createElement(
 						'div',
-						{ className: 'action-item', onClick: function onClick() {
+						{ key: p.name, className: 'action-item', onClick: function onClick() {
 								return selectAction(p);
 							} },
-						' ',
 						'condition' == p.nodeType && _react2.default.createElement(
 							'div',
 							{ className: 'action-tag' },
 							p.nodeType
 						),
-						' ',
 						_react2.default.createElement(
 							'strong',
 							null,
 							p.name
 						),
-						' ',
 						_react2.default.createElement(
 							'div',
 							null,
 							p.description
-						),
-						' '
+						)
 					);
 				}),
 				' '
@@ -42584,35 +42579,29 @@ var CreateNewPanel = function (_React$Component) {
 			var selectPlugin = this.selectPlugin.bind(this);
 			return _react2.default.createElement(
 				'div',
-				null,
+				{ key: 'browse-by-plugin' },
 				_react2.default.createElement(
 					'h5',
 					null,
 					'Browse by plugin'
 				),
-				' ',
 				_react2.default.createElement(
 					'div',
 					{ className: 'create-new-list' },
-					' ',
 					this.props.plugins.map(function (p) {
 						return _react2.default.createElement(
 							'div',
-							{ className: 'create-new-item', onClick: function onClick() {
+							{ key: p.name, className: 'create-new-item', onClick: function onClick() {
 									return selectPlugin(p.name);
 								} },
-							' ',
 							_react2.default.createElement('img', { src: p.icon, className: 'create-new-item__image' }),
-							' ',
 							_react2.default.createElement(
 								'p',
 								null,
 								Entities.decode(p.label)
-							),
-							' '
+							)
 						);
-					}),
-					' '
+					})
 				)
 			);
 		}
@@ -42647,14 +42636,14 @@ var CreateNewPanel = function (_React$Component) {
 					}
 					return _react2.default.createElement(
 						'div',
-						null,
+						{ key: c.name },
 						_react2.default.createElement(
 							'h5',
 							null,
 							'Category: ',
 							c.name
 						),
-						_this3.renderActionList(actions)
+						_this3.renderActionList(actions, c.name)
 					);
 				});
 			}
@@ -42674,7 +42663,7 @@ var CreateNewPanel = function (_React$Component) {
 
 			return _react2.default.createElement(
 				'div',
-				{ className: 'node-filter-panel' },
+				{ key: 'node-filter-panel', className: 'node-filter-panel' },
 				_react2.default.createElement('input', { type: 'text', className: 'node-search-bar', value: this.state.search, placeholder: 'Search available actions...', onChange: function onChange(e) {
 						return _this4.setSearch(e.target.value);
 					} })
@@ -42684,7 +42673,7 @@ var CreateNewPanel = function (_React$Component) {
 		key: 'renderParts',
 		value: function renderParts() {
 			if (this.state && this.state.selectedPlugin) {
-				return this.renderActionList(this.props.actions);
+				return this.renderActionList(this.props.actions, 'plugin-parts');
 			}
 			var cats = this.catParts();
 			return [this.renderFilterPanel(), this.renderBrowseByPlugin()].concat(_toConsumableArray(cats));
@@ -42704,30 +42693,25 @@ var CreateNewPanel = function (_React$Component) {
 			var selectPlugin = this.selectPlugin;
 			return _react2.default.createElement(
 				'div',
-				null,
-				' ',
+				{ key: 'create-new-panel' },
 				_react2.default.createElement(
 					'div',
 					{ className: 'node-settings-plugin' },
 					'Add New'
 				),
-				' ',
 				_react2.default.createElement(
 					'h4',
 					{ className: 'node-settings-title' },
 					this.props.title
 				),
-				' ',
 				this.renderParts(),
-				' ',
 				this.props.preferredNodeTypes && _react2.default.createElement(
 					'a',
 					{ href: 'javascript:void(0)', onClick: function onClick() {
 							return _this5.showAllNodes();
 						} },
 					'Show All Actions'
-				),
-				' '
+				)
 			);
 		}
 	}]);
@@ -44509,7 +44493,7 @@ var AutoSuggest = function (_React$Component) {
 			this.setState({
 				result: query
 			});
-			fetch('/wp-json/wpflow/v1/types/' + this.props.type + '/values/' + query + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
+			fetch(TH.rest_api_url + 'wpflow/v1/types/' + this.props.type + '/values/' + query + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
 				credentials: 'same-origin'
 			}).then(function (response) {
 				if (200 != response.status) {
@@ -46244,7 +46228,7 @@ var SelectBox = function (_React$Component) {
 			this.setState({
 				result: query
 			});
-			fetch('/wp-json/wpflow/v1/types/' + this.props.type + '/values/' + query + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
+			fetch(TH.rest_api_url + 'wpflow/v1/types/' + this.props.type + '/values/' + query + '?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
 				credentials: 'same-origin'
 			}).then(function (response) {
 				if (200 != response.status) {
@@ -46546,7 +46530,7 @@ function _loadDefinitions() {
 		return {
 			then: function then(cb) {
 				var completed = 0;
-				fetch('/wp-json/wpflow/v1/nodes/?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
+				fetch(TH.rest_api_url + 'wpflow/v1/nodes/?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
 					credentials: 'same-origin'
 				}).then(function (response) {
 					return response.json();
@@ -46560,7 +46544,7 @@ function _loadDefinitions() {
 						cb();
 					}
 				});
-				fetch('/wp-json/wpflow/v1/globals/?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
+				fetch(TH.rest_api_url + 'wpflow/v1/globals/?_wpnonce=' + document.getElementById('triggerhappy-x-nonce').value, {
 					credentials: 'same-origin'
 				}).then(function (response) {
 					return response.json();

@@ -62,7 +62,7 @@ class SelectBox extends React.Component {
 		this.setState({
 			result: query
 		});
-		fetch( '/wp-json/wpflow/v1/types/' + this.props.type + '/values/' + query + '?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, {
+		fetch( TH.rest_api_url + 'wpflow/v1/types/' + this.props.type + '/values/' + query + '?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, {
 			credentials: 'same-origin'
 		}).then( response => {
 			if ( 200 != response.status ) {
