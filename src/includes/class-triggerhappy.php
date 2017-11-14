@@ -176,7 +176,7 @@ class TriggerHappyFlow{
 		$this->nodes[ $id ] = $node;
 	}
 	public function addNode( $node, $id = null ) {
-		$id = $id ?? $node->id;
+		$id = $id == null ? $node->id : $id;
 		$this->nodes[ $id ] = $node;
 
 		$def = TriggerHappy::get_node( $node->type );
@@ -233,7 +233,7 @@ class TriggerHappyFlow{
 	public function start( $context = null ) {
 		$this->initialize();
 
-		$context = $context ?? new TriggerHappyContext();
+		$context = $context == null ? new TriggerHappyContext() : $context;
 		foreach ( $this->nodes as $nodeid => $nodeData ) {
 
 			if ( $nodeData->def['nodeType'] == 'trigger' ) {

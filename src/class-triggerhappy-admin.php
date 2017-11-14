@@ -48,7 +48,7 @@ class TriggerHappyAdmin {
 			wp_enqueue_script(  'wpflowscript',  plugins_url( 'assets/trigger-happy.js', dirname(__FILE__) ), array(), '1.0',true );
 			wp_enqueue_style(  'trigger-happy-css',  plugins_url( 'assets/trigger-happy.css', dirname(__FILE__) ) );
 			wp_enqueue_style(  'codemirror',  plugins_url( 'assets/codemirror.css', dirname(__FILE__) ) );
-			wp_enqueue_style( 'font-awesome',  plugins_url( 'assets/font-awesome/font-awesome.min.css', dirname(__FILE__) ), '4.7.0' );
+			wp_enqueue_style( 'font-awesome',  plugins_url( 'assets/font-awesome/css/font-awesome.min.css', dirname(__FILE__) ), '4.7.0' );
 			wp_localize_script( 'wpflowscript', 'TH', array(
 				'expression_css_url' => plugins_url( 'assets/expression.css', dirname(__FILE__) ),
 				'rest_api_url' => rest_url()
