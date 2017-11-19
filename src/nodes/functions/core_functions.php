@@ -23,7 +23,40 @@ function triggerhappy_wp_login( $node, $context ) {
 		'user_password' => $data[ 'password' ]
 	) );
 }
-
+function triggerhappy_create_post( $node, $context ) {
+	/* triggerhappy_field( 'post_id', 'string', array(
+		'label' => 'Post ID',
+		'description' => 'Specify the post ID to update an existing post. Leave blank to create a new post',
+		'dir' => 'in',
+	) ),
+	triggerhappy_field(	'post_type', 'wp_post_type', array(
+		'label' => 'Post Type',
+		'description' => 'Specify the type of post to create',
+		'dir' => 'in',
+	) ),
+	triggerhappy_field('post_title', 'string', array(
+		'label' => 'Post Title',
+		'dir' => 'in',
+	) ),
+	triggerhappy_field('post_content', 'string', array(
+		'label' => 'Content',
+		'dir' => 'in',
+	) )
+	,
+	triggerhappy_field('post_status', 'wp_post_status', array(
+		'label' => 'Post Status',
+		'dir' => 'in',
+	) )
+) */
+	$data = $node->getInputData( $context );
+	wp_insert_post( array(
+		'ID' => $data['post_id'],
+		'post_type' => $data['post_type'],
+		'post_title' => $data['post_title'],
+		'post_content' => $data['post_content'],
+		'post_status' => $data['post_status']
+	) );
+}
 function triggerhappy_wp_logout( $node, $context ) {
 	if ( is_user_logged_in() ) {
 		wp_logout();
@@ -76,7 +109,13 @@ function triggerhappy_action_hook( $node, $context ) {
 
 				if (isset($passed_args[$i])) {
 					$key = $field['name'];
-					$args[$key] = $passed_args[$i];
+					$val = $passed_args[$i];
+					if (is_numeric($val) && $field['type'] !== 'number') {
+						if (has_filter('triggerhappy_resolve_' . $field['type'] . '_from_number')) {
+							$val = apply_filters('triggerhappy_resolve_' . $field['type'] . '_from_number',$val);
+						}
+					}
+					$args[$key] = $val;
 				}
 				$i++;
 			}

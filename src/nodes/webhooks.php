@@ -78,56 +78,38 @@ function triggerhappy_load_webhook_nodes( $nodes ) {
 		)
 	);
 
-	$nodes['th_webhook_send_zapier'] = array(
-		'name' => 'Send Zapier Webhook',
+	$nodes['th_webhook_send_post'] = array(
+		'name' => 'Send POST Webhook',
 		'plugin' => '',
 		'nodeType' => 'action',
-		'description' => 'Sends a webhook request to Zapier',
+		'description' => 'Sends a webhook request to a specified URL',
 		'cat' => 'Webhooks',
-		'callback' => 'triggerhappy_webhook_send_zapier',
+		'callback' => 'triggerhappy_webhook_send',
 		'fields' => array(
+
 			triggerhappy_field(
-				'event_name', 'string', array(
-					'label' => 'Event Name',
-					'description' => 'What is the name of the event you\'ve set up at IFTTT?',
+				'url', 'string', array(
+					'label' => 'Webhook URL',
+					'description' => 'What is the URL of the Webhook?',
 					'dir' => 'in',
 				)
 			),
 			triggerhappy_field(
-				'secret_key', 'string', array(
-					'label' => 'Secret Key',
-					'description' => 'What is your IFTTT secret key? (Found in Documentation at https://ifttt.com/maker_webhooks)',
+				'payload', 'array', array(
+					'label' => 'The Webhook Payload to send',
 					'dir' => 'in',
 				)
-			),
-			triggerhappy_field(
-				'value1', 'array', array(
-					'label' => 'Value 1',
-					'dir' => 'in',
-				)
-			),
-			triggerhappy_field(
-				'value2', 'array', array(
-					'label' => 'Value 2',
-					'dir' => 'in',
-				)
-			),
-			triggerhappy_field(
-				'value3', 'array', array(
-					'label' => 'Value 3',
-					'dir' => 'in',
-				)
-			),
+			)
 		)
 	);
 
-	$nodes['th_webhook_receive_zapier'] = array(
-		'name' => 'When Zapier Webhook Received',
+	$nodes['th_webhook_receive_generic'] = array(
+		'name' => 'When Webhook Received',
 		'plugin' => '',
 		'nodeType' => 'trigger',
-		'description' => 'When a webhook (from Zapier) is received',
+		'description' => 'When a webhook is received',
 		'cat' => 'Webhooks',
-		'callback' => 'triggerhappy_webhook_receive_zapier',
+		'callback' => 'triggerhappy_webhook_receive',
 		'fields' => array(
 			triggerhappy_field(
 				'webhook_name', 'string', array(
@@ -184,17 +166,36 @@ function triggerhappy_webhook_receive_ifttt( $node, $context ) {
 
 
 
-function triggerhappy_webhook_receive_zapier( $node, $context ) {
+function triggerhappy_webhook_receive( $node, $context ) {
 	$data = $node->getInputData( $context );
 	add_action('wp', function() use($data, $node, $context) {
 		if (isset($_GET['thwebhook']) && $_GET['thwebhook'] == $data['webhook_name']) {
 			$entityBody = file_get_contents('php://input');
 			$parsedBody = json_decode($entityBody);
-
 			$node->next( $context, array( 'payload' => $parsedBody, 'payload_raw' => $entityBody, 'payload_post'=> $_POST ) );
 			exit;
 		}
 	});
-
-
 }
+
+
+function triggerhappy_webhook_send( $node, $context ) {
+	$data = $node->getInputData( $context );
+	$payload = $data['payload'];
+	if (is_object($payload)) {
+		$className = get_class($payload);
+		$payload = apply_filters( "triggerhappy_to_json__" . $className, $payload);
+	}
+	wp_remote_post( $data['url'], array( 'headers'   => array('Content-Type' => 'application/json; charset=utf-8'), 'body'=>json_encode( $data['payload'] ) ) );
+}
+
+add_action('wp',function() {
+
+	if (isset($_GET['th_webhook_auth'])) {
+		file_put_contents( dirname(__FILE__) . "/test.txt", "WERWERWER");
+	header("HTTP/1.1 404 Not Found - " . $_GET['th_webhook_auth']);
+	print_r($_GET['th_webhook_auth']);
+	echo "DONE";
+	exit;
+	}
+});

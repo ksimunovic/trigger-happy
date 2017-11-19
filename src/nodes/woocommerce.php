@@ -18,7 +18,37 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 		),
 		'callback' => 'triggerhappy_filter_hook',
 	);
-
+	$nodes['th_woocommerce_create_product'] = array(
+		'name' => 'Create a new product',
+		'plugin' => 'woocommerce',
+		'nodeType' => 'action',
+		'description' => 'Creates (or updates) a product',
+		'cat' => 'Products',
+		'callback' => 'triggerhappy_woocommerce_create_product',
+		'fields' => array(
+			triggerhappy_field( 'id', 'string', array(
+				'label' => 'Product ID',
+				'description' => 'Specify the product ID to update an existing product. Leave blank to create a new product',
+				'dir' => 'in',
+			) ),
+			triggerhappy_field('name', 'string', array(
+				'label' => 'Product Name',
+				'dir' => 'in',
+			) ),
+			triggerhappy_field('description', 'html', array(
+				'label' => 'Description',
+				'dir' => 'in',
+			) ),
+			triggerhappy_field('price', 'number', array(
+				'label' => 'Price',
+				'dir' => 'in',
+			) ),
+			triggerhappy_field('stock_quantity', 'number', array(
+				'label' => 'Stock Quantity',
+				'dir' => 'in',
+			) )
+		)
+	);
 	$nodes['th_woocommerce_single_product'] = array(
 		'description' => 'When a single product is being viewed on the front-end',
 		'name' => 'When a Single Product is viewed',
@@ -80,7 +110,8 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 	);
 
 	$nodes['th_woocommerce_checkout_fields'] = array(
-		'name' => 'Checkout Fields',
+		'name' => 'When Rendering Checkout Fields',
+		'description' => 'When displaying the checkout fields',
 		'plugin' => 'woocommerce',
 		'nodeType' => 'trigger',
 		'hook' => 'woocommerce_checkout_fields',
@@ -852,6 +883,16 @@ function triggerhappy_load_woocommerce_schema() {
 
 }
 
+add_filter( 'triggerhappy_resolve_wc_order_from_number', function ($id) {
+	return new WC_Order( $id );
+});
+add_filter( 'triggerhappy_to_json__WC_Order', function ($order) {
+	$req = new WP_REST_Request( 'GET', '/wc/v2/orders/' . $order->ID );
+
+	$response = rest_do_request( $req );
+	$data = ($response->get_data());
+	return $data;
+});
 add_filter(	'triggerhappy_resolve_field_wc_product__meta_data', function( $result, $obj, $fieldName ) {
 		$meta          = $obj->get_meta_data();
 		$formattedMeta = array();

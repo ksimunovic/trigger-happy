@@ -12,15 +12,15 @@ function triggerhappy_load_forms_nodes( $nodes ) {
 		'cat' => 'Forms',
 		'fields' => array(
 			triggerhappy_field(
-				'form','nf_form_id',array(
-					'dir' => 'in',
+				'form_data', 'array', array(
+					'dir' => 'start',
 				)
 			),
 			triggerhappy_field(
-				'form_data', 'array', array(
-					'dir' => 'out',
+				'form','nf_form_id',array(
+					'dir' => 'in',
 				)
-			),
+			)
 		)
 	);
 

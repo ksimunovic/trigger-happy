@@ -13,12 +13,13 @@ require_once( dirname( __FILE__ ) . '/src/includes/class-triggerhappycontext.php
 require_once( dirname( __FILE__ ) . '/src/includes/class-triggerhappynode.php' );
 require_once( dirname( __FILE__ ) . '/src/includes/class-triggerhappyexpressioncompiler.php' );
 
+require_once( dirname( __FILE__ ) . '/src/class-triggerhappy-auth.php' );
+
 require_once( dirname( __FILE__ ) . '/src/class-triggerhappy-admin.php' );
 require_once( dirname( __FILE__ ) . '/src/class-triggerhappy.php' );
 require_once( dirname( __FILE__ ) . '/src/functions.php' );
 
 triggerhappy_initialize();
-
 // Create a helper function for easy SDK access.
 function triggerhappy_fs() {
     global $triggerhappy_fs;
@@ -56,6 +57,17 @@ function triggerhappy_fs() {
     return $triggerhappy_fs;
 }
 class TH {
+
+	public static function get_template( $templatepath, $args = array() ) {
+		if ( ! empty( $args ) && is_array( $args ) ) {
+		        extract( $args );
+	    }
+		include ( dirname(__FILE__) . "/templates/" . $templatepath );
+	}
+
+	public static function plugin_url() {
+		return plugin_dir_url( __FILE__ ) ;
+	}
     public static function Trigger($triggerName, $setup) {
         $node = TriggerHappy::get_instance()->fetch_node($triggerName);
 
