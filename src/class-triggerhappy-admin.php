@@ -44,7 +44,7 @@ class TriggerHappyAdmin {
 
 		$is_editing_post = $hook == 'post-new.php' || $hook == 'post.php';
 
-		if ( $is_editing_post && 'th_flow' === $post->post_type ) {
+		if ( $is_editing_post && ( 'th_flow' === $post->post_type || 'th_trigger' === $post->post_type ) ) {
 			wp_enqueue_script(  'wpflowscript',  plugins_url( 'assets/trigger-happy.js', dirname(__FILE__) ), array(), '1.0',true );
 			wp_enqueue_style(  'trigger-happy-css',  plugins_url( 'assets/trigger-happy.css', dirname(__FILE__) ) );
 			wp_enqueue_style(  'codemirror',  plugins_url( 'assets/codemirror.css', dirname(__FILE__) ) );
@@ -55,19 +55,33 @@ class TriggerHappyAdmin {
 			));
 			wp_enqueue_editor();
 		}
+
 	}
 
 	/**
 	 * Hooks into Save Post and serializes the Node graph into the post_content field
 	 */
 	 public function save_post( $post_id ) {
-		if (isset($_POST['triggerhappy_data'])) {
+		 if (isset($_POST['triggerhappy_data'])) {
+ 			$has_kses = ( false !== has_filter( 'content_save_pre', 'wp_filter_post_kses' ) );
+ 			if ( $has_kses ) {
+ 				kses_remove_filters(); // Prevent KSES from corrupting JSON in post_content.
+ 			}
+ 			remove_action('save_post', array($this,'save_post'));
+ 			wp_update_post(array('ID'=>$post_id, 'post_content'=>$_POST['triggerhappy_data']));
+ 			if ( $has_kses ) {
+ 				ses_init_filters();
+ 			}
+ 			add_action('save_post',array($this,'save_post'));
+ 		}
+
+		if (isset($_POST['triggerhappy_trigger_data'])) {
 			$has_kses = ( false !== has_filter( 'content_save_pre', 'wp_filter_post_kses' ) );
 			if ( $has_kses ) {
 				kses_remove_filters(); // Prevent KSES from corrupting JSON in post_content.
 			}
 			remove_action('save_post', array($this,'save_post'));
-			wp_update_post(array('ID'=>$post_id, 'post_content'=>$_POST['triggerhappy_data']));
+			wp_update_post(array('ID'=>$post_id, 'post_content'=>$_POST['triggerhappy_trigger_data']));
 			if ( $has_kses ) {
 				ses_init_filters();
 			}
@@ -80,6 +94,7 @@ class TriggerHappyAdmin {
 	*/
 	public function add_meta_boxes() {
 		add_meta_box('triggerhappy_editor', 'Flow Editor', array($this,'render_editor'), 'th_flow' );
+		add_meta_box('triggerhappy_trigger_editor', 'Trigger Editor', array($this,'render_trigger_editor'), 'th_trigger' );
 	}
 
 	/**
@@ -91,6 +106,21 @@ class TriggerHappyAdmin {
 		<div id="flow-editor-container"></div>
 		<textarea id="flow-editor-data-source" style="display:none"><?php echo $post->post_content; ?></textarea>
 		<input type='hidden' name='triggerhappy_data' id='flow-editor-data' />
+		<input type='hidden' id='triggerhappy-x-nonce' value='<?php echo wp_create_nonce( 'wp_rest' ); ?>' />
+		<input type='hidden' id='triggerhappy-rest-url' value='<?php echo esc_url_raw( rest_url() ); ?>' />
+		<?php
+	}
+
+
+	/**
+	 * Render the Editor meta box for custom triggers
+	*/
+	public function render_trigger_editor( $post ) {
+	?>
+
+		<div id="triggerhappy-trigger-editor-container"></div>
+		<textarea id="triggerhappy-trigger-data-source" style="display:none"><?php echo $post->post_content; ?></textarea>
+		<input type='hidden' name='triggerhappy_data' id='triggerhappy-trigger-data' />
 		<input type='hidden' id='triggerhappy-x-nonce' value='<?php echo wp_create_nonce( 'wp_rest' ); ?>' />
 		<input type='hidden' id='triggerhappy-rest-url' value='<?php echo esc_url_raw( rest_url() ); ?>' />
 		<?php

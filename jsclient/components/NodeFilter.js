@@ -37,13 +37,17 @@ class NodeFilter extends React.Component {
 	}
 	componentWillReceiveProps( props ) {
 		if ( props.filter ) {
-			this.setState( props.filter );
-			if ( props.filter.left ) {
-				let fieldType = this.getFieldTypeFromExpression( props.filter.left.expr );
 
-				this.setState({
-					fieldType: fieldType
-				});
+			this.setState( props.filter );
+			if ( props.filter.left && ( ! this.props.filter.left ||! this.props.filter.left.expr || props.filter.left.expr != this.props.filter.left.expr ) ) {
+				if ( props.filter.left ) {
+					debugger;
+					let fieldType = this.getFieldTypeFromExpression( props.filter.left.expr );
+
+					this.setState({
+						fieldType: fieldType
+					});
+				}
 			}
 		}
 	}
@@ -58,14 +62,22 @@ class NodeFilter extends React.Component {
 		let nodeType = '' == nodeId ? null : this.props.getNodeFieldType( nodeId, nextPart );
 
 		while ( 0 < path.length ) {
-			nextPart = path.shift();
+
 			let schema = this.props.getPropsForType( nodeType );
 			if ( null == schema ) {
 				return nodeType;
 			}
+
 			nodeType = schema[nextPart] && schema[nextPart].type;
+			nextPart = path.shift();
 
 		}
+		let schemaType = this.props.getPropsForType( nodeType );
+		if ( null == schemaType ) {
+			return nodeType;
+		}
+
+		nodeType = schemaType[nextPart] && schemaType[nextPart].type;
 		return nodeType;
 
 	}

@@ -76,6 +76,41 @@ class TriggerHappy {
 
 		register_post_type( 'th_flow', $args );
 
+		$labels = array(
+			'name' => _x( 'Custom Trigger', 'post type general name', 'trigger-happy' ),
+			'singular_name' => _x( 'Custom Triggers', 'post type singular name', 'trigger-happy' ),
+			'menu_name' => _x( 'Trigger Happy', 'admin menu', 'trigger-happy' ),
+			'name_admin_bar' => _x( 'Custom Trigger', 'add new on admin bar', 'trigger-happy' ),
+			'add_new' => _x( 'Add New', 'flow', 'trigger-happy' ),
+			'add_new_item' => __( 'Add New Custom Trigger', 'trigger-happy' ),
+			'new_item' => __( 'New Custom Trigger', 'trigger-happy' ),
+			'edit_item' => __( 'Edit Custom Trigger', 'trigger-happy' ),
+			'view_item' => __( 'View Custom Trigger', 'trigger-happy' ),
+			'all_items' => __( 'Custom Triggers', 'trigger-happy' ),
+			'search_items' => __( 'Search Custom Trigger', 'trigger-happy' ),
+			'parent_item_colon' => __( 'Parent  Custom Trigger:', 'trigger-happy' ),
+			'not_found' => __( 'No custom trigger found.', 'trigger-happy' ),
+			'not_found_in_trash' => __( 'No custom triggers found in Trash.', 'trigger-happy' )
+		);
+
+		$args = array(
+			'labels' => $labels,
+
+			'public' => false,
+			'publicly_queryable' => false,
+			'show_ui' => true,
+			'show_in_menu'  =>	'edit.php?post_type=th_flow',
+			'query_var' => false,
+			'rewrite' => false,
+
+			'has_archive' => false,
+			'hierarchical' => false,
+			'menu_position' => null,
+			'supports' => array( 'title' )
+			);
+
+		register_post_type( 'th_trigger', $args );
+
 	}
 	/**
 	 * Initialize the REST API endpoints for Trigger Happy

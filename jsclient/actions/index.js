@@ -7,6 +7,12 @@ export const editNode = ( node, type ) => {
 		editType: type || ''
 	};
 };
+export const addTriggerField = ( type ) => {
+	return {
+		type: 'ADD_FIELD',
+		fieldType: type
+	};
+};
 export const setErrorMessage = ( nodeId, fieldName, error ) => {
 	return {
 		type: 'SET_ERROR_MESSAGE',
@@ -46,6 +52,20 @@ const loadingDataType = ( dataTypeId ) => {
 };
 const loadedDataType = ( dataTypeId, json ) => ({ type: 'LOADED_DATA_TYPE', dataTypeId, datatype: json});
 let dataTypesBeingLoaded = {};
+export const loadAllDataTypes = () => {
+	return dispatch=>{
+		return fetch( TH.rest_api_url + 'wpflow/v1/types/?_wpnonce=' + document.getElementById( 'triggerhappy-x-nonce' ).value, { credentials: 'same-origin' }).then( response => {
+			if ( 200 != response.status ) {
+				return null;
+			}
+			return response.json();
+		}).then( json => {
+			for ( let i in json ) {
+				dispatch( loadedDataType( i, json[i]) );
+			}
+		});
+	};
+};
 export const loadDataType = dataTypeId => {
 	return dispatch=>{
 		if ( null == dataTypeId || dataTypesBeingLoaded[dataTypeId]) {
@@ -207,9 +227,9 @@ return new Promise( ( resolve, reject ) => {
 				}
 			}
 		});
-	
+
 	}
-	if ( node.allowFilters ) {
+	if ( node.allowFilters || 'trigger' == newNode.nodeType ) {
 		dispatch({
 			type: 'ADD_STEP',
 			nodeId: newNode.nid,

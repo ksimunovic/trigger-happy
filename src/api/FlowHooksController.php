@@ -41,6 +41,16 @@ class FlowHooksController extends WP_REST_Controller {
 		);
 
 		register_rest_route(
+			$namespace, '/types/', array(
+				array(
+					'methods'         => WP_REST_Server::READABLE,
+					'callback'        => array( $this, 'get_all_types' ),
+					'permission_callback' => array( $this, 'get_permissions_check' ),
+					'args'            => array(),
+				),
+			)
+		);
+		register_rest_route(
 			$namespace, '/types/(?P<typeid>[a-zA-Z0-9-_]+)/values/(?P<search>.*)', array(
 				array(
 					'methods'         => WP_REST_Server::READABLE,
@@ -84,6 +94,20 @@ class FlowHooksController extends WP_REST_Controller {
 				'ajax' => isset( $typeDef['ajax'] ) ? $typeDef['ajax'] : false,
 				'schema' => $schema,
 			),200
+		);
+	}/**
+	 * Get a collection of items
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function get_all_types( $request ) {
+
+		 $types = TriggerHappy::get_instance()->types;
+
+		
+		return new WP_REST_Response(
+			$types, 200
 		);
 	}
 
@@ -148,7 +172,7 @@ class FlowHooksController extends WP_REST_Controller {
 		}
 		$data = array();
 		foreach ( $items as $type => $nodeData ) {
-			
+
 			if ( $byplugin && ( ! isset( $nodeData['plugin'] ) || $nodeData['plugin'] == '' || sanitize_title( $nodeData['plugin'] ) != $byplugin ) )  {
 				continue;
 			}

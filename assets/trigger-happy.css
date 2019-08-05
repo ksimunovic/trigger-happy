@@ -914,3 +914,34 @@ section.node.node--add-new:after {
 .action-item:hover .action-tag {
     background: rgba(255, 255, 255, 0.2);
 }
+
+
+/* Fields */
+.trigger-field-group { display:flex; }
+.trigger-field-control { flex:1 1; padding:5px; }
+.trigger-field-control__label {
+	display: block;
+	font-weight: bold;
+	font-size: 11px;
+}
+.trigger-field-control__input {
+	display:block;
+	width:100%;
+	padding: 2px;
+	line-height: 28px;
+	height: 28px;
+}
+.trigger-detail-field { display:flex; padding:10px 0px; }
+.trigger-detail-field__label { width:200px; }
+.trigger-detail-field__input { width:100%; }
+.trigger-detail-help {
+	margin-left: 170px;
+	padding-bottom:10px;
+	display:block;
+}
+.trigger-detail-heading { 
+	border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 6px;
+    background: #f8f8f8;
+}

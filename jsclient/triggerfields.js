@@ -93,8 +93,7 @@ class ReactGraph extends React.Component {
 		});
 	}
 	render() {
-		let Control = Components[this.props.panelType || 'CreateNew'];
-		return ( <div>	<div className="node-sidebar">	<Components.NodeList />	</div>	<div className="node-settings">	<Control {...this.props.panelOptions} />	</div>	</div> );
+		return <TriggerFields />;
 	}
 }
 
