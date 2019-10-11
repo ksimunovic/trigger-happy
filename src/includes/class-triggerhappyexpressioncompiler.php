@@ -95,7 +95,7 @@ class TriggerHappyExpressionCompiler {
 
 		return $expr->value;
 	}
-	public function MemberExpression( &$expr, $context ) {
+	public function MemberExpression( $expr, $context ) {
 
 		$obj = $this->Expression( $expr->object,$context );
 		if (is_array($obj) && isset($obj['__triggerhappy_call_functions'])) {
