@@ -286,17 +286,6 @@ class TriggerHappyFlow {
 		}
 	}
 
-	/*
-	 *
-	 *
-	We'll replace the core engine with this package:
-	A pipeline will be created by the TriggerHappyFlow class - and the start method should run the pipeline.
-	This should also remove the need for the TriggerHappyContext class which should be removed.
-	 *
-	Once the pipeline engine is implemented, we no longer need the TriggerHappyNode class - each node can be replaced by a stage - or a simple function.
-	The function called will be responsible for transforming the data passed into it and returning it.
-	 * */
-
 	public function setNode( $node, $id ) {
 		$this->nodes[ $id ] = $node;
 	}
