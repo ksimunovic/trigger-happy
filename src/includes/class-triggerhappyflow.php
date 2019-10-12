@@ -1,10 +1,18 @@
 <?php
 require_once( dirname( __FILE__ ) . '/class-phpep.php' );
+require_once( dirname( __FILE__ ) . '/../../vendor/autoload.php' );
+
+use League\Pipeline\Pipeline;
 
 class TriggerHappyFlow {
 	public $id = null;
 	private $nodes = [];
 	private $startNodes = [];
+
+	/**
+	 * @var Pipeline
+	 */
+	private $pipeline = null;
 
 	public function __construct( $id, $nodeGraph, $autoStart = true ) {
 		$this->id = $id;
@@ -22,12 +30,28 @@ class TriggerHappyFlow {
 	public function start( $context = null ) {
 		$this->initialize();
 
-		$context = $context == null ? new TriggerHappyContext() : $context;
-		foreach ( $this->nodes as $nodeid => $nodeData ) {
+		// Temp hardcoded variable to bypass old implementation
+		$isUsingOldImplementation = false;
 
-			if ( $nodeData->def['nodeType'] == 'trigger' ) {
-				$nodeData->execute( $context );
+		if ( $isUsingOldImplementation ) {
+			$context = $context == null ? new TriggerHappyContext() : $context;
+			foreach ( $this->nodes as $nodeid => $nodeData ) {
+				if ( $nodeData->def['nodeType'] == 'trigger' ) {
+					$nodeData->execute( $context );
+				}
 			}
+		} else {
+			/** @var TriggerHappyNode $nodeData */
+			foreach ( $this->nodes as $nodeData ) {
+				if ( $nodeData->def['nodeType'] == 'trigger' ) {
+					$this->pipeline = $this->pipeline->pipe( $nodeData );
+				}
+			}
+
+			$context = $context == null ? new TriggerHappyContext() : $context;
+
+			// Run the pipeline when all triggers are piped
+			$this->pipeline->process( $context );
 		}
 	}
 
@@ -66,6 +90,8 @@ class TriggerHappyFlow {
 			}
 		}
 
+		// Initialize flow pipeline
+		$this->pipeline = ( new Pipeline );
 
 	}
 
@@ -259,6 +285,17 @@ class TriggerHappyFlow {
 			}
 		}
 	}
+
+	/*
+	 *
+	 *
+	We'll replace the core engine with this package:
+	A pipeline will be created by the TriggerHappyFlow class - and the start method should run the pipeline.
+	This should also remove the need for the TriggerHappyContext class which should be removed.
+	 *
+	Once the pipeline engine is implemented, we no longer need the TriggerHappyNode class - each node can be replaced by a stage - or a simple function.
+	The function called will be responsible for transforming the data passed into it and returning it.
+	 * */
 
 	public function setNode( $node, $id ) {
 		$this->nodes[ $id ] = $node;

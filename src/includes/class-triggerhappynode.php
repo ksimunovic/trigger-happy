@@ -1,6 +1,9 @@
 <?php
+require_once( dirname( __FILE__ ) . '/../../vendor/autoload.php' );
 
-class TriggerHappyNode {
+use League\Pipeline\StageInterface;
+
+class TriggerHappyNode implements StageInterface {
 	public $id;
 	public $type;
 	public $graph;
@@ -89,7 +92,7 @@ class TriggerHappyNode {
 		return $this->returnFields[ $fieldId ] = new TriggerHappyField( $fieldId, $type, $this );
 	}
 
-	public function execute( $context ) {
+	public function __invoke( $context ) {
 		if ( $this->isExecuting ) {
 			return;
 		}
@@ -162,7 +165,7 @@ class TriggerHappyNode {
 
 		foreach ( $this->next as $i => $id ) {
 
-			$result = $this->graph->getNode( $id )->execute( $context );
+			$result = $this->graph->getNode( $id )->__invoke( $context );
 
 		}
 
