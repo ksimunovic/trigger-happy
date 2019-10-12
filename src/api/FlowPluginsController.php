@@ -1,4 +1,5 @@
 <?php
+
 class FlowPluginsController extends WP_REST_Controller {
 
 	/**
@@ -9,14 +10,14 @@ class FlowPluginsController extends WP_REST_Controller {
 		$namespace = 'wpflow/v' . $version;
 		$base = 'plugins';
 		register_rest_route(
-			$namespace, '/' . $base, array(
-				array(
-					'methods'         => WP_REST_Server::READABLE,
-					'callback'        => array( $this, 'get_available_plugins' ),
-					'permission_callback' => array( $this, 'get_plugins_permissions_check' ),
-					'args'            => array(),
-				),
-			)
+			$namespace, '/' . $base, [
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_available_plugins' ],
+					'permission_callback' => [ $this, 'get_plugins_permissions_check' ],
+					'args'                => [],
+				],
+			]
 		);
 	}
 
@@ -24,27 +25,28 @@ class FlowPluginsController extends WP_REST_Controller {
 	 * Get a collection of items
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
+	 *
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function get_available_plugins( $request ) {
 
 		$items = TriggerHappy::get_instance()->nodes;
-		$data = array();
-		$options =  get_option( 'triggerhappy_plugin_data' );
+		$data = [];
+		$options = get_option( 'triggerhappy_plugin_data' );
 		if ( ! $options ) {
-			$options = array();
+			$options = [];
 		}
-		$avail = array();
-		$skip = array();
+		$avail = [];
+		$skip = [];
 		foreach ( $items as $nodeId => $nodeList ) {
-			if (!isset($nodeList['plugin'])) {
+			if ( ! isset( $nodeList['plugin'] ) ) {
 				continue;
 			}
 			$pluginName = $nodeList['plugin'];
-			$avail[$pluginName] = 1;
+			$avail[ $pluginName ] = 1;
 			if ( $pluginName && ! isset( $options[ $pluginName ] ) && ! isset( $skip[ $pluginName ] ) ) {
 
-				$pluginDataReq = wp_remote_get( 'https://api.wordpress.org/plugins/info/1.0/' . strtolower($pluginName) . '.json' );
+				$pluginDataReq = wp_remote_get( 'https://api.wordpress.org/plugins/info/1.0/' . strtolower( $pluginName ) . '.json' );
 				if ( is_wp_error( $pluginDataReq ) ) {
 					$skip[ $pluginName ] = true;
 					continue;
@@ -59,21 +61,21 @@ class FlowPluginsController extends WP_REST_Controller {
 				if ( is_wp_error( wp_remote_get( $iconUrl ) ) ) {
 					$iconUrl = 'https://ps.w.org/' . $pluginName . '/assets/icon-128x128.jpg';
 				}
-				$options[ $pluginName ] = array(
-					'name' => $pluginName,
+				$options[ $pluginName ] = [
+					'name'  => $pluginName,
 					'label' => $pluginData->name,
-					'icon' => $iconUrl,
-				);
+					'icon'  => $iconUrl,
+				];
 			}
 
 		}
-		foreach ($options as $plugin=>$plugindata) {
+		foreach ( $options as $plugin => $plugindata ) {
 			if ( ! isset( $avail[ $plugin ] ) ) {
 				continue;
 			}
 			array_push( $data, $plugindata );
 		}
-		update_option( 'triggerhappy_plugin_data',$options );
+		update_option( 'triggerhappy_plugin_data', $options );
 
 		return new WP_REST_Response( $data, 200 );
 	}
