@@ -62,7 +62,7 @@ class TriggerHappyFlow {
 		foreach ( $this->nodedata->nodes as $node ) {
 
 			$flowNode = new TriggerHappyNode( $node->nid, $node->type, $this );
-			if ( isset( $node->filters ) ) {
+			if ( isset( $node->filters ) && ! empty( $node->filters ) && ! empty( $node->filters[0] ) ) {
 				$flowNode->setFilters( $node->filters );
 			}
 			$this->addNode( $flowNode );
