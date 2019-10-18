@@ -2,6 +2,11 @@
 require_once( dirname( __FILE__ ) . '/class-phpep.php' );
 require_once( dirname( __FILE__ ) . '/../../vendor/autoload.php' );
 
+require_once( dirname( __FILE__ ) . '/../classes/CoreActionNode.php' );
+require_once( dirname( __FILE__ ) . '/../classes/CoreNode.php' );
+require_once( dirname( __FILE__ ) . '/../classes/CoreSendEmail.php' );
+require_once( dirname( __FILE__ ) . '/../classes/NodeField.php' );
+
 use League\Pipeline\Pipeline;
 
 class TriggerHappyFlow {
@@ -28,13 +33,14 @@ class TriggerHappyFlow {
 	}
 
 	public function start( $context = null ) {
+		$context = $context == null ? new TriggerHappyContext() : $context;
+
 		$this->initialize();
 
 		// Temp hardcoded variable to bypass old implementation
 		$isUsingOldImplementation = false;
 
 		if ( $isUsingOldImplementation ) {
-			$context = $context == null ? new TriggerHappyContext() : $context;
 			foreach ( $this->nodes as $nodeid => $nodeData ) {
 				if ( $nodeData->def['nodeType'] == 'trigger' ) {
 					$nodeData->execute( $context );
@@ -43,13 +49,16 @@ class TriggerHappyFlow {
 		} else {
 			/** @var TriggerHappyNode $nodeData */
 			foreach ( $this->nodes as $nodeData ) {
-				if ( $nodeData->def['nodeType'] == 'trigger' ) {
-					$this->pipeline = $this->pipeline->pipe( $nodeData );
+				if ( is_object( $nodeData->def ) ) { // new class-based implementation
+					if ( $nodeData->def->getNodeType() == 'trigger' ) {
+						$this->pipeline = $this->pipeline->pipe( $nodeData );
+					}
+				} else {
+					if ( $nodeData->def['nodeType'] == 'trigger' ) {
+						$this->pipeline = $this->pipeline->pipe( $nodeData );
+					}
 				}
 			}
-
-			$context = $context == null ? new TriggerHappyContext() : $context;
-
 			// Run the pipeline when all triggers are piped
 			$this->pipeline->process( $context );
 		}
@@ -101,11 +110,17 @@ class TriggerHappyFlow {
 
 		$def = TriggerHappy::get_node( $node->type );
 
-		if ( isset( $def['fields'] ) ) {
-			foreach ( $def['fields'] as $i => $portDef ) {
-				$node->addField( $portDef['name'], $portDef['type'] );
+		if ( is_object( $def ) ) { // new class-based implementation
+			/** @var \HotSource\TriggerHappy\CoreNode $def */
+			$node->fields = $def->getFieldsWithNode( $node );
+		} else {
+			if ( isset( $def['fields'] ) ) {
+				foreach ( $def['fields'] as $i => $portDef ) {
+					$node->addField( $portDef['name'], $portDef['type'] );
+				}
 			}
 		}
+
 	}
 
 	public function resolveNodeProperty( $obj, $prop, $context ) {

@@ -69,6 +69,8 @@ class TriggerHappy {
 	/**
 	 * Create a Field definition array - doesn't add it to the global fields
 	 * list, this needs to be done manually
+	 *
+	 * Implemented also in \HotSource\TriggerHappy\NodeField:createFieldDefinition()
 	 */
 	function create_field_def( $name, $type = 'flow', $opts = [] ) {
 		$opts = array_merge(

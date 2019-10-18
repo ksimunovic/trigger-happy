@@ -13,6 +13,7 @@ class TriggerHappyNode implements StageInterface {
 	public $returnData = [];
 	public $fields = [];
 	public $returnFields = [];
+	public $inputData;
 	private $isExecuting = false;
 	private $next = [];
 
@@ -96,7 +97,13 @@ class TriggerHappyNode implements StageInterface {
 		if ( $this->isExecuting ) {
 			return;
 		}
-		if ( isset( $this->def['callback'] ) ) {
+		if ( is_object( $this->def ) ) { // new class-based implementation
+
+			// Adding inputData to flowNode so context can be removed from getInputData
+			$this->inputData = $this->getInputData( new TriggerHappyContext() );
+
+			$this->def->runCallback( $this, $context, $this->inputData );
+		} else if ( isset( $this->def['callback'] ) ) {
 			return call_user_func( $this->def['callback'], $this, $context );
 
 		} elseif ( isset( $this->def['childGraphs'] ) ) {
@@ -126,9 +133,7 @@ class TriggerHappyNode implements StageInterface {
 			$in = $this->fields;
 
 			foreach ( $in as $fieldId => $field ) {
-
 				$data[ $fieldId ] = $field->resolveExpression( $context );
-
 			}
 		}
 
@@ -158,15 +163,11 @@ class TriggerHappyNode implements StageInterface {
 
 		$result = null;
 		if ( ! $this->canExecute( $context ) ) {
-
 			return false;
 		}
 
-
 		foreach ( $this->next as $i => $id ) {
-
 			$result = $this->graph->getNode( $id )->__invoke( $context );
-
 		}
 
 		return $this->getReturnData( $context );
@@ -180,10 +181,15 @@ class TriggerHappyNode implements StageInterface {
 
 		}
 
-		if ( isset( $this->def['nodeFilters'] ) ) {
-
-			$success = $success && $this->applyFilters( $context, json_decode( json_encode( $this->def['nodeFilters'] ) ) );
-
+		if ( is_object( $this->def ) ) { // new class-based implementation
+			//TODO: Implement nodeFilters with CoreTriggerNode
+			if ( isset( $this->def->nodeFilters ) ) {
+				$success = $success && $this->applyFilters( $context, json_decode( json_encode( $this->def->nodeFilters ) ) );
+			}
+		} else {
+			if ( isset( $this->def['nodeFilters'] ) ) {
+				$success = $success && $this->applyFilters( $context, json_decode( json_encode( $this->def['nodeFilters'] ) ) );
+			}
 		}
 
 		return $success;

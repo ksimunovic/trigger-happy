@@ -191,6 +191,8 @@ function triggerhappy_load_core_nodes( $nodes ) {
 		],
 	];
 
+	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\CoreSendEmail();
+
 	$nodes['th_core_set_title'] = [
 		'description' => 'Set the post title',
 		'name'        => 'Set Post Title',

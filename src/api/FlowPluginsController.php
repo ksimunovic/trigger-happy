@@ -39,6 +39,9 @@ class FlowPluginsController extends WP_REST_Controller {
 		$avail = [];
 		$skip = [];
 		foreach ( $items as $nodeId => $nodeList ) {
+			if ( is_object( $nodeList ) ) {
+				$nodeList = $nodeList->toArray();
+			}
 			if ( ! isset( $nodeList['plugin'] ) ) {
 				continue;
 			}
