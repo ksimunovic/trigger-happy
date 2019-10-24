@@ -15,25 +15,6 @@ class CorePostInsertHtml extends CoreActionNode {
 		$this->actionType = 'render';
 		$this->nodeType = $this->getNodeType();
 		$this->fields = $this->generateFields();
-
-		[
-			'fields' => [
-				triggerhappy_field( 'position', 'string', [
-					'label'       => 'Position',
-					'description' => 'Where to add the content',
-					'dir'         => 'in',
-					'choices'     => triggerhappy_assoc_to_choices( [
-						'before_content' => 'Before the post content',
-						'after_content'  => 'After the post content',
-					] ),
-				] ),
-				triggerhappy_field( 'html', 'html', [
-					'label'       => 'HTML',
-					'description' => 'The HTML to be inserted',
-					'dir'         => 'in',
-				] ),
-			],
-		];
 	}
 
 	/**
