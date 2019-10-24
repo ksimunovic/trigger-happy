@@ -33,6 +33,8 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	];
 
+	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\CorePostInsertHtml();
+
 	$nodes['th_core_insert_html_sidebar'] = [
 		'name'        => 'Insert content into sidebar',
 		'plugin'      => '',

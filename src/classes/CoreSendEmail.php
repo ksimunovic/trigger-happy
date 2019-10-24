@@ -34,6 +34,13 @@ class CoreSendEmail extends CoreActionNode {
 		];
 	}
 
+	/**
+	 * @param $node
+	 * @param $context
+	 * @param null $data
+	 *
+	 * @return void|null
+	 */
 	public function runCallback( $node, $context, $data = null ) {
 		$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
 		wp_mail( $data['send_to'], $data['subject'], $data['body'], $headers );

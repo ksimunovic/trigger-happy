@@ -6,6 +6,11 @@ require_once( dirname( __FILE__ ) . '/../classes/CoreNode.php' );
 
 class CoreActionNode extends CoreNode {
 
+	/**
+	 * @var string
+	 */
+	protected $actionType;
+
 	public function getNodeType(): string {
 		return "action";
 	}
