@@ -145,21 +145,6 @@ class TriggerHappyNode implements StageInterface {
 		if ( $data !== null ) {
 			$context->setData( $this->id, $data );
 		}
-		if ( isset( $this->graph->nodedata->mapFields ) && isset( $this->graph->nodedata->mapFields->{$this->id} ) ) {
-			$fieldsToMapToParentContext = $this->graph->nodedata->mapFields->{$this->id};
-			$parentData = $context->parentContext->getData( $context->parentNodeId, $data );
-			foreach ( $fieldsToMapToParentContext as $from => $to ) {
-				if ( isset( $data->{$from} ) ) {
-					$parentData->{$to} = $data->{$from};
-				}
-			}
-			global $pd;
-			$pd = true;
-			$newData = $this->graph->parentFlow->getNode( $context->parentNodeId )->getInputData( $context->parentContext );
-			$context->parentContext->setData( $context->parentNodeId, $newData );
-			$context->setData( 0, $newData );
-
-		}
 
 		$result = null;
 		if ( ! $this->canExecute( $context ) ) {
