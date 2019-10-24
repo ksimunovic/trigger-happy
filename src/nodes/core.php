@@ -8,33 +8,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\CorePostInsertHtml();
 
-	$nodes['th_core_insert_html_sidebar'] = [
-		'name'        => 'Insert content into sidebar',
-		'plugin'      => '',
-		'cat'         => 'Sidebar',
-		'nodeType'    => 'action',
-		'actionType'  => 'render',
-		'callback'    => 'triggerhappy_render_html_on_position_action',
-		'description' => 'Insert HTML into before or after the sidebar',
-		'fields'      => [
-			triggerhappy_field( 'position', 'string', [
-				'label'       => 'Position',
-				'description' => 'Where to add the content',
-				'dir'         => 'in',
-				'choices'     => triggerhappy_assoc_to_choices( [
-					'dynamic_sidebar_before' => 'Before the sidebar has rendered',
-					'dynamic_sidebar_after'  => 'After the sidebar has rendered',
-				] ),
-			] ),
-			triggerhappy_field( 'html', 'html', [
-				'label'       => 'HTML',
-				'description' => 'The HTML to be inserted',
-				'dir'         => 'in',
-			] ),
-		],
-
-	];
-
+	$nodes['th_core_insert_html_sidebar'] = new HotSource\TriggerHappy\CoreSidebarInsertHtml();
 
 	$nodes['th_core_create_post'] = [
 		'name'        => 'Create a new post',
@@ -1270,6 +1244,32 @@ function deprecatedNodes() {
 			] ),
 			triggerhappy_field( 'body', 'html', [ 'label' => 'Body', 'description' => 'The body of the email' ] ),
 
+		],
+	];
+
+	$nodes['th_core_insert_html_sidebar'] = [
+		'name'        => 'Insert content into sidebar',
+		'plugin'      => '',
+		'cat'         => 'Sidebar',
+		'nodeType'    => 'action',
+		'actionType'  => 'render',
+		'callback'    => 'triggerhappy_render_html_on_position_action',
+		'description' => 'Insert HTML into before or after the sidebar',
+		'fields'      => [
+			triggerhappy_field( 'position', 'string', [
+				'label'       => 'Position',
+				'description' => 'Where to add the content',
+				'dir'         => 'in',
+				'choices'     => triggerhappy_assoc_to_choices( [
+					'dynamic_sidebar_before' => 'Before the sidebar has rendered',
+					'dynamic_sidebar_after'  => 'After the sidebar has rendered',
+				] ),
+			] ),
+			triggerhappy_field( 'html', 'html', [
+				'label'       => 'HTML',
+				'description' => 'The HTML to be inserted',
+				'dir'         => 'in',
+			] ),
 		],
 	];
 }
