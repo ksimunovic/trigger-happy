@@ -17,39 +17,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	$nodes['th_core_insert_html_sidebar'] = new HotSource\TriggerHappy\Nodes\CoreSidebarInsertHtml();
 
-	$nodes['th_core_create_post'] = [
-		'name'        => 'Create a new post',
-		'plugin'      => 'WordPress',
-		'nodeType'    => 'action',
-		'description' => 'Creates (or updates) a page or post',
-		'cat'         => 'Posts',
-		'callback'    => 'triggerhappy_create_post',
-		'fields'      => [
-			triggerhappy_field( 'post_id', 'string', [
-				'label'       => 'Post ID',
-				'description' => 'Specify the post ID to update an existing post. Leave blank to create a new post',
-				'dir'         => 'in',
-			] ),
-			triggerhappy_field( 'post_type', 'wp_post_type', [
-				'label'       => 'Post Type',
-				'description' => 'Specify the type of post to create',
-				'dir'         => 'in',
-			] ),
-			triggerhappy_field( 'post_title', 'string', [
-				'label' => 'Post Title',
-				'dir'   => 'in',
-			] ),
-			triggerhappy_field( 'post_content', 'string', [
-				'label' => 'Content',
-				'dir'   => 'in',
-			] )
-			,
-			triggerhappy_field( 'post_status', 'wp_post_status', [
-				'label' => 'Post Status',
-				'dir'   => 'in',
-			] ),
-		],
-	];
+	$nodes['th_core_create_post'] = new HotSource\TriggerHappy\Nodes\CoreCreatePost();
 
 	$nodes['th_core_wp_login'] = [
 		'name'        => 'User Logged In',
@@ -1276,6 +1244,40 @@ function deprecatedNodes() {
 				'label'       => 'HTML',
 				'description' => 'The HTML to be inserted',
 				'dir'         => 'in',
+			] ),
+		],
+	];
+
+	$nodes['th_core_create_post'] = [
+		'name'        => 'Create a new post',
+		'plugin'      => 'WordPress',
+		'nodeType'    => 'action',
+		'description' => 'Creates (or updates) a page or post',
+		'cat'         => 'Posts',
+		'callback'    => 'triggerhappy_create_post',
+		'fields'      => [
+			triggerhappy_field( 'post_id', 'string', [
+				'label'       => 'Post ID',
+				'description' => 'Specify the post ID to update an existing post. Leave blank to create a new post',
+				'dir'         => 'in',
+			] ),
+			triggerhappy_field( 'post_type', 'wp_post_type', [
+				'label'       => 'Post Type',
+				'description' => 'Specify the type of post to create',
+				'dir'         => 'in',
+			] ),
+			triggerhappy_field( 'post_title', 'string', [
+				'label' => 'Post Title',
+				'dir'   => 'in',
+			] ),
+			triggerhappy_field( 'post_content', 'string', [
+				'label' => 'Content',
+				'dir'   => 'in',
+			] )
+			,
+			triggerhappy_field( 'post_status', 'wp_post_status', [
+				'label' => 'Post Status',
+				'dir'   => 'in',
 			] ),
 		],
 	];
