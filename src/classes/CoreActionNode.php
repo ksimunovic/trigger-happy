@@ -2,8 +2,6 @@
 
 namespace HotSource\TriggerHappy;
 
-require_once( dirname( __FILE__ ) . '/../classes/CoreNode.php' );
-
 class CoreActionNode extends CoreNode {
 
 	/**

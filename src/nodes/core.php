@@ -2,6 +2,13 @@
 include( dirname( __FILE__ ) . "/functions/core_functions.php" );
 include( dirname( __FILE__ ) . "/core_advanced.php" );
 
+require_once( dirname( __FILE__ ) . '/../classes/Psr4AutoloaderClass.php' );
+
+// Registering class autoloader
+$loader = new \HotSource\TriggerHappy\Psr4AutoloaderClass;
+$loader->register();
+$loader->addNamespace( 'HotSource\TriggerHappy', 'D:/_htdocs/hotsource/content/plugins/trigger-happy/src/classes' );
+
 function triggerhappy_load_core_nodes( $nodes ) {
 
 	$nodes = triggerhappy_load_core_nodes_advanced( $nodes );
