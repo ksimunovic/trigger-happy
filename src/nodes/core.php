@@ -6,33 +6,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	$nodes = triggerhappy_load_core_nodes_advanced( $nodes );
 
-	$nodes['th_core_insert_html_after_post'] = [
-		'name'        => 'Insert content into post',
-		'plugin'      => '',
-		'cat'         => 'Posts',
-		'nodeType'    => 'action',
-		'actionType'  => 'render',
-		'callback'    => 'triggerhappy_render_html_after_post_content',
-		'description' => 'Insert HTML into the body of a post',
-		'fields'      => [
-			triggerhappy_field( 'position', 'string', [
-				'label'       => 'Position',
-				'description' => 'Where to add the content',
-				'dir'         => 'in',
-				'choices'     => triggerhappy_assoc_to_choices( [
-					'before_content' => 'Before the post content',
-					'after_content'  => 'After the post content',
-				] ),
-			] ),
-			triggerhappy_field( 'html', 'html', [
-				'label'       => 'HTML',
-				'description' => 'The HTML to be inserted',
-				'dir'         => 'in',
-			] ),
-		],
-
-	];
-
 	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\CorePostInsertHtml();
 
 	$nodes['th_core_insert_html_sidebar'] = [
@@ -170,27 +143,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 		'nodeType'    => 'trigger',
 		'plugin'      => 'wordpress',
 		'fields'      => [ triggerhappy_field( 'hours', 'number' ) ],
-	];
-
-	$nodes['th_core_send_email'] = [
-		'plugin'      => 'wordpress',
-		'cat'         => 'WordPress',
-		'name'        => 'Send an email',
-		'description' => 'Send a custom email',
-		'callback'    => 'triggerhappy_send_email',
-		'nodeType'    => 'action',
-		'fields'      => [
-			triggerhappy_field( 'send_to', 'string', [
-				'label'       => 'Send To',
-				'description' => 'Enter the recipient email address',
-			] ),
-			triggerhappy_field( 'subject', 'string', [
-				'label'       => 'Subject',
-				'description' => 'The email subject',
-			] ),
-			triggerhappy_field( 'body', 'html', [ 'label' => 'Body', 'description' => 'The body of the email' ] ),
-
-		],
 	];
 
 	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\CoreSendEmail();
@@ -1270,4 +1222,54 @@ function triggerhappy_assoc_to_choices( $results ) {
 	}
 
 	return $choices;
+}
+
+
+function deprecatedNodes() {
+	$nodes['th_core_insert_html_after_post'] = [
+		'name'        => 'Insert content into post',
+		'plugin'      => '',
+		'cat'         => 'Posts',
+		'nodeType'    => 'action',
+		'actionType'  => 'render',
+		'callback'    => 'triggerhappy_render_html_after_post_content',
+		'description' => 'Insert HTML into the body of a post',
+		'fields'      => [
+			triggerhappy_field( 'position', 'string', [
+				'label'       => 'Position',
+				'description' => 'Where to add the content',
+				'dir'         => 'in',
+				'choices'     => triggerhappy_assoc_to_choices( [
+					'before_content' => 'Before the post content',
+					'after_content'  => 'After the post content',
+				] ),
+			] ),
+			triggerhappy_field( 'html', 'html', [
+				'label'       => 'HTML',
+				'description' => 'The HTML to be inserted',
+				'dir'         => 'in',
+			] ),
+		],
+	];
+
+	$nodes['th_core_send_email'] = [
+		'plugin'      => 'wordpress',
+		'cat'         => 'WordPress',
+		'name'        => 'Send an email',
+		'description' => 'Send a custom email',
+		'callback'    => 'triggerhappy_send_email',
+		'nodeType'    => 'action',
+		'fields'      => [
+			triggerhappy_field( 'send_to', 'string', [
+				'label'       => 'Send To',
+				'description' => 'Enter the recipient email address',
+			] ),
+			triggerhappy_field( 'subject', 'string', [
+				'label'       => 'Subject',
+				'description' => 'The email subject',
+			] ),
+			triggerhappy_field( 'body', 'html', [ 'label' => 'Body', 'description' => 'The body of the email' ] ),
+
+		],
+	];
 }
