@@ -5,15 +5,6 @@ function triggerhappy_wp_redirect( $node, $context ) {
 	exit;
 }
 
-function triggerhappy_send_email( $node, $context ) {
-	$data = $node->getInputData( $context );
-
-	$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
-	wp_mail( $data['send_to'], $data['subject'], $data['body'], $headers );
-
-	$node->next( $context );
-}
-
 function triggerhappy_wp_login( $node, $context ) {
 	if ( is_user_logged_in() ) {
 		wp_logout();
@@ -22,41 +13,6 @@ function triggerhappy_wp_login( $node, $context ) {
 	wp_signon( [
 		'user_login'    => $data['username'],
 		'user_password' => $data['password'],
-	] );
-}
-
-function triggerhappy_create_post( $node, $context ) {
-	/* triggerhappy_field( 'post_id', 'string', array(
-		'label' => 'Post ID',
-		'description' => 'Specify the post ID to update an existing post. Leave blank to create a new post',
-		'dir' => 'in',
-	) ),
-	triggerhappy_field(	'post_type', 'wp_post_type', array(
-		'label' => 'Post Type',
-		'description' => 'Specify the type of post to create',
-		'dir' => 'in',
-	) ),
-	triggerhappy_field('post_title', 'string', array(
-		'label' => 'Post Title',
-		'dir' => 'in',
-	) ),
-	triggerhappy_field('post_content', 'string', array(
-		'label' => 'Content',
-		'dir' => 'in',
-	) )
-	,
-	triggerhappy_field('post_status', 'wp_post_status', array(
-		'label' => 'Post Status',
-		'dir' => 'in',
-	) )
-) */
-	$data = $node->getInputData( $context );
-	wp_insert_post( [
-		'ID'           => $data['post_id'],
-		'post_type'    => $data['post_type'],
-		'post_title'   => $data['post_title'],
-		'post_content' => $data['post_content'],
-		'post_status'  => $data['post_status'],
 	] );
 }
 
@@ -132,35 +88,6 @@ function triggerhappy_action_hook( $node, $context ) {
 		return $node->next( $context, $args );
 	}, $priority, 9999
 	);
-}
-
-function triggerhappy_render_html_after_post_content( $node, $context ) {
-	$data = $node->getInputData( $context );
-	$position = $data['position'];
-	$hook = 'the_content';
-	if ( $position == 'before_title' || $position == 'after_title' ) {
-		$hook = 'the_title';
-	}
-	add_filter( $hook, function ( $existing ) use ( $position, $data ) {
-		if ( $position == 'before_title' || $position == 'before_content' ) {
-			return $data['html'] . $existing;
-		}
-
-		return $existing . $data['html'];
-	} );
-	$node->next( $context, [] );
-}
-
-
-function triggerhappy_render_html_on_position_action( $node, $context ) {
-	$data = $node->getInputData( $context );
-	$position = $data['position'];
-
-	add_action( $position, function () use ( $position, $data ) {
-		echo $data['html'];
-	} );
-	$node->next( $context, [] );
-
 }
 
 function triggerhappy_custom_hook( $node, $context ) {

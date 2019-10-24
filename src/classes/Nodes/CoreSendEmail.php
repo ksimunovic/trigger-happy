@@ -12,7 +12,6 @@ class CoreSendEmail extends CoreActionNode {
 		$this->description = 'Send a custom email';
 		$this->plugin = 'wordpress';
 		$this->cat = 'WordPress';
-		$this->callback = 'triggerhappy_send_email';
 		$this->nodeType = $this->getNodeType();
 		$this->fields = $this->generateFields();
 	}

@@ -27,11 +27,6 @@ abstract class CoreNode {
 	/**
 	 * @var string
 	 */
-	protected $callback;
-
-	/**
-	 * @var string
-	 */
 	protected $nodeType;
 
 	/**

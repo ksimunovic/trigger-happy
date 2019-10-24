@@ -12,7 +12,6 @@ class CoreCreatePost extends CoreActionNode {
 		$this->description = 'Creates (or updates) a page or post';
 		$this->plugin = 'WordPress';
 		$this->cat = 'Posts';
-		$this->callback = 'triggerhappy_create_post';
 		$this->actionType = 'render';
 		$this->nodeType = $this->getNodeType();
 		$this->fields = $this->generateFields();

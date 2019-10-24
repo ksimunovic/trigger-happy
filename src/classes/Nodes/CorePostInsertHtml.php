@@ -12,7 +12,6 @@ class CorePostInsertHtml extends CoreActionNode {
 		$this->description = 'Insert HTML into the body of a post';
 		$this->plugin = '';
 		$this->cat = 'Posts';
-		$this->callback = 'triggerhappy_render_html_after_post_content';
 		$this->actionType = 'render';
 		$this->nodeType = $this->getNodeType();
 		$this->fields = $this->generateFields();

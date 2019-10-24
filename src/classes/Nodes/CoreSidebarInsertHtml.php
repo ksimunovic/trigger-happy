@@ -12,7 +12,6 @@ class CoreSidebarInsertHtml extends CoreActionNode {
 		$this->description = 'Insert HTML into before or after the sidebar';
 		$this->plugin = '';
 		$this->cat = 'Sidebar';
-		$this->callback = 'triggerhappy_render_html_on_position_action';
 		$this->actionType = 'render';
 		$this->nodeType = $this->getNodeType();
 		$this->fields = $this->generateFields();
