@@ -13,9 +13,9 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	$nodes = triggerhappy_load_core_nodes_advanced( $nodes );
 
-	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\CorePostInsertHtml();
+	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\Nodes\CorePostInsertHtml();
 
-	$nodes['th_core_insert_html_sidebar'] = new HotSource\TriggerHappy\CoreSidebarInsertHtml();
+	$nodes['th_core_insert_html_sidebar'] = new HotSource\TriggerHappy\Nodes\CoreSidebarInsertHtml();
 
 	$nodes['th_core_create_post'] = [
 		'name'        => 'Create a new post',
@@ -126,7 +126,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 		'fields'      => [ triggerhappy_field( 'hours', 'number' ) ],
 	];
 
-	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\CoreSendEmail();
+	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\CoreSendEmail();
 
 	$nodes['th_core_set_title'] = [
 		'description' => 'Set the post title',

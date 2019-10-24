@@ -1,6 +1,9 @@
 <?php
 
-namespace HotSource\TriggerHappy;
+namespace HotSource\TriggerHappy\Nodes;
+
+use HotSource\TriggerHappy\CoreActionNode;
+use HotSource\TriggerHappy\NodeField;
 
 class CoreSendEmail extends CoreActionNode {
 
