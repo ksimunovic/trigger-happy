@@ -13,11 +13,15 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	$nodes = triggerhappy_load_core_nodes_advanced( $nodes );
 
+	// Wordpress
+	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\CoreSendEmail();
+
+	// Posts
 	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\Nodes\CorePostInsertHtml();
-
-	$nodes['th_core_insert_html_sidebar'] = new HotSource\TriggerHappy\Nodes\CoreSidebarInsertHtml();
-
 	$nodes['th_core_create_post'] = new HotSource\TriggerHappy\Nodes\CoreCreatePost();
+
+	// Sidebar
+	$nodes['th_core_insert_html_sidebar'] = new HotSource\TriggerHappy\Nodes\CoreSidebarInsertHtml();
 
 	$nodes['th_core_wp_login'] = [
 		'name'        => 'User Logged In',
@@ -93,8 +97,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 		'plugin'      => 'wordpress',
 		'fields'      => [ triggerhappy_field( 'hours', 'number' ) ],
 	];
-
-	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\CoreSendEmail();
 
 	$nodes['th_core_set_title'] = [
 		'description' => 'Set the post title',
