@@ -9,7 +9,7 @@ class CoreActionNode extends CoreNode {
 	/**
 	 * @var string
 	 */
-	protected $actionType;
+	protected $actionType = '';
 
 	public function getNodeType(): string {
 		return "action";
@@ -34,11 +34,27 @@ class CoreActionNode extends CoreNode {
 		return [];
 	}
 
+
 	/**
-	 *
+	 * Used in Frontend: FlowHooksController::get_available_nodes() and
+	 * FlowPluginsController::get_available_plugins()
 	 * @return array
 	 */
 	public function toArray() {
-		return [];
+		$fieldsArray = [];
+		foreach ( $this->fields as $field ) {
+			$fieldsArray[] = $field->createFieldDefinition();
+		}
+
+		return [
+			'name'        => $this->name,
+			'plugin'      => $this->plugin,
+			'description' => $this->description,
+			'cat'         => $this->cat,
+			'callback'    => $this->callback,
+			'actionType'  => $this->actionType,
+			'nodeType'    => $this->nodeType,
+			'fields'      => $fieldsArray,
+		];
 	}
 }

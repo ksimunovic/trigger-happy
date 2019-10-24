@@ -61,27 +61,4 @@ class CorePostInsertHtml extends CoreActionNode {
 		} );
 		$node->next( $context, [] );
 	}
-
-	/**
-	 * Used in Frontend: FlowHooksController::get_available_nodes() and
-	 * FlowPluginsController::get_available_plugins()
-	 * @return array
-	 */
-	public function toArray() {
-		$fieldsArray = [];
-		foreach ( $this->fields as $field ) {
-			$fieldsArray[] = $field->createFieldDefinition();
-		}
-
-		return [
-			'name'        => $this->name,
-			'plugin'      => $this->plugin,
-			'description' => $this->description,
-			'cat'         => $this->cat,
-			'callback'    => $this->callback,
-			'actionType'  => $this->actionType,
-			'nodeType'    => $this->nodeType,
-			'fields'      => $fieldsArray,
-		];
-	}
 }

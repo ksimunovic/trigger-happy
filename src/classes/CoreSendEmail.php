@@ -46,26 +46,4 @@ class CoreSendEmail extends CoreActionNode {
 		wp_mail( $data['send_to'], $data['subject'], $data['body'], $headers );
 		$node->next( $context );
 	}
-
-	/**
-	 * Used in FlowHooksController::get_available_nodes() and
-	 * FlowPluginsController::get_available_plugins()
-	 * @return array
-	 */
-	public function toArray() {
-		$fieldsArray = [];
-		foreach ( $this->fields as $field ) {
-			$fieldsArray[] = $field->createFieldDefinition();
-		}
-
-		return [
-			'name'        => $this->name,
-			'plugin'      => $this->plugin,
-			'description' => $this->description,
-			'cat'         => $this->cat,
-			'callback'    => $this->callback,
-			'nodeType'    => $this->nodeType,
-			'fields'      => $fieldsArray,
-		];
-	}
 }
