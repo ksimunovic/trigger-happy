@@ -1,12 +1,20 @@
 {
-     "parserOptions": {
-        "ecmaVersion": 7,
-        "sourceType": "module",
-        "ecmaFeatures": {
-           "jsx": true
-	   },
-	   "indent": ["error", "tab"]
+  "parserOptions": {
+    "ecmaVersion": 7,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
     },
-
-    "extends": "wordpress"
+    "indent": [
+      "error",
+      "tab"
+    ]
+  },
+  "extends": "wordpress",
+  "rules": {
+    "yoda": [
+      "error",
+      "never"
+    ]
+  }
 }
