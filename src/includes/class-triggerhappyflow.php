@@ -2,17 +2,10 @@
 require_once( dirname( __FILE__ ) . '/class-phpep.php' );
 require_once( dirname( __FILE__ ) . '/../../vendor/autoload.php' );
 
-use League\Pipeline\Pipeline;
-
 class TriggerHappyFlow {
 	public $id = null;
 	private $nodes = [];
 	private $startNodes = [];
-
-	/**
-	 * @var Pipeline
-	 */
-	private $pipeline = null;
 
 	public function __construct( $id, $nodeGraph, $autoStart = true ) {
 		$this->id = $id;
@@ -32,30 +25,16 @@ class TriggerHappyFlow {
 
 		$this->initialize();
 
-		// Temp hardcoded variable to bypass old implementation
-		$isUsingOldImplementation = false;
-
-		if ( $isUsingOldImplementation ) {
-			foreach ( $this->nodes as $nodeid => $nodeData ) {
+		foreach ( $this->nodes as $nodeid => $nodeData ) {
+			if ( is_object( $nodeData->def ) ) { // new class-based implementation
+				if ( $nodeData->def->getNodeType() == 'trigger' ) {
+					$nodeData->execute( $context );
+				}
+			} else {
 				if ( $nodeData->def['nodeType'] == 'trigger' ) {
 					$nodeData->execute( $context );
 				}
 			}
-		} else {
-			/** @var TriggerHappyNode $nodeData */
-			foreach ( $this->nodes as $nodeData ) {
-				if ( is_object( $nodeData->def ) ) { // new class-based implementation
-					if ( $nodeData->def->getNodeType() == 'trigger' ) {
-						$this->pipeline = $this->pipeline->pipe( $nodeData );
-					}
-				} else {
-					if ( $nodeData->def['nodeType'] == 'trigger' ) {
-						$this->pipeline = $this->pipeline->pipe( $nodeData );
-					}
-				}
-			}
-			// Run the pipeline when all triggers are piped
-			$this->pipeline->process( $context );
 		}
 	}
 
@@ -93,9 +72,6 @@ class TriggerHappyFlow {
 				}
 			}
 		}
-
-		// Initialize flow pipeline
-		$this->pipeline = ( new Pipeline );
 
 	}
 
