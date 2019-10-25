@@ -10,7 +10,7 @@ class CoreActionNode extends CoreNode {
 	protected $actionType = '';
 
 	public function getNodeType(): string {
-		return "action";
+		return 'action';
 	}
 
 	/**
@@ -49,7 +49,6 @@ class CoreActionNode extends CoreNode {
 			'plugin'      => $this->plugin,
 			'description' => $this->description,
 			'cat'         => $this->cat,
-			'callback'    => $this->callback,
 			'actionType'  => $this->actionType,
 			'nodeType'    => $this->nodeType,
 			'fields'      => $fieldsArray,

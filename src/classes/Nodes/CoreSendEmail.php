@@ -14,6 +14,7 @@ class CoreSendEmail extends CoreActionNode {
 		$this->cat = 'WordPress';
 		$this->nodeType = $this->getNodeType();
 		$this->fields = $this->generateFields();
+		$this->filters = [];
 	}
 
 	/**

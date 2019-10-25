@@ -2,6 +2,8 @@
 
 namespace HotSource\TriggerHappy;
 
+use TH;
+
 abstract class CoreNode {
 
 	/**
@@ -38,6 +40,11 @@ abstract class CoreNode {
 	 * @var NodeField[]
 	 */
 	protected $fields;
+
+	/**
+	 * @var TH::Filter[]
+	 */
+	protected $filters;
 
 	/**
 	 * @return string

@@ -15,6 +15,7 @@ class CorePostInsertHtml extends CoreActionNode {
 		$this->actionType = 'render';
 		$this->nodeType = $this->getNodeType();
 		$this->fields = $this->generateFields();
+		$this->filters = [];
 	}
 
 	/**
