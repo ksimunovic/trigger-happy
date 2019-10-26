@@ -247,6 +247,8 @@ function triggerhappy_load_core_nodes( $nodes ) {
 			],
 		],
 	];
+//	TODO: Set on hold while query object in expressions is not fixed
+//	$nodes['th_core_single_post_query'] = new \HotSource\TriggerHappy\Nodes\CoreSinglePostQuery();
 
 	$nodes['th_core_archive'] = [
 		'description' => 'When a post archive is being viewed on the front-end',
