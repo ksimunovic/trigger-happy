@@ -231,7 +231,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 		'hook'        => 'template_redirect',
 		'callback'    => 'triggerhappy_action_hook',
 		'cat'         => 'Queries',
-		'globals'     => [ 'post' => 'post' ],
+		'globals'     => [ 'post' => 'post', 'query' => 'wp_query' ],
 		'fields'      => [
 
 			triggerhappy_field( 'query', 'wp_query', [ 'dir' => 'start' ] ),
