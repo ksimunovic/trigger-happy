@@ -67,7 +67,7 @@ class CoreSinglePostQuery extends CoreTriggerNode {
 			$hook, function () use ( $hook, $node, $context ) {
 
 			$args = [];
-			$passed_args = new ArrayObject( func_get_args() );
+			$passed_args = array( func_get_args() );
 
 			if ( isset( $node->def['globals'] ) ) {
 				foreach ( $node->def['globals'] as $id => $key ) {

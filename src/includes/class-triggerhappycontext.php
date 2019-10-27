@@ -19,7 +19,7 @@ class TriggerHappyContext {
 
 	public function setData( $nodeId, $data ) {
 		if ( is_array( $data ) ) {
-			$this->data->{$nodeId} = new ArrayObject( $data );
+			$this->data->{$nodeId} = array( $data );
 
 		} else {
 			$this->data->{$nodeId} = $data;

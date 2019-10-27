@@ -53,7 +53,10 @@ function triggerhappy_action_hook( $node, $context ) {
 		$hook, function () use ( $hook, $node, $context ) {
 
 		$args = [];
-		$passed_args = new ArrayObject( func_get_args() );
+		$passed_args = array( func_get_args() );
+
+		// Remove empty string value func_get_args returns
+		$passed_args = !empty($passed_args[0][0]) ? $passed_args : [[]];
 
 		if ( isset( $node->def['globals'] ) ) {
 			foreach ( $node->def['globals'] as $id => $key ) {
@@ -109,7 +112,7 @@ function triggerhappy_custom_hook( $node, $context ) {
 				$key = (string) $i;
 				$args->{$key} = $val;
 			}
-			$args = new ArrayObject( $passed_args );
+			$args = array( $passed_args );
 
 			$node->next( $context, [ 'args' => $args ] );
 			if ( isset( $args[0] ) ) {
@@ -132,7 +135,7 @@ function triggerhappy_filter_hook( $node, $context ) {
 
 	add_filter(
 		$filter, function () use ( $filter, &$node, $context ) {
-		$passed_args = new ArrayObject( func_get_args() );
+		$passed_args = array( func_get_args() );
 		$start_fields = array_filter( $node->def['fields'], function ( $arr_value ) {
 			return $arr_value['dir'] == 'start';
 		} );
@@ -153,7 +156,7 @@ function triggerhappy_filter_hook( $node, $context ) {
 			}
 		}
 
-		$node->setData( $context, new ArrayObject( $args ) );
+		$node->setData( $context, array( $args ) );
 		if ( ! $node->canExecute( $context ) ) {
 
 			return reset( $passed_args );
@@ -242,7 +245,7 @@ function triggerhappy_set_arr_value( $node, $context ) {
 	if ( is_numeric( $key ) ) {
 		$key = (string) $key;
 	}
-	if ( is_array( $arr ) || is_a( $arr, 'ArrayObject' ) ) {
+	if ( is_array( $arr ) ) {
 		$arr[ $key ] = $args['value'];
 	} else {
 		$arr->{$key} = $args['value'];
@@ -260,11 +263,6 @@ function triggerhappy_set_value( $node, $context ) {
 	$prop = $node->resolveExpression( $keyExpression->right, $context );
 	if ( is_numeric( $key ) ) {
 		$key = (string) $key;
-	}
-	if ( is_array( $arr ) || is_a( $arr, 'ArrayObject' ) ) {
-		$arr[ $key ] = $args['value'];
-	} else {
-		$arr->{$key} = $args['value'];
 	}
 
 	return $node->next( $context );
