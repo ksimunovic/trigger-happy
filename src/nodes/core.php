@@ -202,26 +202,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 			triggerhappy_field( 'value', 'string', [ 'description' => 'The value to set' ] ),
 		],
 	];
-	$nodes['th_core_single_post'] = [
-		'description' => 'When a single post is being viewed on the front-end',
-		'name'        => 'When a Single Post is viewed',
-		'plugin'      => '',
-		'triggerType' => 'render',
-		'nodeType'    => 'trigger',
-		'hook'        => 'template_redirect',
-		'callback'    => 'triggerhappy_action_hook',
-		'cat'         => 'Front-end',
-		'globals'     => [ 'post' => 'post' ],
-		'fields'      => [
 
-			triggerhappy_field( 'post', 'wp_post', [ 'dir' => 'start' ] ),
-		],
-		'nodeFilters' => [
-			[
-				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_single" ), 'equals', true ),
-			],
-		],
-	];
 	$nodes['th_core_single_post'] = new \HotSource\TriggerHappy\Nodes\CoreSinglePostViewed();
 
 	$nodes['th_core_single_post_query'] = [
@@ -1285,6 +1266,26 @@ function deprecatedNodes() {
 				'label' => 'Post Status',
 				'dir'   => 'in',
 			] ),
+		],
+	];
+
+	$nodes['th_core_single_post'] = [
+		'description' => 'When a single post is being viewed on the front-end',
+		'name'        => 'When a Single Post is viewed',
+		'plugin'      => '',
+		'triggerType' => 'render',
+		'nodeType'    => 'trigger',
+		'hook'        => 'template_redirect',
+		'callback'    => 'triggerhappy_action_hook',
+		'cat'         => 'Front-end',
+		'globals'     => [ 'post' => 'post' ],
+		'fields'      => [
+			triggerhappy_field( 'post', 'wp_post', [ 'dir' => 'start' ] ),
+		],
+		'nodeFilters' => [
+			[
+				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_single" ), 'equals', true ),
+			],
 		],
 	];
 }
