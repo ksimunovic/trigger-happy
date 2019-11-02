@@ -203,10 +203,18 @@ class TriggerHappyFlow {
 	}
 
 	public function findField( $def, $field ) {
-		foreach ( $def['fields'] as $key => $field_data ) {
-
-			if ( isset( $field_data['name'] ) && $field == $field_data['name'] ) {
-				return $field_data;
+		if ( $def instanceof \HotSource\TriggerHappy\CoreNode ) {
+			foreach ( $def->generateFields() as $key => $field_data ) {
+				$field_data = $field_data->createFieldDefinition();
+				if ( isset( $field_data['name'] ) && $field == $field_data['name'] ) {
+					return $field_data;
+				}
+			}
+		} else {
+			foreach ( $def['fields'] as $key => $field_data ) {
+				if ( isset( $field_data['name'] ) && $field == $field_data['name'] ) {
+					return $field_data;
+				}
 			}
 		}
 

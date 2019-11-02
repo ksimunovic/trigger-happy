@@ -92,7 +92,7 @@ class CoreTriggerNode extends CoreNode {
 	 * @return void|null
 	 */
 	protected function actionHook( $node, $context ) {
-		$hook = isset( $node->def['hook'] ) ? $node->def['hook'] : $node->def['id'];
+		$hook = isset( $node->def->hook ) ? $node->def->hook : $node->def->id;
 
 		$priority = 10;
 		if ( strpos( $hook, '$' ) === 0 ) {
@@ -109,19 +109,21 @@ class CoreTriggerNode extends CoreNode {
 			$hook, function () use ( $hook, $node, $context ) {
 
 			$args = [];
-			$passed_args = [ func_get_args() ];
+			$passed_args = func_get_args();
 
 			// Remove empty string value func_get_args returns
-			$passed_args = ! empty( $passed_args[0][0] ) ? $passed_args : [ [] ];
+			$passed_args = ! empty( $passed_args[0] ) ? $passed_args : [];
 
-			if ( isset( $node->def['globals'] ) ) {
-				foreach ( $node->def['globals'] as $id => $key ) {
+			if ( isset( $node->def->globals ) ) {
+				foreach ( $node->def->globals as $id => $key ) {
 					$args[ $id ] = $GLOBALS[ $key ];
 				}
 			}
 
 			$i = 0;
-			foreach ( $node->def['fields'] as $i => $field ) {
+			foreach ( $node->def->fields as $i => $field ) {
+				/** @var NodeField $field */
+				$field = $field->createFieldDefinition();
 				if ( $field['dir'] !== 'start' || isset( $args[ $field['name'] ] ) ) {
 					continue;
 				}

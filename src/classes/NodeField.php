@@ -96,17 +96,10 @@ class NodeField {
 		$this->node = $node;
 	}
 
-	public function getCompiler() {
-		if ( $this->compiler == null ) {
-			$this->compiler = $this->node->graph->compiler;
-		}
-
-		return $this->compiler;
-	}
-
 	public function resolveExpression( $context ) {
 		// Ensure executed
 		$expression = $this->expression;
+
 		return $this->node->graph->resolveExpression( $expression, $context );
 	}
 
@@ -123,5 +116,13 @@ class NodeField {
 		}
 
 		return $results;
+	}
+
+	public function getCompiler() {
+		if ( $this->compiler == null ) {
+			$this->compiler = $this->node->graph->compiler;
+		}
+
+		return $this->compiler;
 	}
 }
