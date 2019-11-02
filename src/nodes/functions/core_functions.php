@@ -53,7 +53,7 @@ function triggerhappy_action_hook( $node, $context ) {
 		$hook, function () use ( $hook, $node, $context ) {
 
 		$args = [];
-		$passed_args = array( func_get_args() );
+		$passed_args = func_get_args();
 
 		// Remove empty string value func_get_args returns
 		$passed_args = !empty($passed_args[0][0]) ? $passed_args : [[]];
@@ -112,7 +112,7 @@ function triggerhappy_custom_hook( $node, $context ) {
 				$key = (string) $i;
 				$args->{$key} = $val;
 			}
-			$args = array( $passed_args );
+			$args = $passed_args;
 
 			$node->next( $context, [ 'args' => $args ] );
 			if ( isset( $args[0] ) ) {
@@ -135,7 +135,7 @@ function triggerhappy_filter_hook( $node, $context ) {
 
 	add_filter(
 		$filter, function () use ( $filter, &$node, $context ) {
-		$passed_args = array( func_get_args() );
+		$passed_args = func_get_args();
 		$start_fields = array_filter( $node->def['fields'], function ( $arr_value ) {
 			return $arr_value['dir'] == 'start';
 		} );
@@ -156,7 +156,7 @@ function triggerhappy_filter_hook( $node, $context ) {
 			}
 		}
 
-		$node->setData( $context, array( $args ) );
+		$node->setData( $context, $args );
 		if ( ! $node->canExecute( $context ) ) {
 
 			return reset( $passed_args );
