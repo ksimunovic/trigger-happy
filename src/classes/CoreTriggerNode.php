@@ -85,4 +85,67 @@ class CoreTriggerNode extends CoreNode {
 		];
 	}
 
+	/**
+	 * @param \TriggerHappyNode $node
+	 * @param \TriggerHappyContext $context
+	 *
+	 * @return void|null
+	 */
+	protected function actionHook( $node, $context ) {
+		$hook = isset( $node->def['hook'] ) ? $node->def['hook'] : $node->def['id'];
+
+		$priority = 10;
+		if ( strpos( $hook, '$' ) === 0 ) {
+			$hookField = substr( $hook, 1 );
+			$inputData = $node->getInputData( $context );
+			$hook = $inputData[ $hookField ];
+			$hook_parts = explode( ':', $hook );
+			$hook = $hook_parts[0];
+			if ( count( $hook_parts ) > 1 ) {
+				$priority = $hook_parts[1];
+			}
+		}
+		add_action(
+			$hook, function () use ( $hook, $node, $context ) {
+
+			$args = [];
+			$passed_args = [ func_get_args() ];
+
+			// Remove empty string value func_get_args returns
+			$passed_args = ! empty( $passed_args[0][0] ) ? $passed_args : [ [] ];
+
+			if ( isset( $node->def['globals'] ) ) {
+				foreach ( $node->def['globals'] as $id => $key ) {
+					$args[ $id ] = $GLOBALS[ $key ];
+				}
+			}
+
+			$i = 0;
+			foreach ( $node->def['fields'] as $i => $field ) {
+				if ( $field['dir'] !== 'start' || isset( $args[ $field['name'] ] ) ) {
+					continue;
+				}
+
+				if ( isset( $passed_args[ $i ] ) ) {
+					$key = $field['name'];
+					$val = $passed_args[ $i ];
+					if ( is_numeric( $val ) && $field['type'] !== 'number' ) {
+						if ( has_filter( 'triggerhappy_resolve_' . $field['type'] . '_from_number' ) ) {
+							$val = apply_filters( 'triggerhappy_resolve_' . $field['type'] . '_from_number', $val );
+						}
+					}
+					$args[ $key ] = $val;
+				}
+				$i ++;
+			}
+			$node->setData( $context, $args );
+
+			if ( ! $node->canExecute( $context ) ) {
+				return;
+			}
+
+			return $node->next( $context, $args );
+		}, $priority, 9999
+		);
+	}
 }
