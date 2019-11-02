@@ -222,6 +222,8 @@ function triggerhappy_load_core_nodes( $nodes ) {
 			],
 		],
 	];
+	$nodes['th_core_single_post'] = new \HotSource\TriggerHappy\Nodes\CoreSinglePostViewed();
+
 	$nodes['th_core_single_post_query'] = [
 		'description' => 'When single post data is being queried',
 		'name'        => 'When data for a Single Post is being loaded',
