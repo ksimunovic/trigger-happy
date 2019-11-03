@@ -25,15 +25,10 @@ class CoreSinglePostViewed extends CoreTriggerNode {
 
 		$this->nodeFilters = [
 			[
-				TH::Filter( TH::Expression( "_N1.query.is_single" ), 'equals', true ),
-//				TH::Filter( TH::Expression( "_N.query.is_single" ), 'equals', true ),
+				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_single" ), 'equals', true ),
 			],
 		];
-		$this->filters = [
-			[
-				TH::Filter( TH::Expression( "_self.query.is_main_query" ), 'equals', true ),
-			],
-		];
+		$this->filters = [];
 	}
 
 	/**
