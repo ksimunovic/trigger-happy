@@ -4,7 +4,9 @@ require_once( dirname( __FILE__ ) . '/../../vendor/autoload.php' );
 
 class TriggerHappyFlow {
 	public $id = null;
+
 	private $nodes = [];
+
 	private $startNodes = [];
 
 	public function __construct( $id, $nodeGraph, $autoStart = true ) {
@@ -26,8 +28,13 @@ class TriggerHappyFlow {
 		$this->initialize();
 
 		foreach ( $this->nodes as $nodeid => $nodeData ) {
-			if ( is_object( $nodeData->def ) ) { // new class-based implementation
+			if ( is_object( $nodeData->def ) ) { // TEMP
 				if ( $nodeData->def->getNodeType() == 'trigger' ) {
+					$nodeData->execute( $context );
+				}
+			} else if ( is_object( $nodeData ) ) { // new class-based implementation
+				/** @var \HotSource\TriggerHappy\CoreNode $nodeData */
+				if ( $nodeData->getNodeType() == 'trigger' ) {
 					$nodeData->execute( $context );
 				}
 			} else {
@@ -44,31 +51,60 @@ class TriggerHappyFlow {
 		}
 		foreach ( $this->nodedata->nodes as $node ) {
 
-			$flowNode = new TriggerHappyNode( $node->nid, $node->type, $this );
-			if ( isset( $node->filters ) && ! empty( $node->filters ) && ! empty( $node->filters[0] ) ) {
-				$flowNode->setFilters( $node->filters );
-			}
-			$this->addNode( $flowNode );
-			if ( isset( $node->next ) ) {
-				$flowNode->setNext( $node->next );
-			}
-			if ( isset( $node->expressions ) ) {
-				foreach ( $node->expressions as $k => $v ) {
-					$field = $flowNode->getField( $k );
-					if ( $field ) {
-						$field->setExpression( $v );
-					}
-					$field = $flowNode->getReturnField( $k );
-					if ( $field ) {
-						$field->setExpression( $v );
+			$object = TriggerHappy::get_node( $node->type );
+			if ( ! empty( $object ) && $object instanceof \HotSource\TriggerHappy\CoreNode ) {
+				$object->id = $node->nid;
+				$object->graph = $this;
+
+				// Replaces defined filters with updated one from db
+				if ( isset( $node->filters ) && ! empty( $node->filters ) && ! empty( $node->filters[0] ) ) {
+					$object->setFilters( $node->filters );
+				}
+				$this->addNode( $object );
+
+				if ( isset( $node->next ) ) {
+					$object->setNext( $node->next );
+				}
+
+				if ( ! empty( $node->expressions ) ) {
+					foreach ( $node->expressions as $k => $v ) {
+						$field = $object->getField( $k );
+						if ( $field ) {
+							$field->setExpression( $v );
+						}
+						$field = $object->getReturnField( $k );
+						if ( $field ) {
+							$field->setExpression( $v );
+						}
 					}
 				}
-			}
-			$flowNode->data = [];
-			if ( isset( $node->values ) && isset( $node->values->in ) ) {
-				$vals = $node->values->in;
-				foreach ( $vals as $i => $val ) {
-					$flowNode->data[ $val->name ] = $val->value;
+			} else {
+				$flowNode = new TriggerHappyNode( $node->nid, $node->type, $this );
+				if ( isset( $node->filters ) && ! empty( $node->filters ) && ! empty( $node->filters[0] ) ) {
+					$flowNode->setFilters( $node->filters );
+				}
+				$this->addNode( $flowNode );
+				if ( isset( $node->next ) ) {
+					$flowNode->setNext( $node->next );
+				}
+				if ( isset( $node->expressions ) ) {
+					foreach ( $node->expressions as $k => $v ) {
+						$field = $flowNode->getField( $k );
+						if ( $field ) {
+							$field->setExpression( $v );
+						}
+						$field = $flowNode->getReturnField( $k );
+						if ( $field ) {
+							$field->setExpression( $v );
+						}
+					}
+				}
+				$flowNode->data = [];
+				if ( isset( $node->values ) && isset( $node->values->in ) ) {
+					$vals = $node->values->in;
+					foreach ( $vals as $i => $val ) {
+						$flowNode->data[ $val->name ] = $val->value;
+					}
 				}
 			}
 		}
@@ -80,11 +116,17 @@ class TriggerHappyFlow {
 		$this->nodes[ $id ] = $node;
 
 		$def = TriggerHappy::get_node( $node->type );
+		if ( $node instanceof \HotSource\TriggerHappy\CoreNode ) { // new class-based implementation
+			// No setting of fields needed as it's already in this object
+			$node->addNodeToFields();
 
-		if ( is_object( $def ) ) { // new class-based implementation
-			/** @var \HotSource\TriggerHappy\CoreNode $def */
-			$node->fields = $def->getFieldsWithNode( $node );
-		} else {
+		}else if ( is_object( $def ) ) { // TEMP
+			// TODO: Remove
+			if ( ! empty( $node->fields ) ) {
+				$node->fields = $def->getFieldsWithNode( $node );
+			}
+		}  else {
+			$def = TriggerHappy::get_node( $node->type );
 			if ( isset( $def['fields'] ) ) {
 				foreach ( $def['fields'] as $i => $portDef ) {
 					$node->addField( $portDef['name'], $portDef['type'] );
@@ -110,7 +152,12 @@ class TriggerHappyFlow {
 				} else {
 					$node = $this->getNode( $nodeId );
 				}
-				$field_data = $this->findField( $node->def, $prop );
+
+				if(!empty($node->def)){
+					$field_data = $this->findField( $node->def, $prop );
+				} else {
+					$field_data = $node->findField($prop);
+				}
 				$type = $field_data != null ? $field_data['type'] : null;
 				$context->fieldType = $type;
 
@@ -202,6 +249,9 @@ class TriggerHappyFlow {
 		return null;
 	}
 
+	/**
+	 * @deprecated Not used with class-based nodes, $node->findField() is used now
+	 */
 	public function findField( $def, $field ) {
 		if ( $def instanceof \HotSource\TriggerHappy\CoreNode ) {
 			foreach ( $def->generateFields() as $key => $field_data ) {

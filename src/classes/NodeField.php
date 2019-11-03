@@ -7,12 +7,12 @@ class NodeField {
 	/**
 	 * @var string
 	 */
-	private $name;
+	public $type;
 
 	/**
 	 * @var string
 	 */
-	private $type;
+	private $name;
 
 	/**
 	 * @var array
@@ -89,10 +89,10 @@ class NodeField {
 		return $this->node;
 	}
 
-	/**
-	 * @param \TriggerHappyNode $node
-	 */
-	public function setNode( \TriggerHappyNode $node ) {
+//	/**
+//	 * @param \TriggerHappyNode $node
+//	 */
+	public function setNode( $node ) {
 		$this->node = $node;
 	}
 

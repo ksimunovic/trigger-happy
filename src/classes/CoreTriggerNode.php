@@ -92,7 +92,11 @@ class CoreTriggerNode extends CoreNode {
 	 * @return void|null
 	 */
 	protected function actionHook( $node, $context ) {
-		$hook = isset( $node->def->hook ) ? $node->def->hook : $node->def->id;
+		if(!empty($node->def->hook)){ // TEMP
+			$hook = isset( $node->def->hook ) ? $node->def->hook : $node->id;
+		} else {
+			$hook = isset( $node->hook ) ? $node->hook : $node->id;
+		}
 
 		$priority = 10;
 		if ( strpos( $hook, '$' ) === 0 ) {
@@ -114,14 +118,20 @@ class CoreTriggerNode extends CoreNode {
 			// Remove empty string value func_get_args returns
 			$passed_args = ! empty( $passed_args[0] ) ? $passed_args : [];
 
-			if ( isset( $node->def->globals ) ) {
-				foreach ( $node->def->globals as $id => $key ) {
+			if(!empty($node->def)){
+				$nodeDef = $node->def;
+			} else {
+				$nodeDef = $node;
+			}
+
+			if ( isset( $nodeDef->globals ) ) {
+				foreach ( $nodeDef->globals as $id => $key ) {
 					$args[ $id ] = $GLOBALS[ $key ];
 				}
 			}
 
 			$i = 0;
-			foreach ( $node->def->fields as $i => $field ) {
+			foreach ( $nodeDef->fields as $i => $field ) {
 				/** @var NodeField $field */
 				$field = $field->createFieldDefinition();
 				if ( $field['dir'] !== 'start' || isset( $args[ $field['name'] ] ) ) {
@@ -140,6 +150,7 @@ class CoreTriggerNode extends CoreNode {
 				}
 				$i ++;
 			}
+			// XXXX:
 			$node->setData( $context, $args );
 
 			if ( ! $node->canExecute( $context ) ) {
