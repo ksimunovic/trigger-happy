@@ -205,33 +205,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	$nodes['th_core_single_post'] = new \HotSource\TriggerHappy\Nodes\CoreSinglePostViewed();
 
-	$nodes['th_core_single_post_query'] = [
-		'description' => 'When single post data is being queried',
-		'name'        => 'When data for a Single Post is being loaded',
-		'plugin'      => '',
-		'triggerType' => 'query',
-		'nodeType'    => 'trigger',
-		'hook'        => 'template_redirect',
-		'callback'    => 'triggerhappy_action_hook',
-		'cat'         => 'Queries',
-		'globals'     => [ 'post' => 'post', 'query' => 'wp_query' ],
-		'fields'      => [
-
-			triggerhappy_field( 'query', 'wp_query', [ 'dir' => 'start' ] ),
-		],
-		'nodeFilters' => [
-			[
-				TH::Filter( TH::Expression( "_N1.query.is_single" ), 'equals', true ),
-			],
-		],
-		'filters'     => [
-			[
-				TH::Filter( TH::Expression( "_self.query.is_main_query" ), 'equals', true ),
-			],
-		],
-	];
-//	TODO: Set on hold while query object in expressions is not fixed
-//	$nodes['th_core_single_post_query'] = new \HotSource\TriggerHappy\Nodes\CoreSinglePostQuery();
+	$nodes['th_core_single_post_query'] = new \HotSource\TriggerHappy\Nodes\CoreSinglePostQuery();
 
 	$nodes['th_core_archive'] = [
 		'description' => 'When a post archive is being viewed on the front-end',
@@ -1285,6 +1259,32 @@ function deprecatedNodes() {
 		'nodeFilters' => [
 			[
 				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_single" ), 'equals', true ),
+			],
+		],
+	];
+	
+	$nodes['th_core_single_post_query'] = [
+		'description' => 'When single post data is being queried',
+		'name'        => 'When data for a Single Post is being loaded',
+		'plugin'      => '',
+		'triggerType' => 'query',
+		'nodeType'    => 'trigger',
+		'hook'        => 'template_redirect',
+		'callback'    => 'triggerhappy_action_hook',
+		'cat'         => 'Queries',
+		'globals'     => [ 'post' => 'post', 'query' => 'wp_query' ],
+		'fields'      => [
+
+			triggerhappy_field( 'query', 'wp_query', [ 'dir' => 'start' ] ),
+		],
+		'nodeFilters' => [
+			[
+				TH::Filter( TH::Expression( "_N1.query.is_single" ), 'equals', true ),
+			],
+		],
+		'filters'     => [
+			[
+				TH::Filter( TH::Expression( "_self.query.is_main_query" ), 'equals', true ),
 			],
 		],
 	];

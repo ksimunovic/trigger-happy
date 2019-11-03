@@ -18,19 +18,18 @@ class CoreSinglePostQuery extends CoreTriggerNode {
 		$this->fields = $this->generateFields();
 		$this->hook = 'template_redirect';
 		$this->callback = 'triggerhappy_action_hook';
-		$this->globals = [ 'post' => 'post' ];
+		$this->globals = [ 'post' => 'post', 'query' => 'wp_query' ];
+
+		$this->nodeFilters = [
+			[
+				TH::Filter( TH::Expression( "_N1.query.is_single" ), 'equals', true ),
+			],
+		];
 		$this->filters = [
 			[
 				TH::Filter( TH::Expression( "_self.query.is_main_query" ), 'equals', true ),
 			],
 		];
-
-		$this->filters = [
-			[
-				TH::Filter( TH::Expression( "_N1.query.is_single" ), 'equals', true ),
-			],
-		];
-		$this->filters = [];
 	}
 
 	/**
