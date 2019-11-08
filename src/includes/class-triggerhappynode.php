@@ -3,18 +3,32 @@ require_once( dirname( __FILE__ ) . '/../../vendor/autoload.php' );
 
 class TriggerHappyNode {
 	public $id;
+
 	public $type;
+
 	public $graph;
+
 	public $def;
+
 	public $filters;
+
 	public $data = [];
+
 	public $returnData = [];
+
 	public $fields = [];
+
 	public $returnFields = [];
+
 	public $inputData;
+
 	private $isExecuting = false;
+
 	private $next = [];
 
+	/**
+	 * @deprecated
+	 */
 	public function __construct( $id, $type, $graph ) {
 		$this->id = $id;
 		$this->graph = $graph;
@@ -22,10 +36,16 @@ class TriggerHappyNode {
 		$this->def = TriggerHappy::get_node( $type );
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function setFilters( $filters ) {
 		$this->filters = $filters;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function getFieldDef( $fieldId ) {
 		if ( isset( $this->def['fields'] ) ) {
 			foreach ( $this->def['fields'] as $i => $fld ) {
@@ -39,6 +59,9 @@ class TriggerHappyNode {
 
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function getField( $fieldId ) {
 
 		if ( isset( $this->fields[ $fieldId ] ) ) {
@@ -49,6 +72,9 @@ class TriggerHappyNode {
 		return false;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function getReturnField( $fieldId ) {
 
 		if ( isset( $this->returnFields[ $fieldId ] ) ) {
@@ -59,18 +85,30 @@ class TriggerHappyNode {
 		return false;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function hasReturnData( $context ) {
 		return isset( $context->returnData );
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function getNext() {
 		return $this->next;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function setNext( $nextIds ) {
 		$this->next = $nextIds;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function getFieldsByType( $type ) {
 		$fields = [];
 
@@ -83,25 +121,28 @@ class TriggerHappyNode {
 		return $fields;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function addField( $fieldId, $type ) {
 		return $this->fields[ $fieldId ] = new TriggerHappyField( $fieldId, $type, $this );
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function addReturnField( $fieldId, $type ) {
 		return $this->returnFields[ $fieldId ] = new TriggerHappyField( $fieldId, $type, $this );
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function execute( $context ) {
 		if ( $this->isExecuting ) {
 			return;
 		}
-		if ( is_object( $this->def ) ) { // new class-based implementation
-
-			// Adding inputData to flowNode so context can be removed from getInputData
-			$this->inputData = $this->getInputData( new TriggerHappyContext() );
-
-			$this->def->runCallback( $this, $context, $this->inputData );
-		} else if ( isset( $this->def['callback'] ) ) {
+		if ( isset( $this->def['callback'] ) ) {
 			return call_user_func( $this->def['callback'], $this, $context );
 
 		} elseif ( isset( $this->def['childGraphs'] ) ) {
@@ -123,6 +164,9 @@ class TriggerHappyNode {
 		$this->isExecuting = false;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function getInputData( $context ) {
 		$data = [];
 
@@ -139,6 +183,9 @@ class TriggerHappyNode {
 		return $data;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function next( $context, $data = null ) {
 		if ( $data !== null ) {
 			$context->setData( $this->id, $data );
@@ -156,6 +203,9 @@ class TriggerHappyNode {
 		return $this->getReturnData( $context );
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function canExecute( $context ) {
 		$data = $context->getData( $this->id );
 		$success = true;
@@ -166,7 +216,7 @@ class TriggerHappyNode {
 
 		if ( is_object( $this->def ) ) { // new class-based implementation
 			$nodeDefinition = $this->def->toArray();
-			if ( isset( $nodeDefinition['nodeFilters']) ) {
+			if ( isset( $nodeDefinition['nodeFilters'] ) ) {
 				$success = $success && $this->applyFilters( $context, json_decode( json_encode( $nodeDefinition['nodeFilters'] ) ) );
 			}
 		} else {
@@ -178,6 +228,9 @@ class TriggerHappyNode {
 		return $success;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	protected function applyFilters( $context, $filters ) {
 		foreach ( $filters as $i => $orGroup ) {
 			$success = true;
@@ -234,14 +287,23 @@ class TriggerHappyNode {
 		return false;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function getReturnData( $context ) {
 		return $context->returnData;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function setReturnData( $context, $data ) {
 		$context->returnData = $data;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function setData( $context, $data ) {
 		if ( $data !== null ) {
 			$context->setData( $this->id, $data );
