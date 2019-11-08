@@ -89,32 +89,6 @@ abstract class CoreNode {
 	 */
 	abstract public function toArray();
 
-	public function addNodeToFields() {
-		$this->fields = $this->getFieldsWithNode( $this );
-	}
-
-	/**
-	 * @param CoreNode $node
-	 *
-	 * @return NodeField[]
-	 */
-
-	public function getFieldsWithNode( $node ): array {
-		$fields = [];
-		foreach ( $this->generateFields() as $field ) {
-			$field->setNode( $node );
-			$fields[ $field->getName() ] = $field;
-		}
-
-		return $fields;
-	}
-
-	/**
-	 *
-	 * @return NodeField[]
-	 */
-	abstract public function generateFields();
-
 	public function findField( $prop ) {
 		foreach ( $this->generateFields() as $key => $field ) {
 			$fieldDef = $field->createFieldDefinition();
@@ -123,6 +97,12 @@ abstract class CoreNode {
 			}
 		}
 	}
+
+	/**
+	 *
+	 * @return NodeField[]
+	 */
+	abstract public function generateFields();
 
 	public function setFilters( $filters ) {
 		$this->filters = $filters;
@@ -137,9 +117,10 @@ abstract class CoreNode {
 		$this->graph = $graph;
 		$this->addNodeToFields();
 
-		// Replaces defined filters with updated one from db
+		// Init db filters with updated one from db
+		$this->filtersModified = [];
 		if ( isset( $dbNodeData->filters ) && ! empty( $dbNodeData->filters ) && ! empty( $dbNodeData->filters[0] ) ) {
-			$this->setFilters( $dbNodeData->filters );
+			$this->filtersModified = $dbNodeData->filters;
 		}
 
 		if ( isset( $dbNodeData->next ) ) {
@@ -160,20 +141,27 @@ abstract class CoreNode {
 		}
 	}
 
-	/****************************/
+	public function addNodeToFields() {
+		$this->fields = $this->getFieldsWithNode( $this );
+	}
 
-	public function getFieldDef( $fieldId ) {
-		if ( isset( $this->def['fields'] ) ) {
-			foreach ( $this->def['fields'] as $i => $fld ) {
-				if ( $fld['name'] == $fieldId ) {
-					return $fld;
-				}
-			}
+	/**
+	 * @param CoreNode $node
+	 *
+	 * @return NodeField[]
+	 */
+
+	public function getFieldsWithNode( $node ): array {
+		$fields = [];
+		foreach ( $this->generateFields() as $field ) {
+			$field->setNode( $node );
+			$fields[ $field->getName() ] = $field;
 		}
 
-		return null;
-
+		return $fields;
 	}
+
+	/****************************/
 
 	public function getField( $fieldId ) {
 		foreach ( $this->fields as $field ) {
@@ -193,6 +181,19 @@ abstract class CoreNode {
 		}
 
 		return false;
+	}
+
+	public function getFieldDef( $fieldId ) {
+		if ( isset( $this->def['fields'] ) ) {
+			foreach ( $this->def['fields'] as $i => $fld ) {
+				if ( $fld['name'] == $fieldId ) {
+					return $fld;
+				}
+			}
+		}
+
+		return null;
+
 	}
 
 	public function hasReturnData( $context ) {
@@ -285,8 +286,8 @@ abstract class CoreNode {
 
 	public function canExecute( $context ) {
 		$success = true;
-		if ( ! empty( $this->filters ) ) {
-			$success = $success && $this->applyFilters( $context, $this->filters );
+		if ( ! empty( $this->filtersModified ) ) {
+			$success = $success && $this->applyFilters( $context, $this->filtersModified );
 		}
 
 		if ( ! empty( $this->nodeFilters ) ) {
