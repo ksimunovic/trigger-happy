@@ -87,11 +87,11 @@ abstract class CoreNode {
 		$this->fields = $this->getFieldsWithNode( $this );
 	}
 
-//	/**
-//	 * @param \TriggerHappyNode $node
-//	 *
-//	 * @return NodeField[]
-//	 */
+	/**
+	 * @param CoreNode $node
+	 *
+	 * @return NodeField[]
+	 */
 
 	public function getFieldsWithNode( $node ): array {
 		$fields = [];

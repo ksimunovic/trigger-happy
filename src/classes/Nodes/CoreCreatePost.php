@@ -50,7 +50,7 @@ class CoreCreatePost extends CoreActionNode {
 	}
 
 	/**
-	 * @param \TriggerHappyNode $node
+	 * @param CoreNode $node
 	 * @param \TriggerHappyContext $context
 	 * @param null $data
 	 *

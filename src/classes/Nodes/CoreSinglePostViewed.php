@@ -2,6 +2,7 @@
 
 namespace HotSource\TriggerHappy\Nodes;
 
+use HotSource\TriggerHappy\CoreNode;
 use HotSource\TriggerHappy\CoreTriggerNode;
 use HotSource\TriggerHappy\NodeField;
 use TH;
@@ -41,7 +42,7 @@ class CoreSinglePostViewed extends CoreTriggerNode {
 	}
 
 	/**
-	 * @param \TriggerHappyNode $node
+	 * @param CoreNode $node
 	 * @param \TriggerHappyContext $context
 	 * @param null $data
 	 *

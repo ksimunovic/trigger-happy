@@ -42,7 +42,7 @@ class CoreSinglePostQuery extends CoreTriggerNode {
 	}
 
 	/**
-	 * @param \TriggerHappyNode $node
+	 * @param CoreNode $node
 	 * @param \TriggerHappyContext $context
 	 * @param null $data
 	 *

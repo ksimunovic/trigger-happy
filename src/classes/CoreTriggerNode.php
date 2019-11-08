@@ -86,7 +86,7 @@ class CoreTriggerNode extends CoreNode {
 	}
 
 	/**
-	 * @param \TriggerHappyNode $node
+	 * @param CoreNode $node
 	 * @param \TriggerHappyContext $context
 	 *
 	 * @return void|null

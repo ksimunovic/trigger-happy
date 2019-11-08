@@ -3,6 +3,7 @@
 namespace HotSource\TriggerHappy\Nodes;
 
 use HotSource\TriggerHappy\CoreActionNode;
+use HotSource\TriggerHappy\CoreNode;
 use HotSource\TriggerHappy\NodeField;
 
 class CorePostInsertHtml extends CoreActionNode {
@@ -41,7 +42,7 @@ class CorePostInsertHtml extends CoreActionNode {
 	}
 
 	/**
-	 * @param \TriggerHappyNode $node
+	 * @param CoreNode $node
 	 * @param \TriggerHappyContext $context
 	 * @param null $data
 	 *

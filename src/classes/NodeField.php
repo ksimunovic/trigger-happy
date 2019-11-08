@@ -27,7 +27,7 @@ class NodeField {
 	private $compiler = null;
 
 	/**
-	 * @var \TriggerHappyNode
+	 * @var CoreNode
 	 */
 	private $node = null;
 
@@ -89,9 +89,9 @@ class NodeField {
 		return $this->node;
 	}
 
-//	/**
-//	 * @param \TriggerHappyNode $node
-//	 */
+	/**
+	 * @param CoreNode
+	 */
 	public function setNode( $node ) {
 		$this->node = $node;
 	}
