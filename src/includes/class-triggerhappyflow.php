@@ -7,8 +7,6 @@ class TriggerHappyFlow {
 
 	private $nodes = [];
 
-	private $startNodes = [];
-
 	public function __construct( $id, $nodeGraph, $autoStart = true ) {
 		$this->id = $id;
 		$this->nodedata = $nodeGraph;
@@ -28,16 +26,13 @@ class TriggerHappyFlow {
 		$this->initialize();
 
 		foreach ( $this->nodes as $nodeid => $nodeData ) {
-			if ( is_object( $nodeData->def ) ) { // TEMP
-				if ( $nodeData->def->getNodeType() == 'trigger' ) {
-					$nodeData->execute( $context );
-				}
-			} else if ( is_object( $nodeData ) ) { // new class-based implementation
+			if ( is_object( $nodeData ) && $nodeData instanceof \HotSource\TriggerHappy\CoreNode ) { // new class-based implementation
 				/** @var \HotSource\TriggerHappy\CoreNode $nodeData */
 				if ( $nodeData->getNodeType() == 'trigger' ) {
 					$nodeData->execute( $context );
 				}
 			} else {
+				/** @var TriggerHappyNode $nodeData */
 				if ( $nodeData->def['nodeType'] == 'trigger' ) {
 					$nodeData->execute( $context );
 				}
@@ -115,17 +110,10 @@ class TriggerHappyFlow {
 		$id = $id == null ? $node->id : $id;
 		$this->nodes[ $id ] = $node;
 
-		$def = TriggerHappy::get_node( $node->type );
 		if ( $node instanceof \HotSource\TriggerHappy\CoreNode ) { // new class-based implementation
 			// No setting of fields needed as it's already in this object
 			$node->addNodeToFields();
-
-		}else if ( is_object( $def ) ) { // TEMP
-			// TODO: Remove
-			if ( ! empty( $node->fields ) ) {
-				$node->fields = $def->getFieldsWithNode( $node );
-			}
-		}  else {
+		} else {
 			$def = TriggerHappy::get_node( $node->type );
 			if ( isset( $def['fields'] ) ) {
 				foreach ( $def['fields'] as $i => $portDef ) {
@@ -153,10 +141,10 @@ class TriggerHappyFlow {
 					$node = $this->getNode( $nodeId );
 				}
 
-				if(!empty($node->def)){
+				if ( ! empty( $node->def ) ) {
 					$field_data = $this->findField( $node->def, $prop );
 				} else {
-					$field_data = $node->findField($prop);
+					$field_data = $node->findField( $prop );
 				}
 				$type = $field_data != null ? $field_data['type'] : null;
 				$context->fieldType = $type;

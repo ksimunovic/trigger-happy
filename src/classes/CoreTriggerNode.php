@@ -92,11 +92,7 @@ class CoreTriggerNode extends CoreNode {
 	 * @return void|null
 	 */
 	protected function actionHook( $node, $context ) {
-		if(!empty($node->def->hook)){ // TEMP
-			$hook = isset( $node->def->hook ) ? $node->def->hook : $node->id;
-		} else {
-			$hook = isset( $node->hook ) ? $node->hook : $node->id;
-		}
+		$hook = isset( $node->hook ) ? $node->hook : $node->id;
 
 		$priority = 10;
 		if ( strpos( $hook, '$' ) === 0 ) {
@@ -150,7 +146,7 @@ class CoreTriggerNode extends CoreNode {
 				}
 				$i ++;
 			}
-			// XXXX:
+
 			$node->setData( $context, $args );
 
 			if ( ! $node->canExecute( $context ) ) {

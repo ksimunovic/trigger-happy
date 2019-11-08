@@ -214,15 +214,8 @@ class TriggerHappyNode {
 
 		}
 
-		if ( is_object( $this->def ) ) { // new class-based implementation
-			$nodeDefinition = $this->def->toArray();
-			if ( isset( $nodeDefinition['nodeFilters'] ) ) {
-				$success = $success && $this->applyFilters( $context, json_decode( json_encode( $nodeDefinition['nodeFilters'] ) ) );
-			}
-		} else {
-			if ( isset( $this->def['nodeFilters'] ) ) {
-				$success = $success && $this->applyFilters( $context, json_decode( json_encode( $this->def['nodeFilters'] ) ) );
-			}
+		if ( isset( $this->def['nodeFilters'] ) ) {
+			$success = $success && $this->applyFilters( $context, json_decode( json_encode( $this->def['nodeFilters'] ) ) );
 		}
 
 		return $success;
