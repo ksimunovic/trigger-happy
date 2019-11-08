@@ -4,6 +4,7 @@ namespace HotSource\TriggerHappy;
 
 use TH;
 use TriggerHappyContext;
+use TriggerHappyFlow;
 
 abstract class CoreNode {
 
@@ -13,9 +14,9 @@ abstract class CoreNode {
 	public $id;
 
 	/**
-	 * @var int
+	 * @var array
 	 */
-	public $next;
+	public $next = [];
 
 	/**
 	 * @var string
@@ -193,31 +194,27 @@ abstract class CoreNode {
 		if ( $this->isExecuting ) {
 			return;
 		}
-		if ( $this instanceof CoreNode ) { // new class-based implementation
 
-			// Adding inputData to flowNode so context can be removed from getInputData
-			$this->inputData = $this->getInputData( new TriggerHappyContext() );
+		// Adding inputData to flowNode so context can be removed from getInputData
+		$this->inputData = $this->getInputData( new TriggerHappyContext() );
 
-			$this->runCallback( $this, $context, $this->inputData );
-		} else if ( isset( $this->def['callback'] ) ) {
-			return call_user_func( $this->def['callback'], $this, $context );
-
-		} elseif ( isset( $this->def['childGraphs'] ) ) {
-
-			$child_graphs = json_decode( $this->def['childGraphs'] );
+		if ( ! empty( $this->childGraphs ) ) {
+			$child_graphs = json_decode( $this->childGraphs );
 			foreach ( $child_graphs as $i => $graph ) {
-				$data = $this->getInputData( $context );
 				$childFlow = new TriggerHappyFlow( '', $graph, false );
 				$newContext = new TriggerHappyContext();
-				$context->setData( $this->id, $data );
+				$context->setData( $this->id, $this->inputData );
 				$newContext->parentContext = $context;
 				$newContext->parentNodeId = $this->id;
 				$childFlow->parentFlow = $this->graph;
 				$childFlow->start( $newContext );
-
 			}
+
 			$this->next( $context );
+		} else {
+			$this->runCallback( $this, $context, $this->inputData );
 		}
+
 		$this->isExecuting = false;
 	}
 
@@ -231,15 +228,6 @@ abstract class CoreNode {
 
 		return $data;
 	}
-
-	/**
-	 * @param $node \TriggerHappyNode
-	 * @param $context \TriggerHappyContext
-	 * @param null $data
-	 *
-	 * @return null
-	 */
-	abstract public function runCallback( $node, $context, $data = null );
 
 	public function next( $context, $data = null ) {
 		if ( $data !== null ) {
@@ -259,22 +247,13 @@ abstract class CoreNode {
 	}
 
 	public function canExecute( $context ) {
-		$data = $context->getData( $this->id );
 		$success = true;
-		if ( isset( $this->filters ) ) {
+		if ( ! empty( $this->filters ) ) {
 			$success = $success && $this->applyFilters( $context, $this->filters );
-
 		}
 
-		if ( is_object( $this->def ) ) { // new class-based implementation
-			$nodeDefinition = $this->def->toArray();
-			if ( isset( $nodeDefinition['nodeFilters'] ) ) {
-				$success = $success && $this->applyFilters( $context, json_decode( json_encode( $nodeDefinition['nodeFilters'] ) ) );
-			}
-		} else {
-			if ( isset( $this->def['nodeFilters'] ) ) {
-				$success = $success && $this->applyFilters( $context, json_decode( json_encode( $this->def['nodeFilters'] ) ) );
-			}
+		if ( ! empty( $this->nodeFilters ) ) {
+			$success = $success && $this->applyFilters( $context, json_decode( json_encode( $this->nodeFilters ) ) );
 		}
 
 		return $success;
@@ -339,6 +318,15 @@ abstract class CoreNode {
 	public function getReturnData( $context ) {
 		return $context->returnData;
 	}
+
+	/**
+	 * @param $node CoreNode
+	 * @param $context \TriggerHappyContext
+	 * @param null $data
+	 *
+	 * @return null
+	 */
+	abstract public function runCallback( $node, $context, $data = null );
 
 	public function setReturnData( $context, $data ) {
 		$context->returnData = $data;
