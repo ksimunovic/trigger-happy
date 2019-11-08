@@ -123,6 +123,38 @@ abstract class CoreNode {
 		$this->filters = $filters;
 	}
 
+	/**
+	 * @param $dbNodeData
+	 * @param $graph TriggerHappyFlow
+	 */
+	public function initializeNode( $dbNodeData, $graph ) {
+		$this->id = $dbNodeData->nid;
+		$this->graph = $graph;
+		$this->addNodeToFields();
+
+		// Replaces defined filters with updated one from db
+		if ( isset( $dbNodeData->filters ) && ! empty( $dbNodeData->filters ) && ! empty( $dbNodeData->filters[0] ) ) {
+			$this->setFilters( $dbNodeData->filters );
+		}
+
+		if ( isset( $dbNodeData->next ) ) {
+			$this->setNext( $dbNodeData->next );
+		}
+
+		if ( ! empty( $dbNodeData->expressions ) ) {
+			foreach ( $dbNodeData->expressions as $k => $v ) {
+				$field = $this->getField( $k );
+				if ( $field ) {
+					$field->setExpression( $v );
+				}
+				$field = $this->getReturnField( $k );
+				if ( $field ) {
+					$field->setExpression( $v );
+				}
+			}
+		}
+	}
+
 	/****************************/
 
 	public function getFieldDef( $fieldId ) {
