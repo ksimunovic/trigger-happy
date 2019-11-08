@@ -29,6 +29,16 @@ abstract class CoreNode {
 	public $graph;
 
 	/**
+	 * @var TH::Filter[]
+	 */
+	public $filters = [];
+
+	/**
+	 * @var TH::Filter[]
+	 */
+	protected $filtersModified = [];
+
+	/**
 	 * @var boolean
 	 */
 	protected $isExecuting;
@@ -51,7 +61,7 @@ abstract class CoreNode {
 	/**
 	 * @var string
 	 */
-	protected $plugin;
+	protected $plugin = '';
 
 	/**
 	 * @var string
@@ -67,11 +77,6 @@ abstract class CoreNode {
 	 * @var NodeField[]
 	 */
 	protected $fields;
-
-	/**
-	 * @var TH::Filter[]
-	 */
-	protected $filters;
 
 	/**
 	 * @return string

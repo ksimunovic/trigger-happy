@@ -15,7 +15,6 @@ class CoreSinglePostViewed extends CoreTriggerNode {
 	public function __construct() {
 		$this->name = 'When single post data is being queried';
 		$this->description = 'When data for a Single Post is being loaded';
-		$this->plugin = '';
 		$this->cat = 'Queries';
 		$this->triggerType = 'query';
 		$this->nodeType = $this->getNodeType();
@@ -29,7 +28,6 @@ class CoreSinglePostViewed extends CoreTriggerNode {
 				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_single" ), 'equals', true ),
 			],
 		];
-		$this->filters = [];
 	}
 
 	/**

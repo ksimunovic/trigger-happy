@@ -8,10 +8,12 @@ use TH;
 
 class CoreSinglePostQuery extends CoreTriggerNode {
 
+	/**
+	 * CoreSinglePostQuery constructor.
+	 */
 	public function __construct() {
 		$this->name = 'When data for a Single Post is being loaded';
 		$this->description = 'When single post data is being queried';
-		$this->plugin = '';
 		$this->cat = 'Queries';
 		$this->triggerType = 'query';
 		$this->nodeType = $this->getNodeType();
