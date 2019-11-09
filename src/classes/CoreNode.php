@@ -104,10 +104,6 @@ abstract class CoreNode {
 	 */
 	abstract public function generateFields();
 
-	public function setFilters( $filters ) {
-		$this->filters = $filters;
-	}
-
 	/**
 	 * @param $dbNodeData
 	 * @param $graph TriggerHappyFlow
@@ -130,10 +126,6 @@ abstract class CoreNode {
 		if ( ! empty( $dbNodeData->expressions ) ) {
 			foreach ( $dbNodeData->expressions as $k => $v ) {
 				$field = $this->getField( $k );
-				if ( $field ) {
-					$field->setExpression( $v );
-				}
-				$field = $this->getReturnField( $k );
 				if ( $field ) {
 					$field->setExpression( $v );
 				}
@@ -173,16 +165,6 @@ abstract class CoreNode {
 		return false;
 	}
 
-	public function getReturnField( $fieldId ) {
-
-		if ( isset( $this->returnFields[ $fieldId ] ) ) {
-			return $this->returnFields[ $fieldId ];
-
-		}
-
-		return false;
-	}
-
 	public function getFieldDef( $fieldId ) {
 		if ( isset( $this->def['fields'] ) ) {
 			foreach ( $this->def['fields'] as $i => $fld ) {
@@ -200,32 +182,8 @@ abstract class CoreNode {
 		return isset( $context->returnData );
 	}
 
-	public function getNext() {
-		return $this->next;
-	}
-
 	public function setNext( $nextIds ) {
 		$this->next = $nextIds;
-	}
-
-	public function getFieldsByType( $type ) {
-		$fields = [];
-
-		foreach ( $this->fields as $p => $field ) {
-			if ( $field->type == $type ) {
-				array_push( $fields, $field );
-			}
-		}
-
-		return $fields;
-	}
-
-	public function addField( $fieldId, $type ) {
-		return $this->fields[ $fieldId ] = new TriggerHappyField( $fieldId, $type, $this );
-	}
-
-	public function addReturnField( $fieldId, $type ) {
-		return $this->returnFields[ $fieldId ] = new TriggerHappyField( $fieldId, $type, $this );
 	}
 
 	public function execute( $context ) {
@@ -267,6 +225,12 @@ abstract class CoreNode {
 		return $data;
 	}
 
+	/**
+	 * @param $context TriggerHappyContext
+	 * @param null $data
+	 *
+	 * @return bool
+	 */
 	public function next( $context, $data = null ) {
 		if ( $data !== null ) {
 			$context->setData( $this->id, $data );

@@ -183,7 +183,7 @@ class FlowHooksController extends WP_REST_Controller {
 		$data = [];
 		foreach ( $items as $type => $nodeData ) {
 
-			if ( is_object( $nodeData ) ) { // new class-based implementation
+			if ( is_object( $nodeData ) && $nodeData instanceof \HotSource\TriggerHappy\CoreNode ) { // new class-based implementation
 				$nodeData = $nodeData->toArray();
 			}
 			if ( $byplugin && ( ! isset( $nodeData['plugin'] ) || $nodeData['plugin'] == '' || sanitize_title( $nodeData['plugin'] ) != $byplugin ) ) {

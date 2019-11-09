@@ -7,6 +7,13 @@ class TriggerHappyFlow {
 
 	private $nodes = [];
 
+	/**
+	 * @var TriggerHappyExpressionCompiler
+	 */
+	private $compiler;
+
+	private $nodedata;
+
 	public function __construct( $id, $nodeGraph, $autoStart = true ) {
 		$this->id = $id;
 		$this->nodedata = $nodeGraph;
@@ -48,7 +55,7 @@ class TriggerHappyFlow {
 
 			$object = TriggerHappy::get_node( $node->type );
 			if ( ! empty( $object ) && $object instanceof \HotSource\TriggerHappy\CoreNode ) {
-				$object->initializeNode($node, $this);
+				$object->initializeNode( $node, $this );
 				$this->addNode( $object );
 			} else {
 				$flowNode = new TriggerHappyNode( $node->nid, $node->type, $this );
@@ -89,7 +96,6 @@ class TriggerHappyFlow {
 
 		if ( $node instanceof \HotSource\TriggerHappy\CoreNode ) { // new class-based implementation
 			// No setting of fields needed as it's already in this object
-
 		} else {
 			$def = TriggerHappy::get_node( $node->type );
 			if ( isset( $def['fields'] ) ) {
@@ -218,18 +224,9 @@ class TriggerHappyFlow {
 	 * @deprecated Not used with class-based nodes, $node->findField() is used now
 	 */
 	public function findField( $def, $field ) {
-		if ( $def instanceof \HotSource\TriggerHappy\CoreNode ) {
-			foreach ( $def->generateFields() as $key => $field_data ) {
-				$field_data = $field_data->createFieldDefinition();
-				if ( isset( $field_data['name'] ) && $field == $field_data['name'] ) {
-					return $field_data;
-				}
-			}
-		} else {
-			foreach ( $def['fields'] as $key => $field_data ) {
-				if ( isset( $field_data['name'] ) && $field == $field_data['name'] ) {
-					return $field_data;
-				}
+		foreach ( $def['fields'] as $key => $field_data ) {
+			if ( isset( $field_data['name'] ) && $field == $field_data['name'] ) {
+				return $field_data;
 			}
 		}
 
@@ -256,14 +253,6 @@ class TriggerHappyFlow {
 		}
 
 		return $fieldType;
-	}
-
-	public function createContext() {
-		return new TriggerHappyContext();
-	}
-
-	public function generateExpression( $expression, $context ) {
-		return $this->compiler->generateCode( $expression, $context );
 	}
 
 	public function resolveExpression( $expression, $context ) {
@@ -293,9 +282,5 @@ class TriggerHappyFlow {
 				return $compiler->execute( $expression, $context );
 			}
 		}
-	}
-
-	public function setNode( $node, $id ) {
-		$this->nodes[ $id ] = $node;
 	}
 }
