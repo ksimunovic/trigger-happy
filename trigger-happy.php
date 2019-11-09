@@ -22,134 +22,144 @@ require_once( dirname( __FILE__ ) . '/src/functions.php' );
 triggerhappy_initialize();
 // Create a helper function for easy SDK access.
 function triggerhappy_fs() {
-    global $triggerhappy_fs;
+	global $triggerhappy_fs;
 
-    if ( ! isset( $triggerhappy_fs ) ) {
-        // Include Freemius SDK.
-        require_once dirname(__FILE__) . '/freemius/start.php';
+	if ( ! isset( $triggerhappy_fs ) ) {
+		// Include Freemius SDK.
+		require_once dirname( __FILE__ ) . '/freemius/start.php';
 
-        $triggerhappy_fs = fs_dynamic_init( array(
-            'id'                  => '1523',
-            'slug'                => 'trigger-happy',
-            'type'                => 'plugin',
-            'public_key'          => 'pk_e53c382e123211aaf54c6a2233c32',
-            'is_premium'          => true,
-            // If your plugin is a serviceware, set this option to false.
-            'has_premium_version' => true,
-            'has_addons'          => false,
-            'has_paid_plans'      => true,
-            'is_org_compliant'    => false,
-            'trial'               => array(
-                'days'               => 7,
-                'is_require_payment' => true,
-            ),
-            'menu'                => array(
-                'first-path'     => 'plugins.php',
-                'contact'        => false,
-                'support'        => false,
-            ),
-            // Set the SDK to work in a sandbox mode (for development & testing).
-            // IMPORTANT: MAKE SURE TO REMOVE SECRET KEY BEFORE DEPLOYMENT.
-            'secret_key'          => 'sk_k4r_SHw>dbMiv~~4HE4T2QB4aD-UO',
-        ) );
-    }
+		$triggerhappy_fs = fs_dynamic_init( [
+			'id'                  => '1523',
+			'slug'                => 'trigger-happy',
+			'type'                => 'plugin',
+			'public_key'          => 'pk_e53c382e123211aaf54c6a2233c32',
+			'is_premium'          => true,
+			// If your plugin is a serviceware, set this option to false.
+			'has_premium_version' => true,
+			'has_addons'          => false,
+			'has_paid_plans'      => true,
+			'is_org_compliant'    => false,
+			'trial'               => [
+				'days'               => 7,
+				'is_require_payment' => true,
+			],
+			'menu'                => [
+				'first-path' => 'plugins.php',
+				'contact'    => false,
+				'support'    => false,
+			],
+			// Set the SDK to work in a sandbox mode (for development & testing).
+			// IMPORTANT: MAKE SURE TO REMOVE SECRET KEY BEFORE DEPLOYMENT.
+			'secret_key'          => 'sk_k4r_SHw>dbMiv~~4HE4T2QB4aD-UO',
+		] );
+	}
 
-    return $triggerhappy_fs;
+	return $triggerhappy_fs;
 }
+
 class TH {
 
-	public static function get_template( $templatepath, $args = array() ) {
+	public static function get_template( $templatepath, $args = [] ) {
 		if ( ! empty( $args ) && is_array( $args ) ) {
-		        extract( $args );
-	    }
-		include ( dirname(__FILE__) . "/templates/" . $templatepath );
+			extract( $args );
+		}
+		include( dirname( __FILE__ ) . "/templates/" . $templatepath );
 	}
 
 	public static function plugin_url() {
-		return plugin_dir_url( __FILE__ ) ;
+		return plugin_dir_url( __FILE__ );
 	}
-    public static function Trigger($triggerName, $setup) {
-        $node = TriggerHappy::get_instance()->fetch_node($triggerName);
 
-        $nodeId = 1;
-        $args = array();
-        foreach ($node['fields'] as $i=>$field) {
-            if ($field['dir'] == 'start' || $field['dir'] == 'out') {
-                $args[$field['name']] = TH::Expression('_N' . $nodeId . '.' . $field['name']);
-            }
-        }
-        $actions = call_user_func($setup,$args);
-        $flow = new TriggerHappyFlow(time(),null,false);
-        $trigger = new TriggerHappyNode($nodeId, $triggerName, $flow);
+	public static function Trigger( $triggerName, $setup ) {
+		$node = TriggerHappy::get_instance()->fetch_node( $triggerName );
 
-        $nodeId++;
+		$nodeId = 1;
+		$args = [];
+		foreach ( $node['fields'] as $i => $field ) {
+			if ( $field['dir'] == 'start' || $field['dir'] == 'out' ) {
+				$args[ $field['name'] ] = TH::Expression( '_N' . $nodeId . '.' . $field['name'] );
+			}
+		}
+		$actions = call_user_func( $setup, $args );
+		$flow = new TriggerHappyFlow( time(), null, false );
+		$trigger = new TriggerHappyNode( $nodeId, $triggerName, $flow );
 
-        $prevNode = $trigger;
-        foreach ($actions as $i=>$action) {
-            $next = array();
+		$nodeId ++;
 
-            $anode = new TriggerHappyNode($nodeId, $action['type'], $flow);
-            $flow->addNode($anode);
-            array_push($next,$nodeId);
+		$prevNode = $trigger;
+		foreach ( $actions as $i => $action ) {
+			$next = [];
 
-            $prevNode->setNext($next);
-            foreach ($action['args'] as $x=>$arg) {
-                $fieldDef = $anode->getFieldDef($x);
+			$anode = new TriggerHappyNode( $nodeId, $action['type'], $flow );
+			$flow->addNode( $anode );
+			array_push( $next, $nodeId );
 
-                $afield = $anode->getField($x);
-                $afield->setExpression($arg);
+			$prevNode->setNext( $next );
+			foreach ( $action['args'] as $x => $arg ) {
+				$fieldDef = $anode->getFieldDef( $x );
 
-            }
+				$afield = $anode->getField( $x );
+				$afield->setExpression( $arg );
+
+			}
 
 
-        }
-        $flow->addNode( $trigger );
-        $flow->start();
-    }
-    public static function Filter($left, $op, $right) {
-        return array(
-            'left'=>array('expr'=>$left),
-            'op'=>$op,
-            'right'=>array('expr'=>$right)
-        );
-    }
-    public static function Graph() {
-        $nodes = array();
-        $prevNode = null;
-        foreach (func_get_args() as $i=>$node) {
+		}
+		$flow->addNode( $trigger );
+		$flow->start();
+	}
 
-            $node['nid'] = $i+1;
-            if ($i > 0)
-                $prevNode = $nodes[$i-1];
-            if ( $prevNode != null && !isset($prevNode['next'])) {
-                $nodes[$i-1]['next'] = array($i+1);
+	public static function Expression( $expr ) {
+		$phep = new PHPEP( $expr );
 
-            }
+		return $phep->exec();
+	}
 
-            array_push($nodes,$node);
+	public static function Filter( $left, $op, $right ) {
+		return [
+			'left'  => [ 'expr' => $left ],
+			'op'    => $op,
+			'right' => [ 'expr' => $right ],
+		];
+	}
 
-            $i++;
-        }
-        return array(
-            array(
+	public static function Graph() {
+		$nodes = [];
+		$prevNode = null;
+		foreach ( func_get_args() as $i => $node ) {
 
-                'nodes' =>
-                $nodes
-            )
-        );
-    }
-    public static function Expression($expr) {
-        $phep = new PHPEP($expr);
-        return $phep->exec();
-    }
-    public static function Action($actionName, $args) {
-        $node = TriggerHappy::get_instance()->fetch_node($actionName);
-        return array(
-            'type'=>$actionName,
-            'args'=>$args,
-            'node'=>$node
-        );
-    }
+			$node['nid'] = $i + 1;
+			if ( $i > 0 ) {
+				$prevNode = $nodes[ $i - 1 ];
+			}
+			if ( $prevNode != null && ! isset( $prevNode['next'] ) ) {
+				$nodes[ $i - 1 ]['next'] = [ $i + 1 ];
+
+			}
+
+			array_push( $nodes, $node );
+
+			$i ++;
+		}
+
+		return [
+			[
+
+				'nodes' =>
+					$nodes,
+			],
+		];
+	}
+
+	public static function Action( $actionName, $args ) {
+		$node = TriggerHappy::get_instance()->fetch_node( $actionName );
+
+		return [
+			'type' => $actionName,
+			'args' => $args,
+			'node' => $node,
+		];
+	}
 
 
 }

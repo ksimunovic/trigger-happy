@@ -18,7 +18,6 @@ class TriggerHappyContext {
 	}
 
 	public function setData( $nodeId, $data ) {
-
 		$this->data->{$nodeId} = $data;
 	}
 }

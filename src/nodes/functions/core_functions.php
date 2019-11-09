@@ -56,7 +56,7 @@ function triggerhappy_action_hook( $node, $context ) {
 		$passed_args = func_get_args();
 
 		// Remove empty string value func_get_args returns
-		$passed_args = !empty($passed_args[0][0]) ? $passed_args : [[]];
+		$passed_args = ! empty( $passed_args[0][0] ) ? $passed_args : [ [] ];
 
 		if ( isset( $node->def['globals'] ) ) {
 			foreach ( $node->def['globals'] as $id => $key ) {

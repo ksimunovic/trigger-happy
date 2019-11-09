@@ -2,14 +2,18 @@
 
 /**
  * Main TriggerHappy class
- * Responsiblw for setting up Trigger Happy and subclasses, as well as hooking
+ * Responsible for setting up Trigger Happy and subclasses, as well as hooking
  * into appropriate WordPress hooks
  */
 class TriggerHappy {
 	private static $instance = null;
+
 	public $nodes = [];
+
 	public $types = [];
+
 	public $types_schema = [];
+
 	public $globals = [];
 
 	/**
