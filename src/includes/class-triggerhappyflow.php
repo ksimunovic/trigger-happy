@@ -10,7 +10,7 @@ class TriggerHappyFlow {
 	/**
 	 * @var TriggerHappyExpressionCompiler
 	 */
-	private $compiler;
+	public $compiler;
 
 	private $nodedata;
 

@@ -4,11 +4,6 @@ function triggerhappy_field( $name, $type = 'flow', $opts = [] ) {
 	return TriggerHappy::get_instance()->create_field( $name, $type, $opts );
 }
 
-
-function triggerhappy_register_node( $id, $ns, $options ) {
-	return TriggerHappy::get_instance()->register_node( $id, $ns, $options );
-}
-
 function triggerhappy_register_json_schema( $id, $jsonSchema ) {
 	return TriggerHappy::get_instance()->register_json_schema( $id, $jsonSchema );
 }

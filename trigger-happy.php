@@ -70,45 +70,6 @@ class TH {
 		return plugin_dir_url( __FILE__ );
 	}
 
-	public static function Trigger( $triggerName, $setup ) {
-		$node = TriggerHappy::get_instance()->fetch_node( $triggerName );
-
-		$nodeId = 1;
-		$args = [];
-		foreach ( $node['fields'] as $i => $field ) {
-			if ( $field['dir'] == 'start' || $field['dir'] == 'out' ) {
-				$args[ $field['name'] ] = TH::Expression( '_N' . $nodeId . '.' . $field['name'] );
-			}
-		}
-		$actions = call_user_func( $setup, $args );
-		$flow = new TriggerHappyFlow( time(), null, false );
-		$trigger = new TriggerHappyNode( $nodeId, $triggerName, $flow );
-
-		$nodeId ++;
-
-		$prevNode = $trigger;
-		foreach ( $actions as $i => $action ) {
-			$next = [];
-
-			$anode = new TriggerHappyNode( $nodeId, $action['type'], $flow );
-			$flow->addNode( $anode );
-			array_push( $next, $nodeId );
-
-			$prevNode->setNext( $next );
-			foreach ( $action['args'] as $x => $arg ) {
-				$fieldDef = $anode->getFieldDef( $x );
-
-				$afield = $anode->getField( $x );
-				$afield->setExpression( $arg );
-
-			}
-
-
-		}
-		$flow->addNode( $trigger );
-		$flow->start();
-	}
-
 	public static function Expression( $expr ) {
 		$phep = new PHPEP( $expr );
 
@@ -134,32 +95,16 @@ class TH {
 			}
 			if ( $prevNode != null && ! isset( $prevNode['next'] ) ) {
 				$nodes[ $i - 1 ]['next'] = [ $i + 1 ];
-
 			}
-
 			array_push( $nodes, $node );
-
 			$i ++;
 		}
 
 		return [
 			[
-
 				'nodes' =>
 					$nodes,
 			],
 		];
 	}
-
-	public static function Action( $actionName, $args ) {
-		$node = TriggerHappy::get_instance()->fetch_node( $actionName );
-
-		return [
-			'type' => $actionName,
-			'args' => $args,
-			'node' => $node,
-		];
-	}
-
-
 }
