@@ -15,6 +15,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	// Wordpress
 	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\CoreSendEmail();
+	$nodes['th_core_user_updated'] = new \HotSource\TriggerHappy\Nodes\UserUpdated();
 	$nodes['th_core_user_login'] = new HotSource\TriggerHappy\Nodes\UserLogin();
 
 	// Posts
@@ -431,22 +432,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 		'fields'      => [
 			triggerhappy_field( 'id', 'number', [ 'description' => 'The post ID', 'dir' => 'start' ] ),
 			triggerhappy_field( 'post', 'wp_post', [ 'description' => 'The saved post', 'dir' => 'start' ] ),
-		],
-
-	];
-
-	$nodes['th_core_userupdated'] = [
-		'name'     => 'When a User profile is updated',
-		'plugin'   => '',
-		'cat'      => 'Users',
-		'nodeType' => 'trigger',
-		'callback' => 'triggerhappy_action_hook',
-		'hook'     => 'profile_update',
-
-		'description' => 'When a user profile is saved',
-		'fields'      => [
-			triggerhappy_field( 'id', 'number', [ 'description' => 'The user ID', 'dir' => 'start' ] ),
-			triggerhappy_field( 'user', 'wp_user', [ 'description' => 'The user data', 'dir' => 'start' ] ),
 		],
 
 	];
@@ -1265,7 +1250,7 @@ function deprecatedNodes() {
 			],
 		],
 	];
-	
+
 	$nodes['th_core_single_post_query'] = [
 		'description' => 'When single post data is being queried',
 		'name'        => 'When data for a Single Post is being loaded',
@@ -1290,6 +1275,23 @@ function deprecatedNodes() {
 				TH::Filter( TH::Expression( "_self.query.is_main_query" ), 'equals', true ),
 			],
 		],
+	];
+
+
+	$nodes['th_core_userupdated'] = [
+		'name'     => 'When a User profile is updated',
+		'plugin'   => '',
+		'cat'      => 'Users',
+		'nodeType' => 'trigger',
+		'callback' => 'triggerhappy_action_hook',
+		'hook'     => 'profile_update',
+
+		'description' => 'When a user profile is saved',
+		'fields'      => [
+			triggerhappy_field( 'id', 'number', [ 'description' => 'The user ID', 'dir' => 'start' ] ),
+			triggerhappy_field( 'user', 'wp_user', [ 'description' => 'The user data', 'dir' => 'start' ] ),
+		],
+
 	];
 
 	$nodes['th_core_wp_login'] = [
