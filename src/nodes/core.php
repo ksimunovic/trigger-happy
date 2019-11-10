@@ -71,60 +71,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 		'fields'      => [ triggerhappy_field( 'hours', 'number' ) ],
 	];
 
-	$nodes['th_core_set_title'] = [
-		'description' => 'Set the post title',
-		'name'        => 'Set Post Title',
-		'plugin'      => '',
-		'actionType'  => 'render',
-		'nodeType'    => 'action',
-		'cat'         => 'Front-end',
-		'callback'    => 'triggerhappy_filter_hook',
-		'hook'        => 'the_title',
-		'filters'     => [
-			[
-				TH::Filter( TH::Expression( "_N.wp.in_the_loop" ), 'equals', true ),
-			],
-		],
-		'expressions' => [
-			'title' => "{{.current_title}}",
-		],
-		'fields'      => [
-			triggerhappy_field( 'current_title', 'string', [
-				'dir'         => 'start',
-				'description' => 'The existing Post Title',
-			] ),
-			triggerhappy_field( 'post', 'wp_post', [ 'dir' => 'start', 'description' => 'The Post object' ] ),
-			triggerhappy_field( 'title', 'string', [ 'dir' => 'in', 'description' => 'The Post Title' ] ),
-		],
-	];
-	$nodes['th_core_the_content'] = [
-		'description' => 'Modify the post content before it is displayed',
-		'name'        => 'Set Post Content',
-		'plugin'      => '',
-		'actionType'  => 'render',
-		'nodeType'    => 'action',
-		'cat'         => 'Front-end',
-		'callback'    => 'triggerhappy_filter_hook',
-		'hook'        => 'the_content',
-		'globals'     => [ 'post' => 'post' ],
-		'filters'     => [
-			[
-				TH::Filter( TH::Expression( "_N.wp.in_the_loop" ), 'equals', true ),
-			],
-		],
-		'fields'      => [
-			triggerhappy_field( 'current_content', 'string', [
-				'dir'         => 'start',
-				'description' => 'The existing Post Content',
-			] ),
-			triggerhappy_field( 'post', 'wp_post', [ 'dir' => 'start', 'description' => 'The Post object' ] ),
-			triggerhappy_field( 'content', 'html', [ 'dir' => 'in', 'description' => 'The Post Content' ] ),
-		],
-
-		'expressions' => [
-			'content' => "{{.current_content}}",
-		],
-	];
 	$nodes['th_core_add_nav_menu_item'] = [
 		'description' => 'Adds a link to a navigation menu',
 		'name'        => 'Add Nav Menu Item',
@@ -176,22 +122,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 		],
 	];
 
-	$nodes['th_core_archive'] = [
-		'description' => 'When a post archive is being viewed on the front-end',
-		'name'        => 'When a Post Archive is viewed',
-		'plugin'      => '',
-		'nodeType'    => 'trigger',
-		'hook'        => 'template_redirect',
-		'callback'    => 'triggerhappy_action_hook',
-		'cat'         => 'Front-end',
-		'triggerType' => 'render',
-		'fields'      => [],
-		'nodeFilters' => [
-			[
-				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_archive" ), 'equals', true ),
-			],
-		],
-	];
+
 	$nodes['th_core_archive_query'] = [
 		'description' => 'When data for a post archive is being queried',
 		'name'        => 'When Post Archive data is loaded',
@@ -216,22 +147,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 		],
 	];
 
-	$nodes['th_core_cat_archive'] = [
-		'description' => 'When a category is being viewed on the front-end',
-		'name'        => 'When a Post Category Archive is viewed',
-		'plugin'      => '',
-		'nodeType'    => 'trigger',
-		'hook'        => 'template_redirect',
-		'callback'    => 'triggerhappy_action_hook',
-		'cat'         => 'Front-end',
-		'triggerType' => 'render',
-		'fields'      => [],
-		'nodeFilters' => [
-			[
-				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_category" ), 'equals', true ),
-			],
-		],
-	];
 
 	$nodes['th_core_cat_archive_query'] = [
 		'description' => 'When data for a category is being queried',
@@ -257,22 +172,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 		],
 	];
 
-	$nodes['th_core_tax_archive'] = [
-		'description' => 'When a Taxonomy Archive is being viewed on the front-end',
-		'name'        => 'When a Taxonomy Archive is viewed',
-		'plugin'      => '',
-		'nodeType'    => 'trigger',
-		'hook'        => 'template_redirect',
-		'callback'    => 'triggerhappy_action_hook',
-		'cat'         => 'Front-end',
-		'triggerType' => 'render',
-		'fields'      => [],
-		'nodeFilters' => [
-			[
-				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_tax" ), 'equals', true ),
-			],
-		],
-	];
 
 	$nodes['th_core_tax_archive_query'] = [
 		'description' => 'When loading data for a Taxonomy Archive',
@@ -296,19 +195,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 				TH::Filter( TH::Expression( "_self.query.is_main_query" ), 'equals', true ),
 			],
 		],
-	];
-
-
-	$nodes['th_core_any_url'] = [
-		'description' => 'When any page, post or archive is being viewed on the front-end',
-		'name'        => 'When any front-end URL is viewed',
-		'plugin'      => '',
-		'triggerType' => 'render',
-		'nodeType'    => 'trigger',
-		'hook'        => 'template_redirect',
-		'callback'    => 'triggerhappy_action_hook',
-		'cat'         => 'Front-end',
-		'fields'      => [],
 	];
 
 
@@ -1087,6 +973,140 @@ function triggerhappy_assoc_to_choices( $results ) {
 	return $choices;
 }
 
+function deprecatedFrontendNodes() {
+	$nodes['th_core_tax_archive'] = [
+		'description' => 'When a Taxonomy Archive is being viewed on the front-end',
+		'name'        => 'When a Taxonomy Archive is viewed',
+		'plugin'      => '',
+		'nodeType'    => 'trigger',
+		'hook'        => 'template_redirect',
+		'callback'    => 'triggerhappy_action_hook',
+		'cat'         => 'Front-end',
+		'triggerType' => 'render',
+		'fields'      => [],
+		'nodeFilters' => [
+			[
+				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_tax" ), 'equals', true ),
+			],
+		],
+	];
+	$nodes['th_core_set_title'] = [
+		'description' => 'Set the post title',
+		'name'        => 'Set Post Title',
+		'plugin'      => '',
+		'actionType'  => 'render',
+		'nodeType'    => 'action',
+		'cat'         => 'Front-end',
+		'callback'    => 'triggerhappy_filter_hook',
+		'hook'        => 'the_title',
+		'filters'     => [
+			[
+				TH::Filter( TH::Expression( "_N.wp.in_the_loop" ), 'equals', true ),
+			],
+		],
+		'expressions' => [
+			'title' => "{{.current_title}}",
+		],
+		'fields'      => [
+			triggerhappy_field( 'current_title', 'string', [
+				'dir'         => 'start',
+				'description' => 'The existing Post Title',
+			] ),
+			triggerhappy_field( 'post', 'wp_post', [ 'dir' => 'start', 'description' => 'The Post object' ] ),
+			triggerhappy_field( 'title', 'string', [ 'dir' => 'in', 'description' => 'The Post Title' ] ),
+		],
+	];
+	$nodes['th_core_the_content'] = [
+		'description' => 'Modify the post content before it is displayed',
+		'name'        => 'Set Post Content',
+		'plugin'      => '',
+		'actionType'  => 'render',
+		'nodeType'    => 'action',
+		'cat'         => 'Front-end',
+		'callback'    => 'triggerhappy_filter_hook',
+		'hook'        => 'the_content',
+		'globals'     => [ 'post' => 'post' ],
+		'filters'     => [
+			[
+				TH::Filter( TH::Expression( "_N.wp.in_the_loop" ), 'equals', true ),
+			],
+		],
+		'fields'      => [
+			triggerhappy_field( 'current_content', 'string', [
+				'dir'         => 'start',
+				'description' => 'The existing Post Content',
+			] ),
+			triggerhappy_field( 'post', 'wp_post', [ 'dir' => 'start', 'description' => 'The Post object' ] ),
+			triggerhappy_field( 'content', 'html', [ 'dir' => 'in', 'description' => 'The Post Content' ] ),
+		],
+
+		'expressions' => [
+			'content' => "{{.current_content}}",
+		],
+	];
+	$nodes['th_core_archive'] = [
+		'description' => 'When a post archive is being viewed on the front-end',
+		'name'        => 'When a Post Archive is viewed',
+		'plugin'      => '',
+		'nodeType'    => 'trigger',
+		'hook'        => 'template_redirect',
+		'callback'    => 'triggerhappy_action_hook',
+		'cat'         => 'Front-end',
+		'triggerType' => 'render',
+		'fields'      => [],
+		'nodeFilters' => [
+			[
+				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_archive" ), 'equals', true ),
+			],
+		],
+	];
+	$nodes['th_core_single_post'] = [
+		'description' => 'When a single post is being viewed on the front-end',
+		'name'        => 'When a Single Post is viewed',
+		'plugin'      => '',
+		'triggerType' => 'render',
+		'nodeType'    => 'trigger',
+		'hook'        => 'template_redirect',
+		'callback'    => 'triggerhappy_action_hook',
+		'cat'         => 'Front-end',
+		'globals'     => [ 'post' => 'post' ],
+		'fields'      => [
+			triggerhappy_field( 'post', 'wp_post', [ 'dir' => 'start' ] ),
+		],
+		'nodeFilters' => [
+			[
+				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_single" ), 'equals', true ),
+			],
+		],
+	];
+	$nodes['th_core_any_url'] = [
+		'description' => 'When any page, post or archive is being viewed on the front-end',
+		'name'        => 'When any front-end URL is viewed',
+		'plugin'      => '',
+		'triggerType' => 'render',
+		'nodeType'    => 'trigger',
+		'hook'        => 'template_redirect',
+		'callback'    => 'triggerhappy_action_hook',
+		'cat'         => 'Front-end',
+		'fields'      => [],
+	];
+	$nodes['th_core_cat_archive'] = [
+		'description' => 'When a category is being viewed on the front-end',
+		'name'        => 'When a Post Category Archive is viewed',
+		'plugin'      => '',
+		'nodeType'    => 'trigger',
+		'hook'        => 'template_redirect',
+		'callback'    => 'triggerhappy_action_hook',
+		'cat'         => 'Front-end',
+		'triggerType' => 'render',
+		'fields'      => [],
+		'nodeFilters' => [
+			[
+				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_category" ), 'equals', true ),
+			],
+		],
+	];
+}
 
 function deprecatedNodes() {
 	$nodes['th_core_insert_html_after_post'] = [
@@ -1196,25 +1216,6 @@ function deprecatedNodes() {
 		],
 	];
 
-	$nodes['th_core_single_post'] = [
-		'description' => 'When a single post is being viewed on the front-end',
-		'name'        => 'When a Single Post is viewed',
-		'plugin'      => '',
-		'triggerType' => 'render',
-		'nodeType'    => 'trigger',
-		'hook'        => 'template_redirect',
-		'callback'    => 'triggerhappy_action_hook',
-		'cat'         => 'Front-end',
-		'globals'     => [ 'post' => 'post' ],
-		'fields'      => [
-			triggerhappy_field( 'post', 'wp_post', [ 'dir' => 'start' ] ),
-		],
-		'nodeFilters' => [
-			[
-				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_single" ), 'equals', true ),
-			],
-		],
-	];
 
 	$nodes['th_core_single_post_query'] = [
 		'description' => 'When single post data is being queried',
