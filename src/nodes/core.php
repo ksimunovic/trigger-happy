@@ -15,6 +15,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	// Wordpress
 	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\CoreSendEmail();
+	$nodes['th_core_user_login'] = new HotSource\TriggerHappy\Nodes\UserLogin();
 
 	// Posts
 	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\Nodes\CorePostInsertHtml();
@@ -22,29 +23,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	// Sidebar
 	$nodes['th_core_insert_html_sidebar'] = new HotSource\TriggerHappy\Nodes\CoreSidebarInsertHtml();
-
-	$nodes['th_core_wp_login'] = [
-		'name'        => 'User Logged In',
-		'plugin'      => '',
-		'nodeType'    => 'trigger',
-		'description' => 'When a user has successfully logged in',
-		'cat'         => 'Users',
-		'callback'    => 'triggerhappy_action_hook',
-		'hook'        => 'wp_login',
-		'fields'      => [
-			triggerhappy_field(
-				'user_login', 'string', [
-					'dir' => 'start',
-				]
-			),
-			triggerhappy_field(
-				'user', 'wp_user', [
-					'dir' => 'start',
-				]
-			),
-		],
-	];
-
 
 	$nodes['th_core_wp_logout'] = [
 		'name'        => 'User Logged Out',
@@ -1311,6 +1289,28 @@ function deprecatedNodes() {
 			[
 				TH::Filter( TH::Expression( "_self.query.is_main_query" ), 'equals', true ),
 			],
+		],
+	];
+
+	$nodes['th_core_wp_login'] = [
+		'name'        => 'User Logged In',
+		'plugin'      => '',
+		'nodeType'    => 'trigger',
+		'description' => 'When a user has successfully logged in',
+		'cat'         => 'Users',
+		'callback'    => 'triggerhappy_action_hook',
+		'hook'        => 'wp_login',
+		'fields'      => [
+			triggerhappy_field(
+				'user_login', 'string', [
+					'dir' => 'start',
+				]
+			),
+			triggerhappy_field(
+				'user', 'wp_user', [
+					'dir' => 'start',
+				]
+			),
 		],
 	];
 }
