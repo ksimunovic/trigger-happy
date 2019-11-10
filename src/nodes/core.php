@@ -15,7 +15,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	// Wordpress
 	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\CoreSendEmail();
-	$nodes['th_core_user_updated'] = new \HotSource\TriggerHappy\Nodes\UserUpdated();
+	$nodes['th_core_user_updated'] = new HotSource\TriggerHappy\Nodes\UserUpdated();
 	$nodes['th_core_user_login'] = new HotSource\TriggerHappy\Nodes\UserLogin();
 	$nodes['th_core_user_logout'] = new HotSource\TriggerHappy\Nodes\UserLogout();
 
@@ -25,6 +25,10 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	// Sidebar
 	$nodes['th_core_insert_html_sidebar'] = new HotSource\TriggerHappy\Nodes\CoreSidebarInsertHtml();
+
+	// Queries
+	$nodes['th_core_single_post'] = new HotSource\TriggerHappy\Nodes\CoreSinglePostViewed();
+	$nodes['th_core_single_post_query'] = new HotSource\TriggerHappy\Nodes\CoreSinglePostQuery();
 
 	$nodes['th_core_triggerhappy_set_navigation_menu'] = [
 		'name'        => 'Set the Navigation Menu',
@@ -171,35 +175,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 			triggerhappy_field( 'value', 'string', [ 'description' => 'The value to set' ] ),
 		],
 	];
-
-	$nodes['th_core_single_post'] = new \HotSource\TriggerHappy\Nodes\CoreSinglePostViewed();
-
-	$nodes['th_core_single_post_query'] = [
-		'description' => 'When single post data is being queried',
-		'name'        => 'When data for a Single Post is being loaded',
-		'plugin'      => '',
-		'triggerType' => 'query',
-		'nodeType'    => 'trigger',
-		'hook'        => 'template_redirect',
-		'callback'    => 'triggerhappy_action_hook',
-		'cat'         => 'Queries',
-		'globals'     => [ 'post' => 'post', 'query' => 'wp_query' ],
-		'fields'      => [
-
-			triggerhappy_field( 'query', 'wp_query', [ 'dir' => 'start' ] ),
-		],
-		'nodeFilters' => [
-			[
-				TH::Filter( TH::Expression( "_N1.query.is_single" ), 'equals', true ),
-			],
-		],
-		'filters'     => [
-			[
-				TH::Filter( TH::Expression( "_self.query.is_main_query" ), 'equals', true ),
-			],
-		],
-	];
-	$nodes['th_core_single_post_query'] = new \HotSource\TriggerHappy\Nodes\CoreSinglePostQuery();
 
 	$nodes['th_core_archive'] = [
 		'description' => 'When a post archive is being viewed on the front-end',
