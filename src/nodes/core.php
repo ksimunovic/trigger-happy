@@ -17,6 +17,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\CoreSendEmail();
 	$nodes['th_core_user_updated'] = new \HotSource\TriggerHappy\Nodes\UserUpdated();
 	$nodes['th_core_user_login'] = new HotSource\TriggerHappy\Nodes\UserLogin();
+	$nodes['th_core_user_logout'] = new HotSource\TriggerHappy\Nodes\UserLogout();
 
 	// Posts
 	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\Nodes\CorePostInsertHtml();
@@ -24,17 +25,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	// Sidebar
 	$nodes['th_core_insert_html_sidebar'] = new HotSource\TriggerHappy\Nodes\CoreSidebarInsertHtml();
-
-	$nodes['th_core_wp_logout'] = [
-		'name'        => 'User Logged Out',
-		'plugin'      => 'WordPress',
-		'nodeType'    => 'trigger',
-		'description' => 'When a user has logged out',
-		'cat'         => 'User Triggers',
-		'callback'    => 'triggerhappy_action_hook',
-		'hook'        => 'wp_logout',
-		'fields'      => [],
-	];
 
 	$nodes['th_core_triggerhappy_set_navigation_menu'] = [
 		'name'        => 'Set the Navigation Menu',
@@ -1294,6 +1284,7 @@ function deprecatedNodes() {
 
 	];
 
+	// Replaced by th_core_wp_user_login
 	$nodes['th_core_wp_login'] = [
 		'name'        => 'User Logged In',
 		'plugin'      => '',
@@ -1314,5 +1305,17 @@ function deprecatedNodes() {
 				]
 			),
 		],
+	];
+
+	// Replaced by th_core_wp_user_logout
+	$nodes['th_core_wp_logout'] = [
+		'name'        => 'User Logged Out',
+		'plugin'      => 'WordPress',
+		'nodeType'    => 'trigger',
+		'description' => 'When a user has logged out',
+		'cat'         => 'User Triggers',
+		'callback'    => 'triggerhappy_action_hook',
+		'hook'        => 'wp_logout',
+		'fields'      => [],
 	];
 }
