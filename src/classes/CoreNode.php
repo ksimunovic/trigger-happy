@@ -76,7 +76,7 @@ abstract class CoreNode {
 	/**
 	 * @var NodeField[]
 	 */
-	protected $fields;
+	protected $fields = [];
 
 	/**
 	 * @return string
