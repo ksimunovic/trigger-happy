@@ -144,22 +144,6 @@ class TriggerHappyNode {
 		}
 		if ( isset( $this->def['callback'] ) ) {
 			return call_user_func( $this->def['callback'], $this, $context );
-
-		} elseif ( isset( $this->def['childGraphs'] ) ) {
-
-			$child_graphs = json_decode( $this->def['childGraphs'] );
-			foreach ( $child_graphs as $i => $graph ) {
-				$data = $this->getInputData( $context );
-				$childFlow = new TriggerHappyFlow( '', $graph, false );
-				$newContext = new TriggerHappyContext();
-				$context->setData( $this->id, $data );
-				$newContext->parentContext = $context;
-				$newContext->parentNodeId = $this->id;
-				$childFlow->parentFlow = $this->graph;
-				$childFlow->start( $newContext );
-
-			}
-			$this->next( $context );
 		}
 		$this->isExecuting = false;
 	}

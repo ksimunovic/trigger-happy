@@ -194,22 +194,7 @@ abstract class CoreNode {
 		// Adding inputData to flowNode so context can be removed from getInputData
 		$this->inputData = $this->getInputData( new TriggerHappyContext() );
 
-		if ( ! empty( $this->childGraphs ) ) {
-			$child_graphs = json_decode( $this->childGraphs );
-			foreach ( $child_graphs as $i => $graph ) {
-				$childFlow = new TriggerHappyFlow( '', $graph, false );
-				$newContext = new TriggerHappyContext();
-				$context->setData( $this->id, $this->inputData );
-				$newContext->parentContext = $context;
-				$newContext->parentNodeId = $this->id;
-				$childFlow->parentFlow = $this->graph;
-				$childFlow->start( $newContext );
-			}
-
-			$this->next( $context );
-		} else {
-			$this->runCallback( $this, $context, $this->inputData );
-		}
+		$this->runCallback( $this, $context, $this->inputData );
 
 		$this->isExecuting = false;
 	}
