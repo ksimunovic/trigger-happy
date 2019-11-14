@@ -196,10 +196,7 @@ abstract class CoreNode {
 			return;
 		}
 
-		// Adding inputData to flowNode so context can be removed from getInputData
-		$this->inputData = $this->getInputData( new TriggerHappyContext() );
-
-		$this->runCallback( $this, $context, $this->inputData );
+		$this->runCallback( $this, $context, $this->getInputData( $context ) );
 
 		$this->isExecuting = false;
 	}
