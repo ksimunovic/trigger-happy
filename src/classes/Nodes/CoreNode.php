@@ -61,6 +61,11 @@ abstract class CoreNode {
 	/**
 	 * @var string
 	 */
+	protected $helpText = '';
+
+	/**
+	 * @var string
+	 */
 	protected $plugin = '';
 
 	/**
@@ -323,6 +328,5 @@ abstract class CoreNode {
 		if ( $data !== null ) {
 			$context->setData( $this->id, $data );
 		}
-
 	}
 }

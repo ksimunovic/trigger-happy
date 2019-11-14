@@ -48,6 +48,7 @@ class CoreActionNode extends CoreNode {
 			'name'        => $this->name,
 			'plugin'      => $this->plugin,
 			'description' => $this->description,
+			'helpText'    => $this->helpText,
 			'cat'         => $this->cat,
 			'actionType'  => $this->actionType,
 			'nodeType'    => $this->nodeType,

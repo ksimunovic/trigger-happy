@@ -73,6 +73,7 @@ class CoreTriggerNode extends CoreNode {
 			'name'        => $this->name,
 			'plugin'      => $this->plugin,
 			'description' => $this->description,
+			'helpText'    => $this->helpText,
 			'cat'         => $this->cat,
 			'hook'        => $this->hook,
 			'globals'     => $this->globals,
