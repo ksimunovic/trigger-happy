@@ -3,7 +3,7 @@
 namespace HotSource\TriggerHappy\Nodes\Actions;
 
 use HotSource\TriggerHappy\Nodes\CoreActionNode;
-use HotSource\TriggerHappy\CoreNode;
+use HotSource\TriggerHappy\Nodes\CoreNode;
 use HotSource\TriggerHappy\NodeField;
 
 class CoreSidebarInsertHtml extends CoreActionNode {

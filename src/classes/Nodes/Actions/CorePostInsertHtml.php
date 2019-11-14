@@ -3,8 +3,8 @@
 namespace HotSource\TriggerHappy\Nodes\Actions;
 
 use HotSource\TriggerHappy\Nodes\CoreActionNode;
-use HotSource\TriggerHappy\CoreNode;
 use HotSource\TriggerHappy\NodeField;
+use HotSource\TriggerHappy\Nodes\CoreNode;
 
 class CorePostInsertHtml extends CoreActionNode {
 

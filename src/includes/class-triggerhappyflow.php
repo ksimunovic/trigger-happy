@@ -34,7 +34,7 @@ class TriggerHappyFlow {
 
 		foreach ( $this->nodes as $nodeid => $nodeData ) {
 			if ( is_object( $nodeData ) && $nodeData instanceof \HotSource\TriggerHappy\Nodes\CoreNode ) { // new class-based implementation
-				/** @var \HotSource\TriggerHappy\CoreNode $nodeData */
+				/** @var \HotSource\TriggerHappy\Nodes\CoreNode $nodeData */
 				if ( $nodeData->getNodeType() == 'trigger' ) {
 					$nodeData->execute( $context );
 				}

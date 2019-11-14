@@ -4,6 +4,7 @@ namespace HotSource\TriggerHappy\Nodes\Actions;
 
 use HotSource\TriggerHappy\Nodes\CoreActionNode;
 use HotSource\TriggerHappy\NodeField;
+use HotSource\TriggerHappy\Nodes\CoreNode;
 
 class CoreCreatePost extends CoreActionNode {
 

@@ -2,7 +2,7 @@
 
 namespace HotSource\TriggerHappy\Nodes\Triggers;
 
-use HotSource\TriggerHappy\CoreNode;
+use HotSource\TriggerHappy\Nodes\CoreNode;
 use HotSource\TriggerHappy\Nodes\CoreTriggerNode;
 
 class UserLogout extends CoreTriggerNode {
