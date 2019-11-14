@@ -352,4 +352,19 @@ function deprecatedNodes() {
 			)
 		),
 	];
+
+	$nodes['th_core_add_nav_menu_item'] = [
+		'description' => 'Adds a link to a navigation menu',
+		'name'        => 'Add Nav Menu Item',
+		'plugin'      => '',
+		'nodeType'    => 'action',
+		'cat'         => 'WordPress',
+		'callback'    => 'triggerhappy_add_nav_menu_item',
+
+		'fields' => [
+			triggerhappy_field( 'nav_menu', 'wp_nav_menu', [ 'description' => 'The Nav Menu to be modified ' ] ),
+			triggerhappy_field( 'text', 'string', [ 'description' => 'The item text' ] ),
+			triggerhappy_field( 'url', 'string', [ 'description' => 'The item URL' ] ),
+		],
+	];
 }

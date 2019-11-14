@@ -18,6 +18,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes['th_core_user_updated'] = new HotSource\TriggerHappy\Nodes\Triggers\UserUpdated();
 	$nodes['th_core_user_login'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogin();
 	$nodes['th_core_user_logout'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogout();
+	$nodes['th_core_add_nav_menu_item'] = new HotSource\TriggerHappy\Nodes\Actions\AddNavMenuItem();
 
 	// Posts
 	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\Nodes\Actions\CorePostInsertHtml();
@@ -40,20 +41,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 		'fields'      => [ triggerhappy_field( 'hours', 'number' ) ],
 	];
 
-	$nodes['th_core_add_nav_menu_item'] = [
-		'description' => 'Adds a link to a navigation menu',
-		'name'        => 'Add Nav Menu Item',
-		'plugin'      => '',
-		'nodeType'    => 'action',
-		'cat'         => 'WordPress',
-		'callback'    => 'triggerhappy_add_nav_menu_item',
-
-		'fields' => [
-			triggerhappy_field( 'nav_menu', 'wp_nav_menu', [ 'description' => 'The Nav Menu to be modified ' ] ),
-			triggerhappy_field( 'text', 'string', [ 'description' => 'The item text' ] ),
-			triggerhappy_field( 'url', 'string', [ 'description' => 'The item URL' ] ),
-		],
-	];
 	$nodes['th_core_set_query_param'] = [
 		'description' => 'Set a query parameter',
 		'name'        => 'Set Query Parameter',
