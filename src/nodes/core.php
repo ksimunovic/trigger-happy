@@ -14,21 +14,21 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes = triggerhappy_load_core_nodes_advanced( $nodes );
 
 	// Wordpress
-	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\CoreSendEmail();
-	$nodes['th_core_user_updated'] = new HotSource\TriggerHappy\Nodes\UserUpdated();
-	$nodes['th_core_user_login'] = new HotSource\TriggerHappy\Nodes\UserLogin();
-	$nodes['th_core_user_logout'] = new HotSource\TriggerHappy\Nodes\UserLogout();
+	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\Actions\CoreSendEmail();
+	$nodes['th_core_user_updated'] = new HotSource\TriggerHappy\Nodes\Triggers\UserUpdated();
+	$nodes['th_core_user_login'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogin();
+	$nodes['th_core_user_logout'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogout();
 
 	// Posts
-	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\Nodes\CorePostInsertHtml();
-	$nodes['th_core_create_post'] = new HotSource\TriggerHappy\Nodes\CoreCreatePost();
+	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\Nodes\Actions\CorePostInsertHtml();
+	$nodes['th_core_create_post'] = new HotSource\TriggerHappy\Nodes\Actions\CoreCreatePost();
 
 	// Sidebar
-	$nodes['th_core_insert_html_sidebar'] = new HotSource\TriggerHappy\Nodes\CoreSidebarInsertHtml();
+	$nodes['th_core_insert_html_sidebar'] = new HotSource\TriggerHappy\Nodes\Actions\CoreSidebarInsertHtml();
 
 	// Queries
-	$nodes['th_core_single_post'] = new HotSource\TriggerHappy\Nodes\CoreSinglePostViewed();
-	$nodes['th_core_single_post_query'] = new HotSource\TriggerHappy\Nodes\CoreSinglePostQuery();
+	$nodes['th_core_single_post'] = new HotSource\TriggerHappy\Nodes\Triggers\CoreSinglePostViewed();
+	$nodes['th_core_single_post_query'] = new HotSource\TriggerHappy\Nodes\Triggers\CoreSinglePostQuery();
 
 	$nodes['th_core_timer'] = [
 		'cat'         => 'WordPress',

@@ -1,8 +1,8 @@
 <?php
 
-namespace HotSource\TriggerHappy\Nodes;
+namespace HotSource\TriggerHappy\Nodes\Triggers;
 
-use HotSource\TriggerHappy\CoreTriggerNode;
+use HotSource\TriggerHappy\Nodes\CoreTriggerNode;
 use HotSource\TriggerHappy\NodeField;
 use TH;
 

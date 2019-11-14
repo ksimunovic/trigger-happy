@@ -33,7 +33,7 @@ class TriggerHappyFlow {
 		$this->initialize();
 
 		foreach ( $this->nodes as $nodeid => $nodeData ) {
-			if ( is_object( $nodeData ) && $nodeData instanceof \HotSource\TriggerHappy\CoreNode ) { // new class-based implementation
+			if ( is_object( $nodeData ) && $nodeData instanceof \HotSource\TriggerHappy\Nodes\CoreNode ) { // new class-based implementation
 				/** @var \HotSource\TriggerHappy\CoreNode $nodeData */
 				if ( $nodeData->getNodeType() == 'trigger' ) {
 					$nodeData->execute( $context );
@@ -54,7 +54,7 @@ class TriggerHappyFlow {
 		foreach ( $this->nodedata->nodes as $node ) {
 
 			$object = TriggerHappy::get_node( $node->type );
-			if ( ! empty( $object ) && $object instanceof \HotSource\TriggerHappy\CoreNode ) {
+			if ( ! empty( $object ) && $object instanceof \HotSource\TriggerHappy\Nodes\CoreNode ) {
 				$object->initializeNode( $node, $this );
 				$this->addNode( $object );
 			} else {
@@ -94,7 +94,7 @@ class TriggerHappyFlow {
 		$id = $id == null ? $node->id : $id;
 		$this->nodes[ $id ] = $node;
 
-		if ( $node instanceof \HotSource\TriggerHappy\CoreNode ) { // new class-based implementation
+		if ( $node instanceof \HotSource\TriggerHappy\Nodes\CoreNode ) { // new class-based implementation
 			// No setting of fields needed as it's already in this object
 		} else {
 			$def = TriggerHappy::get_node( $node->type );

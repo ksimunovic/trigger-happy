@@ -1,6 +1,6 @@
 <?php
 
-namespace HotSource\TriggerHappy;
+namespace HotSource\TriggerHappy\Nodes;
 
 class CoreActionNode extends CoreNode {
 
