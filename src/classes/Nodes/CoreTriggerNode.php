@@ -62,6 +62,7 @@ class CoreTriggerNode extends CoreNode {
 	/**
 	 * Used in Frontend: FlowHooksController::get_available_nodes() and
 	 * FlowPluginsController::get_available_plugins()
+	 *
 	 * @return array
 	 */
 	public function toArray() {
@@ -116,7 +117,7 @@ class CoreTriggerNode extends CoreNode {
 			// Remove empty string value func_get_args returns
 			$passed_args = ! empty( $passed_args[0] ) ? $passed_args : [];
 
-			if(!empty($node->def)){
+			if ( ! empty( $node->def ) ) {
 				$nodeDef = $node->def;
 			} else {
 				$nodeDef = $node;
