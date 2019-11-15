@@ -489,4 +489,22 @@ function deprecatedNodes() {
 		],
 	];
 
+	$nodes['th_core_any_url_query'] = [
+		'description' => 'When any page, post or archive data is being queried',
+		'name'        => 'When loading data for any front-end URL',
+		'plugin'      => '',
+		'triggerType' => 'query',
+		'nodeType'    => 'trigger',
+		'hook'        => 'template_redirect',
+		'callback'    => 'triggerhappy_action_hook',
+		'cat'         => 'Queries',
+		'fields'      => [
+			triggerhappy_field( 'query', 'wp_query', [ 'dir' => 'start' ] ),
+		],
+		'filters'     => [
+			[
+				TH::Filter( TH::Expression( "_self.query.is_main_query" ), 'equals', true ),
+			],
+		],
+	];
 }
