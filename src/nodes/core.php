@@ -33,31 +33,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes['th_core_single_post_query'] = new HotSource\TriggerHappy\Nodes\Triggers\CoreSinglePostQuery();
 	$nodes['th_core_set_query_param'] = new HotSource\TriggerHappy\Nodes\Actions\SetQueryParameter();
 	$nodes['th_core_archive_query'] = new HotSource\TriggerHappy\Nodes\Triggers\ArchiveQuery();
-
-	$nodes['th_core_cat_archive_query'] = [
-		'description' => 'When data for a category is being queried',
-		'name'        => 'When Post Category data is loaded',
-		'plugin'      => '',
-		'nodeType'    => 'trigger',
-		'hook'        => 'pre_get_posts',
-		'callback'    => 'triggerhappy_action_hook',
-		'cat'         => 'Queries',
-		'triggerType' => 'query',
-		'fields'      => [
-			triggerhappy_field( 'query', 'wp_query', [ 'dir' => 'start' ] ),
-		],
-		'nodeFilters' => [
-			[
-				TH::Filter( TH::Expression( "_N1.query.is_category" ), 'equals', true ),
-			],
-		],
-		'filters'     => [
-			[
-				TH::Filter( TH::Expression( "_self.query.is_main_query" ), 'equals', true ),
-			],
-		],
-	];
-
+	$nodes['th_core_cat_archive_query'] = new HotSource\TriggerHappy\Nodes\Triggers\CategoryQuery();
 
 	$nodes['th_core_tax_archive_query'] = [
 		'description' => 'When loading data for a Taxonomy Archive',
@@ -82,7 +58,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 			],
 		],
 	];
-
 
 	$nodes['th_core_any_url_query'] = [
 		'description' => 'When any page, post or archive data is being queried',
