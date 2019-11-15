@@ -19,6 +19,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes['th_core_user_login'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogin();
 	$nodes['th_core_user_logout'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogout();
 	$nodes['th_core_add_nav_menu_item'] = new HotSource\TriggerHappy\Nodes\Actions\AddNavMenuItem();
+	$nodes['th_core_timer'] = new HotSource\TriggerHappy\Nodes\Triggers\Timer();
 
 	// Posts
 	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\Nodes\Actions\CorePostInsertHtml();
@@ -32,15 +33,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes['th_core_single_post_query'] = new HotSource\TriggerHappy\Nodes\Triggers\CoreSinglePostQuery();
 	$nodes['th_core_set_query_param'] = new HotSource\TriggerHappy\Nodes\Actions\SetQueryParameter();
 
-	$nodes['th_core_timer'] = [
-		'cat'         => 'WordPress',
-		'name'        => 'On Timer',
-		'description' => 'Run every x hours/days etc',
-		'callback'    => 'triggerhappy_timer_trigger',
-		'nodeType'    => 'trigger',
-		'plugin'      => 'wordpress',
-		'fields'      => [ triggerhappy_field( 'hours', 'number' ) ],
-	];
 
 	$nodes['th_core_archive_query'] = [
 		'description' => 'When data for a post archive is being queried',

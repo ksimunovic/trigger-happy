@@ -404,4 +404,14 @@ function deprecatedNodes() {
 			triggerhappy_field( 'value', 'string', [ 'description' => 'The value to set' ] ),
 		],
 	];
+
+	$nodes['th_core_timer'] = [
+		'cat'         => 'WordPress',
+		'name'        => 'On Timer',
+		'description' => 'Run every x hours/days etc',
+		'callback'    => 'triggerhappy_timer_trigger',
+		'nodeType'    => 'trigger',
+		'plugin'      => 'wordpress',
+		'fields'      => [ triggerhappy_field( 'hours', 'number' ) ],
+	];
 }
