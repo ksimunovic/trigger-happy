@@ -464,4 +464,29 @@ function deprecatedNodes() {
 			],
 		],
 	];
+
+	$nodes['th_core_tax_archive_query'] = [
+		'description' => 'When loading data for a Taxonomy Archive',
+		'name'        => 'When Taxonomy Archive data is loaded',
+		'plugin'      => '',
+		'nodeType'    => 'trigger',
+		'hook'        => 'pre_get_posts',
+		'callback'    => 'triggerhappy_action_hook',
+		'cat'         => 'Queries',
+		'triggerType' => 'query',
+		'fields'      => [
+			triggerhappy_field( 'query', 'wp_query', [ 'dir' => 'start' ] ),
+		],
+		'nodeFilters' => [
+			[
+				TH::Filter( TH::Expression( "_N1.query.is_tax" ), 'equals', true ),
+			],
+		],
+		'filters'     => [
+			[
+				TH::Filter( TH::Expression( "_self.query.is_main_query" ), 'equals', true ),
+			],
+		],
+	];
+
 }
