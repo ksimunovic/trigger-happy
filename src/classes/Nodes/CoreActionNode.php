@@ -2,6 +2,8 @@
 
 namespace HotSource\TriggerHappy\Nodes;
 
+use HotSource\TriggerHappy\NodeField;
+
 class CoreActionNode extends CoreNode {
 
 	/**

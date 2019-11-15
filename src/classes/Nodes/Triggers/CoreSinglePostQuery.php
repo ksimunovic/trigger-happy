@@ -2,6 +2,7 @@
 
 namespace HotSource\TriggerHappy\Nodes\Triggers;
 
+use HotSource\TriggerHappy\Nodes\CoreNode;
 use HotSource\TriggerHappy\Nodes\CoreTriggerNode;
 use HotSource\TriggerHappy\NodeField;
 use TH;

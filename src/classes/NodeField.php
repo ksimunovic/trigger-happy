@@ -2,6 +2,8 @@
 
 namespace HotSource\TriggerHappy;
 
+use HotSource\TriggerHappy\Nodes\CoreNode;
+
 class NodeField {
 
 	/**

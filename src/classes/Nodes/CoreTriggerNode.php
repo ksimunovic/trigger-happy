@@ -2,6 +2,7 @@
 
 namespace HotSource\TriggerHappy\Nodes;
 
+use HotSource\TriggerHappy\NodeField;
 use TH;
 
 class CoreTriggerNode extends CoreNode {
