@@ -8,6 +8,9 @@ use HotSource\TriggerHappy\Nodes\CoreNode;
 
 class CoreCreatePost extends CoreActionNode {
 
+	/**
+	 * CoreCreatePost constructor.
+	 */
 	public function __construct() {
 		$this->name = 'Create a new post';
 		$this->description = 'Creates (or updates) a page or post';

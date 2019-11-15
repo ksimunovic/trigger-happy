@@ -7,6 +7,9 @@ use HotSource\TriggerHappy\NodeField;
 
 class CoreSendEmail extends CoreActionNode {
 
+	/**
+	 * CoreSendEmail constructor.
+	 */
 	public function __construct() {
 		$this->name = 'Send an email';
 		$this->description = 'Send a custom email';

@@ -8,6 +8,9 @@ use HotSource\TriggerHappy\Nodes\CoreNode;
 
 class CorePostInsertHtml extends CoreActionNode {
 
+	/**
+	 * CorePostInsertHtml constructor.
+	 */
 	public function __construct() {
 		$this->name = 'Insert content into post';
 		$this->description = 'Insert HTML into the body of a post';

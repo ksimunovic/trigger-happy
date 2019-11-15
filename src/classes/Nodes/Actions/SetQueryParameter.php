@@ -8,6 +8,9 @@ use HotSource\TriggerHappy\Nodes\CoreNode;
 
 class SetQueryParameter extends CoreActionNode {
 
+	/**
+	 * SetQueryParameter constructor.
+	 */
 	public function __construct() {
 		$this->name = 'Set Query Parameter';
 		$this->description = 'Set a query parameter';

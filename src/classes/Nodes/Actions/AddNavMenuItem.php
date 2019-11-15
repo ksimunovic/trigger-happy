@@ -8,6 +8,9 @@ use HotSource\TriggerHappy\Nodes\CoreNode;
 
 class AddNavMenuItem extends CoreActionNode {
 
+	/**
+	 * AddNavMenuItem constructor.
+	 */
 	public function __construct() {
 		$this->name = 'Add Nav Menu Item';
 		$this->description = 'Adds a link to a navigation menu';

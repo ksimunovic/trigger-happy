@@ -8,6 +8,9 @@ use HotSource\TriggerHappy\NodeField;
 
 class CoreSidebarInsertHtml extends CoreActionNode {
 
+	/**
+	 * CoreSidebarInsertHtml constructor.
+	 */
 	public function __construct() {
 		$this->name = 'Insert content into sidebar';
 		$this->description = 'Insert HTML into before or after the sidebar';
