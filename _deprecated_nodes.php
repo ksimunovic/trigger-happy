@@ -507,4 +507,23 @@ function deprecatedNodes() {
 			],
 		],
 	];
+
+	$nodes['th_core_commentcreated'] = [
+		'name'     => 'When a Comment is created',
+		'plugin'   => '',
+		'cat'      => 'Comments',
+		'nodeType' => 'trigger',
+		'callback' => 'triggerhappy_action_hook',
+		'hook'     => 'wp_insert_comment',
+
+		'description' => 'When a comment is created and saved',
+		'fields'      => [
+			triggerhappy_field( 'commentId', 'number', [ 'description' => 'The comment ID', 'dir' => 'start' ] ),
+			triggerhappy_field( 'comment', 'wp_comment', [
+				'description' => 'The added comment',
+				'dir'         => 'start',
+			] ),
+		],
+
+	];
 }
