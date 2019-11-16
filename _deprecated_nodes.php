@@ -524,6 +524,22 @@ function deprecatedNodes() {
 				'dir'         => 'start',
 			] ),
 		],
+	];
 
+	$nodes['th_core_commentapproved'] = [
+		'name'        => 'When a Comment is approved',
+		'description' => 'When a comment is created and saved',
+		'plugin'      => '',
+		'cat'         => 'Comments',
+		'nodeType'    => 'trigger',
+		'callback'    => 'triggerhappy_filter_hook',
+		'hook'        => 'wp_insert_comment',
+		'fields'      => [
+			triggerhappy_field( 'commentId', 'number', [ 'description' => 'The comment ID', 'dir' => 'start' ] ),
+			triggerhappy_field( 'comment', 'wp_comment', [
+				'description' => 'The added comment',
+				'dir'         => 'start',
+			] ),
+		],
 	];
 }
