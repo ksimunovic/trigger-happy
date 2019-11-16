@@ -14,12 +14,12 @@ class NodeField {
 	/**
 	 * @var string
 	 */
-	private $name;
+	public $name;
 
 	/**
 	 * @var array
 	 */
-	private $options;
+	public $options;
 
 	private $expression = null;
 

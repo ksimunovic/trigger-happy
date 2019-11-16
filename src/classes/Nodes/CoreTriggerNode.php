@@ -160,4 +160,62 @@ class CoreTriggerNode extends CoreNode {
 		}, $priority, 9999
 		);
 	}
+
+	/**
+	 * @param $node CoreNode
+	 * @param $context \TriggerHappyContext
+	 */
+	protected function filterHook( $node, $context ) {
+		$filter = isset( $node->hook ) ? $node->hook : $node->id;
+		$priority = 10;
+		if ( isset( $node->priority ) ) {
+			$priority = $node->priority;
+		}
+
+		add_filter(
+			$filter, function () use ( $filter, &$node, $context ) {
+			$passed_args = func_get_args();
+			$start_fields = array_filter( $node->fields, function ( $arr_value ) {
+				return $arr_value->options['dir'] == 'start';
+			} );
+			$in_fields = array_filter( $node->fields, function ( $arr_value ) {
+				return $arr_value->options['dir'] == 'in';
+			} );
+			$args = [];
+			$start_fields = array_values( $start_fields );
+			foreach ( $passed_args as $i => $val ) {
+				if ( isset( $start_fields[ $i ] ) ) {
+					$key = $start_fields[ $i ]->name;
+					$args[ $key ] = $val;
+				}
+			}
+
+			if ( isset( $node->globals ) ) {
+				foreach ( $node->globals as $id => $key ) {
+					$args[ $id ] = $GLOBALS[ $key ];
+				}
+			}
+
+			$node->setData( $context, $args );
+			if ( ! $node->canExecute( $context ) ) {
+				return reset( $passed_args );
+			}
+
+			$inputData = $node->getInputData( $context );
+
+			$returnData = $node->next( $context, $args );
+
+			if ( $node->hasReturnData( $context ) ) {
+
+				return $node->getReturnData( $context );
+			}
+			$first = reset( $in_fields );
+			if ( isset( $inputData[ $first['name'] ] ) ) {
+				return $inputData[ $first['name'] ];
+			}
+
+			return $passed_args[0];
+		}, $priority, 9999
+		);
+	}
 }
