@@ -18,6 +18,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes['th_core_user_login'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogin();
 	$nodes['th_core_user_logout'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogout();
 	$nodes['th_core_user_updated'] = new HotSource\TriggerHappy\Nodes\Triggers\UserUpdated();
+	$nodes['th_core_user_register'] = new HotSource\TriggerHappy\Nodes\Triggers\UserRegister();
 	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\Actions\CoreSendEmail();
 	$nodes['th_core_add_nav_menu_item'] = new HotSource\TriggerHappy\Nodes\Actions\AddNavMenuItem();
 
@@ -43,21 +44,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes['th_core_comment_created'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentCreated();
 	$nodes['th_core_comment_status_changed'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentStatus();
 
-	$nodes['th_core_user_register'] = [
-		'name'     => 'When a User profile is created',
-		'plugin'   => '',
-		'cat'      => 'Users',
-		'nodeType' => 'trigger',
-		'callback' => 'triggerhappy_action_hook',
-		'hook'     => 'user_register',
-
-		'description' => 'When a User Profile is created/registered',
-		'fields'      => [
-			triggerhappy_field( 'id', 'number', [ 'description' => 'The user ID', 'dir' => 'start' ] ),
-			triggerhappy_field( 'user', 'wp_user', [ 'description' => 'The user data', 'dir' => 'start' ] ),
-		],
-
-	];
 	$nodes['th_core_wp_redirect'] = [
 		'name'     => 'Redirect to URL',
 		'plugin'   => '',
