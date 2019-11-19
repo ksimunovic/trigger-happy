@@ -556,4 +556,18 @@ function deprecatedNodes() {
 			triggerhappy_field( 'post', 'wp_post', [ 'description' => 'The added comment', 'dir' => 'start' ] ),
 		],
 	];
+
+	$nodes['th_core_post_published'] = [
+		'name'     => 'When a Post is published',
+		'plugin'   => '',
+		'cat'      => 'Posts',
+		'nodeType' => 'trigger',
+		'callback' => 'triggerhappy_action_hook',
+		'hook'     => 'publish_post',
+		'description' => 'When a post is saved as Published',
+		'fields'      => [
+			triggerhappy_field( 'id', 'number', [ 'description' => 'The post ID', 'dir' => 'start' ] ),
+			triggerhappy_field( 'post', 'wp_post', [ 'description' => 'The saved post', 'dir' => 'start' ] ),
+		],
+	];
 }

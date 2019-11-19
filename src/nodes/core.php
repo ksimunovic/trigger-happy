@@ -22,6 +22,8 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes['th_core_timer'] = new HotSource\TriggerHappy\Nodes\Triggers\Timer();
 
 	// Posts
+	$nodes['th_core_post_saved'] = new HotSource\TriggerHappy\Nodes\Triggers\PostSaved();
+	$nodes['th_core_post_published'] = new HotSource\TriggerHappy\Nodes\Triggers\PostPublished();
 	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\Nodes\Actions\CorePostInsertHtml();
 	$nodes['th_core_create_post'] = new HotSource\TriggerHappy\Nodes\Actions\CoreCreatePost();
 
@@ -40,25 +42,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	// Comments
 	$nodes['th_core_comment_created'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentCreated();
 	$nodes['th_core_comment_status_changed'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentStatus();
-
-	// Posts
-	$nodes['th_core_post_saved'] = new HotSource\TriggerHappy\Nodes\Triggers\PostSaved();
-
-	$nodes['th_core_postpublished'] = [
-		'name'     => 'When a Post is published',
-		'plugin'   => '',
-		'cat'      => 'Posts',
-		'nodeType' => 'trigger',
-		'callback' => 'triggerhappy_action_hook',
-		'hook'     => 'publish_post',
-
-		'description' => 'When a post is saved as Published',
-		'fields'      => [
-			triggerhappy_field( 'id', 'number', [ 'description' => 'The post ID', 'dir' => 'start' ] ),
-			triggerhappy_field( 'post', 'wp_post', [ 'description' => 'The saved post', 'dir' => 'start' ] ),
-		],
-
-	];
 
 	$nodes['th_core_user_register'] = [
 		'name'     => 'When a User profile is created',
