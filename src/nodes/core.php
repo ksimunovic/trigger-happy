@@ -13,14 +13,16 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	$nodes = triggerhappy_load_core_nodes_advanced( $nodes );
 
-	// Wordpress
+	// WordPress
 	$nodes['th_core_timer'] = new HotSource\TriggerHappy\Nodes\Triggers\Timer();
+	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\Actions\CoreSendEmail();
+	$nodes['th_core_add_nav_menu_item'] = new HotSource\TriggerHappy\Nodes\Actions\AddNavMenuItem();
+
+	// Users
 	$nodes['th_core_user_login'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogin();
 	$nodes['th_core_user_logout'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogout();
 	$nodes['th_core_user_updated'] = new HotSource\TriggerHappy\Nodes\Triggers\UserUpdated();
 	$nodes['th_core_user_register'] = new HotSource\TriggerHappy\Nodes\Triggers\UserRegister();
-	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\Actions\CoreSendEmail();
-	$nodes['th_core_add_nav_menu_item'] = new HotSource\TriggerHappy\Nodes\Actions\AddNavMenuItem();
 
 	// Posts
 	$nodes['th_core_post_saved'] = new HotSource\TriggerHappy\Nodes\Triggers\PostSaved();

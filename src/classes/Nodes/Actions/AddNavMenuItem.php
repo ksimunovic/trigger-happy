@@ -15,7 +15,7 @@ class AddNavMenuItem extends CoreActionNode {
 		$this->name = 'Add Nav Menu Item';
 		$this->description = 'Adds a link to a navigation menu';
 		$this->plugin = '';
-		$this->cat = 'Wordpress';
+		$this->cat = 'WordPress';
 		$this->actionType = 'render';
 		$this->nodeType = $this->getNodeType();
 		$this->fields = $this->generateFields();
