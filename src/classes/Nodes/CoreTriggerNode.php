@@ -111,44 +111,8 @@ class CoreTriggerNode extends CoreNode {
 		add_action(
 			$hook, function () use ( $hook, $node, $context ) {
 
-			$args = [];
 			$passed_args = func_get_args();
-
-			// Remove empty string value func_get_args returns
-			$passed_args = ! empty( $passed_args[0] ) ? $passed_args : [];
-
-			if ( ! empty( $node->def ) ) {
-				$nodeDef = $node->def;
-			} else {
-				$nodeDef = $node;
-			}
-
-			if ( isset( $nodeDef->globals ) ) {
-				foreach ( $nodeDef->globals as $id => $key ) {
-					$args[ $id ] = $GLOBALS[ $key ];
-				}
-			}
-
-			$i = 0;
-			foreach ( $nodeDef->fields as $i => $field ) {
-				/** @var NodeField $field */
-				$field = $field->createFieldDefinition();
-				if ( $field['dir'] !== 'start' || isset( $args[ $field['name'] ] ) ) {
-					continue;
-				}
-
-				if ( isset( $passed_args[ $i ] ) ) {
-					$key = $field['name'];
-					$val = $passed_args[ $i ];
-					if ( is_numeric( $val ) && $field['type'] !== 'number' ) {
-						if ( has_filter( 'triggerhappy_resolve_' . $field['type'] . '_from_number' ) ) {
-							$val = apply_filters( 'triggerhappy_resolve_' . $field['type'] . '_from_number', $val );
-						}
-					}
-					$args[ $key ] = $val;
-				}
-				$i ++;
-			}
+			$args = $this->mergeArguments( $passed_args );
 
 			$node->setData( $context, $args );
 
@@ -174,27 +138,9 @@ class CoreTriggerNode extends CoreNode {
 
 		add_filter(
 			$filter, function () use ( $filter, &$node, $context ) {
-			$passed_args = func_get_args();
-			$start_fields = array_filter( $node->fields, function ( $arr_value ) {
-				return $arr_value->options['dir'] == 'start';
-			} );
-			$in_fields = array_filter( $node->fields, function ( $arr_value ) {
-				return $arr_value->options['dir'] == 'in';
-			} );
-			$args = [];
-			$start_fields = array_values( $start_fields );
-			foreach ( $passed_args as $i => $val ) {
-				if ( isset( $start_fields[ $i ] ) ) {
-					$key = $start_fields[ $i ]->name;
-					$args[ $key ] = $val;
-				}
-			}
 
-			if ( isset( $node->globals ) ) {
-				foreach ( $node->globals as $id => $key ) {
-					$args[ $id ] = $GLOBALS[ $key ];
-				}
-			}
+			$passed_args = func_get_args();
+			$args = $this->mergeArguments( $passed_args );
 
 			$node->setData( $context, $args );
 			if ( ! $node->canExecute( $context ) ) {
@@ -206,16 +152,57 @@ class CoreTriggerNode extends CoreNode {
 			$returnData = $node->next( $context, $args );
 
 			if ( $node->hasReturnData( $context ) ) {
-
 				return $node->getReturnData( $context );
 			}
-			$first = reset( $in_fields );
-			if ( isset( $inputData[ $first['name'] ] ) ) {
-				return $inputData[ $first['name'] ];
+
+			$inFields = array_filter( $node->fields, function ( $arr_value ) {
+				return $arr_value->options['dir'] == 'start';
+			} );
+
+			$first = reset( $inFields );
+			if ( isset( $inputData[ $first->name ] ) ) {
+				return $inputData[ $first->name ];
 			}
 
 			return $passed_args[0];
 		}, $priority, 9999
 		);
+	}
+
+	protected function mergeArguments( $passedArgs ) {
+		$args = [];
+
+		// Remove empty string value func_get_args returns
+		$passedArgs = ! empty( $passedArgs[0] ) ? $passedArgs : [];
+
+		if(!empty($passedArgs)){
+			$index = - 1;
+			foreach ( $this->fields as $fieldName => $field ) {
+				$index ++;
+
+				/** @var NodeField $field */
+				$fieldDef = $field->createFieldDefinition();
+
+				if ( isset( $passedArgs[ $index ] ) ) {
+					$value = $passedArgs[ $index ];
+				}
+
+				if ( is_numeric( $value ) && $fieldDef['type'] !== 'number' ) {
+					if ( has_filter( 'triggerhappy_resolve_' . $fieldDef['type'] . '_from_number' ) ) {
+						$value = apply_filters( 'triggerhappy_resolve_' . $fieldDef['type'] . '_from_number', $value );
+					}
+				}
+
+				$args[ $fieldName ] = $value;
+			}
+		}
+
+		if ( isset( $this->globals ) ) {
+			foreach ( $this->globals as $id => $key ) {
+				$args[ $id ] = $GLOBALS[ $key ];
+			}
+		}
+
+		return $args;
 	}
 }
