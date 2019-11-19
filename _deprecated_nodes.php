@@ -542,4 +542,18 @@ function deprecatedNodes() {
 			] ),
 		],
 	];
+
+	$nodes['th_core_postsaved'] = [
+		'name'        => 'When a Post is saved',
+		'plugin'      => '',
+		'cat'         => 'Posts',
+		'nodeType'    => 'trigger',
+		'callback'    => 'triggerhappy_action_hook',
+		'hook'        => 'save_post',
+		'description' => 'When a post is created or updated',
+		'fields'      => [
+			triggerhappy_field( 'ID', 'number', [ 'description' => 'The comment ID', 'dir' => 'start' ] ),
+			triggerhappy_field( 'post', 'wp_post', [ 'description' => 'The added comment', 'dir' => 'start' ] ),
+		],
+	];
 }

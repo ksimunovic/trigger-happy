@@ -41,21 +41,8 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes['th_core_comment_created'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentCreated();
 	$nodes['th_core_comment_status_changed'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentStatus();
 
-	$nodes['th_core_postsaved'] = [
-		'name'     => 'When a Post is saved',
-		'plugin'   => '',
-		'cat'      => 'Posts',
-		'nodeType' => 'trigger',
-		'callback' => 'triggerhappy_action_hook',
-		'hook'     => 'save_post',
-
-		'description' => 'When a post is created or updated',
-		'fields'      => [
-			triggerhappy_field( 'ID', 'number', [ 'description' => 'The comment ID', 'dir' => 'start' ] ),
-			triggerhappy_field( 'post', 'wp_post', [ 'description' => 'The added comment', 'dir' => 'start' ] ),
-		],
-
-	];
+	// Posts
+	$nodes['th_core_post_saved'] = new HotSource\TriggerHappy\Nodes\Triggers\PostSaved();
 
 	$nodes['th_core_postpublished'] = [
 		'name'     => 'When a Post is published',
