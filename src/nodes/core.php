@@ -14,30 +14,30 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes = triggerhappy_load_core_nodes_advanced( $nodes );
 
 	// Wordpress
-	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\Actions\CoreSendEmail();
-	$nodes['th_core_user_updated'] = new HotSource\TriggerHappy\Nodes\Triggers\UserUpdated();
+	$nodes['th_core_timer'] = new HotSource\TriggerHappy\Nodes\Triggers\Timer();
 	$nodes['th_core_user_login'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogin();
 	$nodes['th_core_user_logout'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogout();
+	$nodes['th_core_user_updated'] = new HotSource\TriggerHappy\Nodes\Triggers\UserUpdated();
+	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\Actions\CoreSendEmail();
 	$nodes['th_core_add_nav_menu_item'] = new HotSource\TriggerHappy\Nodes\Actions\AddNavMenuItem();
-	$nodes['th_core_timer'] = new HotSource\TriggerHappy\Nodes\Triggers\Timer();
 
 	// Posts
 	$nodes['th_core_post_saved'] = new HotSource\TriggerHappy\Nodes\Triggers\PostSaved();
 	$nodes['th_core_post_published'] = new HotSource\TriggerHappy\Nodes\Triggers\PostPublished();
-	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\Nodes\Actions\CorePostInsertHtml();
 	$nodes['th_core_create_post'] = new HotSource\TriggerHappy\Nodes\Actions\CoreCreatePost();
+	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\Nodes\Actions\CorePostInsertHtml();
 
 	// Sidebar
 	$nodes['th_core_insert_html_sidebar'] = new HotSource\TriggerHappy\Nodes\Actions\CoreSidebarInsertHtml();
 
 	// Queries
-	$nodes['th_core_single_post'] = new HotSource\TriggerHappy\Nodes\Triggers\CoreSinglePostViewed();
-	$nodes['th_core_single_post_query'] = new HotSource\TriggerHappy\Nodes\Triggers\CoreSinglePostQuery();
-	$nodes['th_core_set_query_param'] = new HotSource\TriggerHappy\Nodes\Actions\SetQueryParameter();
+	$nodes['th_core_any_url_query'] = new HotSource\TriggerHappy\Nodes\Triggers\AnyUrlQuery();
 	$nodes['th_core_archive_query'] = new HotSource\TriggerHappy\Nodes\Triggers\ArchiveQuery();
 	$nodes['th_core_category_query'] = new HotSource\TriggerHappy\Nodes\Triggers\CategoryQuery();
 	$nodes['th_core_taxonomy_query'] = new HotSource\TriggerHappy\Nodes\Triggers\TaxonomyQuery();
-	$nodes['th_core_any_url_query'] = new HotSource\TriggerHappy\Nodes\Triggers\AnyUrlQuery();
+	$nodes['th_core_single_post'] = new HotSource\TriggerHappy\Nodes\Triggers\CoreSinglePostViewed();
+	$nodes['th_core_single_post_query'] = new HotSource\TriggerHappy\Nodes\Triggers\CoreSinglePostQuery();
+	$nodes['th_core_set_query_param'] = new HotSource\TriggerHappy\Nodes\Actions\SetQueryParameter();
 
 	// Comments
 	$nodes['th_core_comment_created'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentCreated();
