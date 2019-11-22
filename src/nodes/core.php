@@ -27,6 +27,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes['th_core_user_updated'] = new HotSource\TriggerHappy\Nodes\Triggers\UserUpdated();
 	$nodes['th_core_user_register'] = new HotSource\TriggerHappy\Nodes\Triggers\UserRegister();
 	$nodes['th_core_filter_logged_in'] = new HotSource\TriggerHappy\Nodes\Conditions\LoggedIn();
+	$nodes['th_core_filter_not_logged_in'] = new HotSource\TriggerHappy\Nodes\Conditions\NotLoggedIn();
 
 	// Posts
 	$nodes['th_core_post_saved'] = new HotSource\TriggerHappy\Nodes\Triggers\PostSaved();
@@ -49,22 +50,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	// Comments
 	$nodes['th_core_comment_created'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentCreated();
 	$nodes['th_core_comment_status_changed'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentStatus();
-
-	$nodes['th_core_filter_not_logged_in'] = [
-		'name'        => 'If the user is not logged in',
-		'plugin'      => '',
-		'cat'         => 'Users',
-		'nodeType'    => 'condition',
-		'callback'    => 'triggerhappy_condition',
-		'fields'      => [],
-		'nodeFilters' => [
-			[
-
-				TH::Filter( TH::Expression( "_N.wp.is_user_logged_in" ), 'equals', false ),
-			],
-		],
-
-	];
 
 	return $nodes;
 }

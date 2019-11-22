@@ -638,4 +638,18 @@ function deprecatedNodes() {
 			],
 		],
 	];
+
+	$nodes['th_core_filter_not_logged_in'] = [
+		'name'        => 'If the user is not logged in',
+		'plugin'      => '',
+		'cat'         => 'Users',
+		'nodeType'    => 'condition',
+		'callback'    => 'triggerhappy_condition',
+		'fields'      => [],
+		'nodeFilters' => [
+			[
+				TH::Filter( TH::Expression( "_N.wp.is_user_logged_in" ), 'equals', false ),
+			],
+		],
+	];
 }
