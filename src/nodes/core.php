@@ -395,8 +395,8 @@ function triggerhappy_load_core_schema() {
 						'readonly'    => true,
 					],
 
-					'is_category' => [
-						'description' => 'Is a category archive page being displayed',
+					'is_archive' => [
+						'description' => 'Is archive page being displayed',
 						'type'        => 'boolean',
 						'readonly'    => true,
 					],
@@ -569,10 +569,6 @@ function triggerhappy_load_core_schema() {
 
 					'comment_author_ip' => [
 						'description' => 'The comment authors IP',
-						'type'        => 'string',
-					],
-					'comment_date'      => [
-						'description' => 'The date the comment was created (in server\'s timezone)',
 						'type'        => 'string',
 					],
 					'comment_date'      => [
