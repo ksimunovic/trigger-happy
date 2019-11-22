@@ -17,6 +17,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes['th_core_timer'] = new HotSource\TriggerHappy\Nodes\Triggers\Timer();
 	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\Actions\CoreSendEmail();
 	$nodes['th_core_add_nav_menu_item'] = new HotSource\TriggerHappy\Nodes\Actions\AddNavMenuItem();
+	$nodes['th_core_wp_redirect'] = new HotSource\TriggerHappy\Nodes\Actions\Redirect();
 
 	// Users
 	$nodes['th_core_user_login'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogin();
@@ -45,18 +46,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	// Comments
 	$nodes['th_core_comment_created'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentCreated();
 	$nodes['th_core_comment_status_changed'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentStatus();
-
-	$nodes['th_core_wp_redirect'] = [
-		'name'     => 'Redirect to URL',
-		'plugin'   => '',
-		'cat'      => 'WordPress',
-		'nodeType' => 'action',
-		'callback' => 'triggerhappy_wp_redirect',
-		'fields'   => [
-			triggerhappy_field( 'url', 'array' ),
-		],
-	];
-
 
 	$nodes['th_core_wp_logout'] = [
 		'name'        => 'Logout the current user',

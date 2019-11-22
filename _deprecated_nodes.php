@@ -584,4 +584,15 @@ function deprecatedNodes() {
 			triggerhappy_field( 'user', 'wp_user', [ 'description' => 'The user data', 'dir' => 'start' ] ),
 		],
 	];
+
+	$nodes['th_core_wp_redirect'] = [
+		'name'     => 'Redirect to URL',
+		'plugin'   => '',
+		'cat'      => 'WordPress',
+		'nodeType' => 'action',
+		'callback' => 'triggerhappy_wp_redirect',
+		'fields'   => [
+			triggerhappy_field( 'url', 'array' ),
+		],
+	];
 }
