@@ -15,6 +15,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	// WordPress
 	$nodes['th_core_timer'] = new HotSource\TriggerHappy\Nodes\Triggers\Timer();
+	$nodes['th_core_wp_login'] = new HotSource\TriggerHappy\Nodes\Actions\Login();
 	$nodes['th_core_wp_logout'] = new HotSource\TriggerHappy\Nodes\Actions\Logout();
 	$nodes['th_core_wp_redirect'] = new HotSource\TriggerHappy\Nodes\Actions\Redirect();
 	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\Actions\CoreSendEmail();
@@ -47,26 +48,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	// Comments
 	$nodes['th_core_comment_created'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentCreated();
 	$nodes['th_core_comment_status_changed'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentStatus();
-
-	$nodes['th_core_wp_login'] = [
-		'name'        => 'Log in as user',
-		'description' => 'Logs in as the specified user',
-		'plugin'      => '',
-		'cat'         => 'WordPress',
-		'nodeType'    => 'action',
-		'callback'    => 'triggerhappy_wp_login',
-		'fields'      => [
-			triggerhappy_field( 'username', 'string', [
-				'label'       => 'User Name',
-				'description' => 'The user name of the user to log in as',
-			] ),
-			triggerhappy_field( 'password', 'string', [
-				'label'       => 'Password',
-				'description' => 'The password to use when logging in ',
-			] ),
-		],
-	];
-
 
 	$nodes['th_core_filter_logged_in'] = [
 		'name'        => 'If the user is logged in',

@@ -605,4 +605,23 @@ function deprecatedNodes() {
 		'callback'    => 'triggerhappy_wp_logout',
 		'fields'      => [],
 	];
+
+	$nodes['th_core_wp_login'] = [
+		'name'        => 'Log in as user',
+		'description' => 'Logs in as the specified user',
+		'plugin'      => '',
+		'cat'         => 'WordPress',
+		'nodeType'    => 'action',
+		'callback'    => 'triggerhappy_wp_login',
+		'fields'      => [
+			triggerhappy_field( 'username', 'string', [
+				'label'       => 'User Name',
+				'description' => 'The user name of the user to log in as',
+			] ),
+			triggerhappy_field( 'password', 'string', [
+				'label'       => 'Password',
+				'description' => 'The password to use when logging in ',
+			] ),
+		],
+	];
 }
