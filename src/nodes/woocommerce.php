@@ -4,38 +4,8 @@ include( dirname( __FILE__ ) . "/functions/woocommerce_functions.php" );
 function triggerhappy_load_woocommerce_nodes( $nodes ) {
 
 	$nodes['th_woocommerce_get_price_html'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\GetPriceHtml();
+	$nodes['th_woocommerce_create_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\CreateProduct();
 
-	$nodes['th_woocommerce_create_product'] = [
-		'name'        => 'Create a new product',
-		'plugin'      => 'woocommerce',
-		'nodeType'    => 'action',
-		'description' => 'Creates (or updates) a product',
-		'cat'         => 'Products',
-		'callback'    => 'triggerhappy_woocommerce_create_product',
-		'fields'      => [
-			triggerhappy_field( 'id', 'string', [
-				'label'       => 'Product ID',
-				'description' => 'Specify the product ID to update an existing product. Leave blank to create a new product',
-				'dir'         => 'in',
-			] ),
-			triggerhappy_field( 'name', 'string', [
-				'label' => 'Product Name',
-				'dir'   => 'in',
-			] ),
-			triggerhappy_field( 'description', 'html', [
-				'label' => 'Description',
-				'dir'   => 'in',
-			] ),
-			triggerhappy_field( 'price', 'number', [
-				'label' => 'Price',
-				'dir'   => 'in',
-			] ),
-			triggerhappy_field( 'stock_quantity', 'number', [
-				'label' => 'Stock Quantity',
-				'dir'   => 'in',
-			] ),
-		],
-	];
 	$nodes['th_woocommerce_single_product'] = [
 		'description' => 'When a single product is being viewed on the front-end',
 		'name'        => 'When a Single Product is viewed',

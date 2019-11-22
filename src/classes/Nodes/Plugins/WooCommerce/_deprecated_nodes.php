@@ -16,5 +16,37 @@ function deprecatedNodes() {
 		],
 		'callback'    => 'triggerhappy_filter_hook',
 	];
-	
+
+	$nodes['th_woocommerce_create_product'] = [
+		'name'        => 'Create a new product',
+		'plugin'      => 'woocommerce',
+		'nodeType'    => 'action',
+		'description' => 'Creates (or updates) a product',
+		'cat'         => 'Products',
+		'callback'    => 'triggerhappy_woocommerce_create_product',
+		'fields'      => [
+			triggerhappy_field( 'id', 'string', [
+				'label'       => 'Product ID',
+				'description' => 'Specify the product ID to update an existing product. Leave blank to create a new product',
+				'dir'         => 'in',
+			] ),
+			triggerhappy_field( 'name', 'string', [
+				'label' => 'Product Name',
+				'dir'   => 'in',
+			] ),
+			triggerhappy_field( 'description', 'html', [
+				'label' => 'Description',
+				'dir'   => 'in',
+			] ),
+			triggerhappy_field( 'price', 'number', [
+				'label' => 'Price',
+				'dir'   => 'in',
+			] ),
+			triggerhappy_field( 'stock_quantity', 'number', [
+				'label' => 'Stock Quantity',
+				'dir'   => 'in',
+			] ),
+		],
+	];
+
 }
