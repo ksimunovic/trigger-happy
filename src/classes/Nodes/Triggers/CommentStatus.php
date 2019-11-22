@@ -18,7 +18,7 @@ class CommentStatus extends CoreTriggerNode {
 		$this->nodeType = $this->getNodeType();
 		$this->fields = $this->generateFields();
 		$this->hook = 'wp_set_comment_status';
-		$this->callback = 'triggerhappy_filter_hook';
+		$this->callback = 'triggerhappy_action_hook';
 	}
 
 	/**
@@ -45,6 +45,6 @@ class CommentStatus extends CoreTriggerNode {
 	 * @return void|null
 	 */
 	public function runCallback( $node, $context, $data = null ) {
-		$this->filterHook( $node, $context );
+		$this->actionHook( $node, $context );
 	}
 }
