@@ -3,21 +3,8 @@ include( dirname( __FILE__ ) . "/functions/woocommerce_functions.php" );
 
 function triggerhappy_load_woocommerce_nodes( $nodes ) {
 
+	$nodes['th_woocommerce_get_price_html'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\GetPriceHtml();
 
-	$nodes['th_woocommerce_get_price_html'] = [
-		'description' => 'Modify the product price before it is displayed',
-		'name'        => 'Product Price',
-		'plugin'      => 'woocommerce',
-		'nodeType'    => 'trigger',
-		'cat'         => 'woocommerce',
-		'fields'      => [
-
-			triggerhappy_field( 'price', 'html', [ 'dir' => 'start' ] ),
-			triggerhappy_field( 'product', 'wc_product', [ 'dir' => 'start' ] ),
-
-		],
-		'callback'    => 'triggerhappy_filter_hook',
-	];
 	$nodes['th_woocommerce_create_product'] = [
 		'name'        => 'Create a new product',
 		'plugin'      => 'woocommerce',
