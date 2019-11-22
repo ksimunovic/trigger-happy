@@ -49,4 +49,25 @@ function deprecatedNodes() {
 		],
 	];
 
+
+	$nodes['th_woocommerce_single_product'] = [
+		'description' => 'When a single product is being viewed on the front-end',
+		'name'        => 'When a Single Product is viewed',
+		'plugin'      => '',
+		'triggerType' => 'product_render',
+		'nodeType'    => 'trigger',
+		'hook'        => 'template_redirect',
+		'callback'    => 'triggerhappy_action_hook',
+		'cat'         => 'Front-end - WooCommerce',
+		'globals'     => [ 'post' => 'post' ],
+		'fields'      => [
+			triggerhappy_field( 'post', 'wp_post', [ 'dir' => 'start' ] ),
+		],
+		'nodeFilters' => [
+			[
+				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_single" ), 'equals', true ),
+				TH::Filter( TH::Expression( "_N.wpPageFunctions.get_post_type" ), 'equals', 'product' ),
+			],
+		],
+	];
 }

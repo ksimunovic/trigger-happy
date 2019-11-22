@@ -4,28 +4,9 @@ include( dirname( __FILE__ ) . "/functions/woocommerce_functions.php" );
 function triggerhappy_load_woocommerce_nodes( $nodes ) {
 
 	$nodes['th_woocommerce_get_price_html'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\GetPriceHtml();
+	$nodes['th_woocommerce_single_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\SingleProduct();
 	$nodes['th_woocommerce_create_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\CreateProduct();
 
-	$nodes['th_woocommerce_single_product'] = [
-		'description' => 'When a single product is being viewed on the front-end',
-		'name'        => 'When a Single Product is viewed',
-		'plugin'      => '',
-		'triggerType' => 'product_render',
-		'nodeType'    => 'trigger',
-		'hook'        => 'template_redirect',
-		'callback'    => 'triggerhappy_action_hook',
-		'cat'         => 'Front-end - WooCommerce',
-		'globals'     => [ 'post' => 'post' ],
-		'fields'      => [
-			triggerhappy_field( 'post', 'wp_post', [ 'dir' => 'start' ] ),
-		],
-		'nodeFilters' => [
-			[
-				TH::Filter( TH::Expression( "_N.wpPageFunctions.is_single" ), 'equals', true ),
-				TH::Filter( TH::Expression( "_N.wpPageFunctions.get_post_type" ), 'equals', 'product' ),
-			],
-		],
-	];
 	$nodes['th_woocommerce_insert_html_single_product'] = [
 		'description' => 'Add content to a single product page',
 		'name'        => 'Add HTML to Single Product template',
