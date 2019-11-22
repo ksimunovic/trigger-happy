@@ -595,4 +595,14 @@ function deprecatedNodes() {
 			triggerhappy_field( 'url', 'array' ),
 		],
 	];
+
+	$nodes['th_core_wp_logout'] = [
+		'name'        => 'Logout the current user',
+		'description' => 'Forces the user to log out',
+		'plugin'      => '',
+		'cat'         => 'WordPress',
+		'nodeType'    => 'action',
+		'callback'    => 'triggerhappy_wp_logout',
+		'fields'      => [],
+	];
 }

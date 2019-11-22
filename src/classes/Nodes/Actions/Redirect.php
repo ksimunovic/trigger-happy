@@ -8,7 +8,7 @@ use HotSource\TriggerHappy\Nodes\CoreActionNode;
 class Redirect extends CoreActionNode {
 
 	/**
-	 * Timer constructor.
+	 * Redirect constructor.
 	 */
 	public function __construct() {
 		$this->name = 'Redirect to URL';
