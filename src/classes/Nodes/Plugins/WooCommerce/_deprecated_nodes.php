@@ -198,4 +198,26 @@ function deprecatedNodes() {
 
 		],
 	];
+
+	$nodes['th_wc_add_notice'] = [
+		'name'          => 'Add WooCommerce Notice',
+		'plugin'        => 'woocommerce',
+		'nodeType'      => 'action',
+		'description'   => 'Add a WooCommerce notice message',
+		'cat'           => 'woocommerce',
+		'callback'      => 'triggerhappy_function_call',
+		'function'      => 'wc_add_notice',
+		'function_args' => [ 'notice', 'notice_type' ],
+		'fields'        => [
+
+			triggerhappy_field( 'notice_type', 'wc_notice_type', [
+				'label'       => 'Notice Type',
+				'description' => 'The type of notice',
+			] ),
+			triggerhappy_field( 'notice', 'html', [
+				'label'       => 'Content',
+				'description' => 'The message to be displayed',
+			] ),
+		],
+	];
 }

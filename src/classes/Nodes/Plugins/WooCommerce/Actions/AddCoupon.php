@@ -15,7 +15,7 @@ class AddCoupon extends CoreActionNode {
 		$this->name = 'Create a new coupon';
 		$this->description = 'Create coupon';
 		$this->plugin = 'WooCommerce';
-		$this->cat = 'Products';
+		$this->cat = 'WooCommerce';
 		$this->callback = 'triggerhappy_wc_add_coupon';
 		$this->nodeType = $this->getNodeType();
 		$this->fields = $this->generateFields();
