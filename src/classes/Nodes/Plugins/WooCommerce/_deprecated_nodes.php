@@ -135,4 +135,23 @@ function deprecatedNodes() {
 		],
 		'callback'    => 'triggerhappy_woocommerce_output_html_single_product',
 	];
+
+	$nodes['th_woocommerce_checkout_fields'] = [
+		'name'        => 'When Rendering Checkout Fields',
+		'description' => 'When displaying the checkout fields',
+		'plugin'      => 'woocommerce',
+		'nodeType'    => 'trigger',
+		'hook'        => 'woocommerce_checkout_fields',
+		'cat'         => 'woocommerce',
+		'callback'    => 'triggerhappy_filter_hook',
+		'fields'      => [
+			triggerhappy_field(
+				'fields', 'array', [
+					'argIndex' => 0,
+					'dir'      => 'out',
+				]
+
+			),
+		],
+	];
 }
