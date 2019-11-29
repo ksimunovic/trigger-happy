@@ -245,4 +245,21 @@ function deprecatedNodes() {
 
 		],
 	];
+
+	$nodes['th_woocommerce_wc_order_created'] = [
+		'name'        => 'Order Created',
+		'description' => 'When an order is created',
+		'cat'         => 'woocommerce',
+		'plugin'      => 'woocommerce',
+		'nodeType'    => 'trigger',
+		'hook'        => 'woocommerce_thankyou',
+		'callback'    => 'triggerhappy_action_hook',
+		'fields'      => [
+			triggerhappy_field(
+				'order', 'wc_order', [
+					'dir' => 'start',
+				]
+			),
+		],
+	];
 }
