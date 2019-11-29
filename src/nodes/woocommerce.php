@@ -1,5 +1,4 @@
 <?php
-include( dirname( __FILE__ ) . "/functions/woocommerce_functions.php" );
 
 function triggerhappy_load_woocommerce_nodes( $nodes ) {
 
