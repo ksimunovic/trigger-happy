@@ -6,6 +6,7 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 	$nodes['th_woocommerce_get_price_html'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\GetPriceHtml();
 	$nodes['th_woocommerce_single_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\SingleProduct();
 	$nodes['th_woocommerce_calculate_fees'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\CalculateFees();
+	$nodes['th_woocommerce_quantity_input_args'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\QuantityInputArgs();
 	$nodes['th_woocommerce_before_checkout_form'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\BeforeCheckoutForm();
 	$nodes['th_woocommerce_checkout_fields'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\CheckoutFieldsRendering();
 	$nodes['th_woocommerce_add_notice'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\AddNotice();
@@ -13,31 +14,6 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 	$nodes['th_woocommerce_create_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\CreateProduct();
 	$nodes['th_woocommerce_insert_html_single_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\InsertHtmlSingleProduct();
 
-	$nodes['th_woocommerce_quantity_input_args'] = [
-		'name'        => 'Quantity Input Args',
-		'plugin'      => 'woocommerce',
-		'nodeType'    => 'trigger',
-		'description' => 'Adjust quantity input values',
-		'hook'        => 'woocommerce_quantity_input_args',
-		'cat'         => 'woocommerce',
-		'callback'    => 'triggerhappy_filter_hook',
-		'resultLabel' => 'Input Args Result',
-		'resultDesc'  => 'Updated quantity input args',
-		'fields'      => [
-
-			triggerhappy_field(
-				'args', 'wc_quantity_input_args', [
-					'dir' => 'start',
-				]
-			),
-			triggerhappy_field(
-				'product', 'wc_product', [
-					'dir' => 'start',
-				]
-			),
-
-		],
-	];
 	$nodes['th_woocommerce_wc_order_created'] = [
 		'name'        => 'Order Created',
 		'description' => 'When an order is created',

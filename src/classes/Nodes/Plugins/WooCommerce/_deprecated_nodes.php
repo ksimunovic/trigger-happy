@@ -220,4 +220,29 @@ function deprecatedNodes() {
 			] ),
 		],
 	];
+
+	$nodes['th_woocommerce_quantity_input_args'] = [
+		'name'        => 'Quantity Input Args',
+		'plugin'      => 'woocommerce',
+		'nodeType'    => 'trigger',
+		'description' => 'Adjust quantity input values',
+		'hook'        => 'woocommerce_quantity_input_args',
+		'cat'         => 'woocommerce',
+		'callback'    => 'triggerhappy_filter_hook',
+		'resultLabel' => 'Input Args Result',
+		'resultDesc'  => 'Updated quantity input args',
+		'fields'      => [
+			triggerhappy_field(
+				'args', 'wc_quantity_input_args', [
+					'dir' => 'start',
+				]
+			),
+			triggerhappy_field(
+				'product', 'wc_product', [
+					'dir' => 'start',
+				]
+			),
+
+		],
+	];
 }
