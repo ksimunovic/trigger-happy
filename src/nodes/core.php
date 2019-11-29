@@ -1,6 +1,5 @@
 <?php
 include( dirname( __FILE__ ) . "/functions/core_functions.php" );
-include( dirname( __FILE__ ) . "/core_advanced.php" );
 
 require_once( dirname( __FILE__ ) . '/../classes/Psr4AutoloaderClass.php' );
 
@@ -11,7 +10,7 @@ $loader->addNamespace( 'HotSource\TriggerHappy', 'D:/_htdocs/hotsource/content/p
 
 function triggerhappy_load_core_nodes( $nodes ) {
 
-	$nodes = triggerhappy_load_core_nodes_advanced( $nodes );
+	$nodes = [];
 
 	// WordPress
 	$nodes['th_core_timer'] = new HotSource\TriggerHappy\Nodes\Triggers\Timer();
