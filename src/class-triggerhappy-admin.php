@@ -136,8 +136,6 @@ class TriggerHappyAdmin {
 	 * Add Trigger Happy CSS to TinyMCE
 	 */
 	public function add_editor_style() {
-
 		add_editor_style( plugins_url( 'assets/expression.css', dirname( __FILE__ ) ) );
 	}
-
 }
