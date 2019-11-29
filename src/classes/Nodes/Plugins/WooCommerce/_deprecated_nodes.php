@@ -165,4 +165,22 @@ function deprecatedNodes() {
 		'callback'    => 'triggerhappy_action_hook',
 		'fields'      => [],
 	];
+
+	$nodes['th_wc_add_coupon'] = [
+		'description' => 'Create a new coupon',
+		'name'        => 'Create coupon',
+		'plugin'      => 'woocommerce',
+		'nodeType'    => 'action',
+		'callback'    => 'triggerhappy_wc_add_coupon',
+		'cat'         => 'woocommerce',
+		'fields'      => [
+
+			triggerhappy_field( 'code', 'string' ),
+			triggerhappy_field( 'code', 'string' ),
+			triggerhappy_field( 'discount_type', 'string', [
+				'choices' => triggerhappy_assoc_to_choices( wc_get_coupon_types() ),
+			] ),
+			triggerhappy_field( 'amount', 'number' ),
+		],
+	];
 }

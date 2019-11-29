@@ -7,26 +7,10 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 	$nodes['th_woocommerce_single_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\SingleProduct();
 	$nodes['th_woocommerce_before_checkout_form'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\BeforeCheckoutForm();
 	$nodes['th_woocommerce_checkout_fields'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\CheckoutFieldsRendering();
+	$nodes['th_woocommerce_add_coupon'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\AddCoupon();
 	$nodes['th_woocommerce_create_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\CreateProduct();
 	$nodes['th_woocommerce_insert_html_single_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\InsertHtmlSingleProduct();
 
-	$nodes['th_wc_add_coupon'] = [
-		'description' => 'Create a new coupon',
-		'name'        => 'Create coupon',
-		'plugin'      => 'woocommerce',
-		'nodeType'    => 'action',
-		'callback'    => 'triggerhappy_wc_add_coupon',
-		'cat'         => 'woocommerce',
-		'fields'      => [
-
-			triggerhappy_field( 'code', 'string' ),
-			triggerhappy_field( 'code', 'string' ),
-			triggerhappy_field( 'discount_type', 'string', [
-				'choices' => triggerhappy_assoc_to_choices( wc_get_coupon_types() ),
-			] ),
-			triggerhappy_field( 'amount', 'number' ),
-		],
-	];
 
 	$nodes['th_wc_calculate_fees'] = [
 		'name'        => 'Calculate Fees',
