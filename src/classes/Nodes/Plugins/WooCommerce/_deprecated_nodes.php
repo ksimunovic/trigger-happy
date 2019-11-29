@@ -262,4 +262,27 @@ function deprecatedNodes() {
 			),
 		],
 	];
+
+	$nodes['th_woocommerce_wc_add_fee'] = [
+		'name'        => 'Add Fee',
+		'plugin'      => 'woocommerce',
+		'cat'         => 'woocommerce',
+		'nodeType'    => 'action',
+		'description' => 'Add a new fee to the order',
+		'callback'    => 'triggerhappy_wc_add_fee',
+		'fields'      => [
+			triggerhappy_field(
+				'fee', 'number', [
+					'label'       => 'Fee',
+					'description' => 'Enter the fee amount',
+				]
+			),
+			triggerhappy_field(
+				'description', 'string', [
+					'label'       => 'Description',
+					'description' => 'The description of the fee - will be shown on the order',
+				]
+			),
+		],
+	];
 }

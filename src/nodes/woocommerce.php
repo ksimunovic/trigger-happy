@@ -10,33 +10,11 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 	$nodes['th_woocommerce_quantity_input_args'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\QuantityInputArgs();
 	$nodes['th_woocommerce_before_checkout_form'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\BeforeCheckoutForm();
 	$nodes['th_woocommerce_checkout_fields'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\CheckoutFieldsRendering();
+	$nodes['th_woocommerce_wc_add_fee'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\AddFee();
 	$nodes['th_woocommerce_add_notice'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\AddNotice();
 	$nodes['th_woocommerce_add_coupon'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\AddCoupon();
 	$nodes['th_woocommerce_create_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\CreateProduct();
 	$nodes['th_woocommerce_insert_html_single_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\InsertHtmlSingleProduct();
-
-	$nodes['th_woocommerce_wc_add_fee'] = [
-		'name'        => 'Add Fee',
-		'plugin'      => 'woocommerce',
-		'cat'         => 'woocommerce',
-		'nodeType'    => 'action',
-		'description' => 'Add a new fee to the order',
-		'callback'    => 'triggerhappy_wc_add_fee',
-		'fields'      => [
-			triggerhappy_field(
-				'fee', 'number', [
-					'label'       => 'Fee',
-					'description' => 'Enter the fee amount',
-				]
-			),
-			triggerhappy_field(
-				'description', 'string', [
-					'label'       => 'Description',
-					'description' => 'The description of the fee - will be shown on the order',
-				]
-			),
-		],
-	];
 
 	return $nodes;
 }
