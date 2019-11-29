@@ -5,20 +5,11 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 
 	$nodes['th_woocommerce_get_price_html'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\GetPriceHtml();
 	$nodes['th_woocommerce_single_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\SingleProduct();
+	$nodes['th_woocommerce_before_checkout_form'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\BeforeCheckoutForm();
 	$nodes['th_woocommerce_checkout_fields'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\CheckoutFieldsRendering();
 	$nodes['th_woocommerce_create_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\CreateProduct();
 	$nodes['th_woocommerce_insert_html_single_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\InsertHtmlSingleProduct();
 
-	$nodes['th_woocommerce_before_checkout_form'] = [
-		'name'        => 'Before Checkout Form',
-		'plugin'      => 'woocommerce',
-		'nodeType'    => 'trigger',
-		'description' => 'Before the checkout form is displayed',
-		'hook'        => 'woocommerce_before_checkout_form',
-		'cat'         => 'woocommerce',
-		'callback'    => 'triggerhappy_action_hook',
-		'fields'      => [],
-	];
 	$nodes['th_wc_add_coupon'] = [
 		'description' => 'Create a new coupon',
 		'name'        => 'Create coupon',

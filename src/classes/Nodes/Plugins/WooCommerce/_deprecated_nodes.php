@@ -154,4 +154,15 @@ function deprecatedNodes() {
 			),
 		],
 	];
+
+	$nodes['th_woocommerce_before_checkout_form'] = [
+		'name'        => 'Before Checkout Form',
+		'plugin'      => 'woocommerce',
+		'nodeType'    => 'trigger',
+		'description' => 'Before the checkout form is displayed',
+		'hook'        => 'woocommerce_before_checkout_form',
+		'cat'         => 'woocommerce',
+		'callback'    => 'triggerhappy_action_hook',
+		'fields'      => [],
+	];
 }
