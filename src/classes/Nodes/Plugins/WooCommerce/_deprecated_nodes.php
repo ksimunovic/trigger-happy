@@ -183,4 +183,19 @@ function deprecatedNodes() {
 			triggerhappy_field( 'amount', 'number' ),
 		],
 	];
+
+	$nodes['th_wc_calculate_fees'] = [
+		'name'        => 'Calculate Fees',
+		'plugin'      => 'woocommerce',
+		'nodeType'    => 'trigger',
+		'description' => 'When calculating fees at checkout',
+		'hook'        => 'woocommerce_cart_calculate_fees',
+		'cat'         => 'woocommerce',
+		'callback'    => 'triggerhappy_action_hook',
+
+		'fields' => [
+			triggerhappy_field( 'cart', 'wc_cart', [ 'dir' => 'start' ] ),
+
+		],
+	];
 }
