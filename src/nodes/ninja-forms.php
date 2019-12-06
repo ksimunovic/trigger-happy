@@ -1,6 +1,6 @@
 <?php
 
-function triggerhappy_load_forms_nodes( $nodes ) {
+function triggerhappy_load_ninja_forms_nodes( $nodes ) {
 
 	$nodes['th_ninja_forms_after_submission'] = new HotSource\TriggerHappy\Nodes\Plugins\NinjaForms\Triggers\AfterSubmission();
 	$nodes['th_ninja_forms_display_form'] = new HotSource\TriggerHappy\Nodes\Plugins\NinjaForms\Actions\DisplayForm();
@@ -8,7 +8,7 @@ function triggerhappy_load_forms_nodes( $nodes ) {
 	return $nodes;
 }
 
-function triggerhappy_load_forms_schema() {
+function triggerhappy_load_ninja_forms_schema() {
 	triggerhappy_register_value_type(
 		'nf_form_id', 'number', function () {
 		$data = [];
@@ -25,5 +25,5 @@ function triggerhappy_load_forms_schema() {
 	} );
 }
 
-add_filter( 'triggerhappy_nodes', 'triggerhappy_load_forms_nodes' );
-add_action( 'triggerhappy_schema', 'triggerhappy_load_forms_schema' );
+add_filter( 'triggerhappy_nodes', 'triggerhappy_load_ninja_forms_nodes' );
+add_action( 'triggerhappy_schema', 'triggerhappy_load_ninja_forms_schema' );

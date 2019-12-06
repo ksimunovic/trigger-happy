@@ -198,7 +198,10 @@ class TriggerHappy {
 			require_once( dirname( __FILE__ ) . '/nodes/woocommerce.php' );
 		}
 		if ( function_exists( 'Ninja_Forms' ) ) {
-			require_once( dirname( __FILE__ ) . '/nodes/forms.php' );
+			require_once( dirname( __FILE__ ) . '/nodes/ninja-forms.php' );
+		}
+		if ( class_exists( 'GFCommon' ) ) {
+			require_once( dirname( __FILE__ ) . '/nodes/gravity-forms.php' );
 		}
 	}
 
