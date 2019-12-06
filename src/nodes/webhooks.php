@@ -1,8 +1,9 @@
 <?php
 
-
 function triggerhappy_load_webhook_nodes( $nodes ) {
 
+	$nodes['th_webhook_receive_generic'] = new \HotSource\TriggerHappy\Nodes\Triggers\WebhookReceive();
+	$nodes['th_webhook_send_post'] = new \HotSource\TriggerHappy\Nodes\Actions\WebhookSend();
 
 	$nodes['th_webhook_send'] = [
 		'name'        => 'Send IFTTT Webhook',
@@ -78,69 +79,10 @@ function triggerhappy_load_webhook_nodes( $nodes ) {
 		],
 	];
 
-	$nodes['th_webhook_send_post'] = [
-		'name'        => 'Send POST Webhook',
-		'plugin'      => '',
-		'nodeType'    => 'action',
-		'description' => 'Sends a webhook request to a specified URL',
-		'cat'         => 'Webhooks',
-		'callback'    => 'triggerhappy_webhook_send',
-		'fields'      => [
-
-			triggerhappy_field(
-				'url', 'string', [
-					'label'       => 'Webhook URL',
-					'description' => 'What is the URL of the Webhook?',
-					'dir'         => 'in',
-				]
-			),
-			triggerhappy_field(
-				'payload', 'array', [
-					'label' => 'The Webhook Payload to send',
-					'dir'   => 'in',
-				]
-			),
-		],
-	];
-
-	$nodes['th_webhook_receive_generic'] = [
-		'name'        => 'When Webhook Received',
-		'plugin'      => '',
-		'nodeType'    => 'trigger',
-		'description' => 'When a webhook is received',
-		'cat'         => 'Webhooks',
-		'callback'    => 'triggerhappy_webhook_receive',
-		'fields'      => [
-			triggerhappy_field(
-				'webhook_name', 'string', [
-					'label'       => 'Event Name',
-					'description' => 'Webhook will be available at ' . get_site_url() . "/?thwebhook=[eventname]",
-					'dir'         => 'in',
-				]
-			),
-			triggerhappy_field(
-				'payload', 'array', [
-					'label' => 'Payload (JSON)',
-					'dir'   => 'start',
-				]
-			),
-			triggerhappy_field(
-				'payload_post', 'array', [
-					'label' => 'Payload (POST)',
-					'dir'   => 'start',
-				]
-			),
-
-		],
-	];
-
 	return $nodes;
-
-
 }
 
 add_filter( 'triggerhappy_nodes', 'triggerhappy_load_webhook_nodes' );
-
 
 function triggerhappy_webhook_send_ifttt( $node, $context ) {
 	$data = $node->getInputData( $context );
@@ -168,48 +110,5 @@ function triggerhappy_webhook_receive_ifttt( $node, $context ) {
 			exit;
 		}
 	} );
-
-
 }
 
-
-function triggerhappy_webhook_receive( $node, $context ) {
-	$data = $node->getInputData( $context );
-	add_action( 'wp', function () use ( $data, $node, $context ) {
-		if ( isset( $_GET['thwebhook'] ) && $_GET['thwebhook'] == $data['webhook_name'] ) {
-			$entityBody = file_get_contents( 'php://input' );
-			$parsedBody = json_decode( $entityBody );
-			$node->next( $context, [
-				'payload'      => $parsedBody,
-				'payload_raw'  => $entityBody,
-				'payload_post' => $_POST,
-			] );
-			exit;
-		}
-	} );
-}
-
-
-function triggerhappy_webhook_send( $node, $context ) {
-	$data = $node->getInputData( $context );
-	$payload = $data['payload'];
-	if ( is_object( $payload ) ) {
-		$className = get_class( $payload );
-		$payload = apply_filters( "triggerhappy_to_json__" . $className, $payload );
-	}
-	wp_remote_post( $data['url'], [
-		'headers' => [ 'Content-Type' => 'application/json; charset=utf-8' ],
-		'body'    => json_encode( $data['payload'] ),
-	] );
-}
-
-add_action( 'wp', function () {
-
-	if ( isset( $_GET['th_webhook_auth'] ) ) {
-		file_put_contents( dirname( __FILE__ ) . "/test.txt", "WERWERWER" );
-		header( "HTTP/1.1 404 Not Found - " . $_GET['th_webhook_auth'] );
-		print_r( $_GET['th_webhook_auth'] );
-		echo "DONE";
-		exit;
-	}
-} );
