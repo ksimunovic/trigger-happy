@@ -58,6 +58,7 @@ class TriggerHappyFlow {
 				$object->initializeNode( $node, $this );
 				$this->addNode( $object );
 			} else {
+				throw new \RuntimeException( "Deprecated node type '{$node->type	}'." );
 				$flowNode = new TriggerHappyNode( $node->nid, $node->type, $this );
 				if ( isset( $node->filters ) && ! empty( $node->filters ) && ! empty( $node->filters[0] ) ) {
 					$flowNode->setFilters( $node->filters );
