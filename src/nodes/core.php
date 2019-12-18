@@ -52,6 +52,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	// Products
 	$nodes['th_core_product_created'] = new \HotSource\TriggerHappy\Nodes\Triggers\ProductCreated();
+	$nodes['th_core_product_updated'] = new \HotSource\TriggerHappy\Nodes\Triggers\ProductUpdated();
 
 	return $nodes;
 }
