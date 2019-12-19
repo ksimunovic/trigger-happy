@@ -358,7 +358,7 @@ function triggerhappy_load_core_schema() {
 			'properties' =>
 				[
 					'is_single'            => [
-						'description' => 'Is a single → being displayed (any post type, not included Pages)',
+						'description' => 'Is a single post being displayed (any post type, not included Pages)',
 						'type'        => 'boolean',
 						'readonly'    => true,
 					],
