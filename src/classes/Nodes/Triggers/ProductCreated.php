@@ -18,7 +18,8 @@ class ProductCreated extends CoreTriggerNode {
 		$this->callback = 'triggerhappy_action_hook';
 		$this->nodeFilters = [
 			[
-				TH::Filter( TH::Expression( "_N1.post.post_date" ), 'equals', TH::Expression( "_N1.post.post_modified" ) )
+				TH::Filter( TH::Expression( "_N1.post.post_date" ), 'equals', TH::Expression( "_N1.post.post_modified" ) ),
+				TH::Filter( TH::Expression( "_N1.post.post_status" ), 'equals', 'publish' )
 			],
 		];
 	}
