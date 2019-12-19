@@ -50,11 +50,6 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes['th_core_comment_created'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentCreated();
 	$nodes['th_core_comment_status_changed'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentStatus();
 
-	// Products
-	$nodes['th_core_product_created'] = new \HotSource\TriggerHappy\Nodes\Triggers\ProductCreated();
-	$nodes['th_core_product_updated'] = new \HotSource\TriggerHappy\Nodes\Triggers\ProductUpdated();
-	$nodes['th_core_product_stock_updated'] = new \HotSource\TriggerHappy\Nodes\Triggers\ProductStockUpdated();
-
 	return $nodes;
 }
 
