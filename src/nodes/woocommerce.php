@@ -20,7 +20,6 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 	$nodes['th_woocommerce_product_stock_updated'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\ProductStockUpdated();
 	$nodes['th_woocommerce_product_add_to_cart'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\ProductAddedToCart();
 
-
 	// Customer triggers
 	$nodes['th_woocommerce_customer_created'] = new \HotSource\TriggerHappy\Nodes\Triggers\CustomerCreated();
 	$nodes['th_woocommerce_customer_updated'] = new \HotSource\TriggerHappy\Nodes\Triggers\CustomerUpdated();
@@ -29,6 +28,7 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 	$nodes['th_woocommerce_wc_order_created'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\OrderCreated();
 	$nodes['th_woocommerce_wc_order_updated'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\OrderUpdated();
 	$nodes['th_woocommerce_wc_order_paid'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\OrderPaid();
+	$nodes['th_woocommerce_wc_order_status_changed'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\OrderStatusChanged();
 
 	return $nodes;
 }
