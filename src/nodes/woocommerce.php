@@ -22,6 +22,7 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 
 	// Customer triggers
 	$nodes['th_woocommerce_customer_created'] = new \HotSource\TriggerHappy\Nodes\Triggers\CustomerCreated();
+	$nodes['th_woocommerce_customer_updated'] = new \HotSource\TriggerHappy\Nodes\Triggers\CustomerUpdated();
 
 
 	return $nodes;
