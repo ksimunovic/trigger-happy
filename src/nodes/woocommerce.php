@@ -5,8 +5,6 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 	$nodes['th_woocommerce_get_price_html'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\GetPriceHtml();
 	$nodes['th_woocommerce_single_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\SingleProduct();
 	$nodes['th_woocommerce_calculate_fees'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\CalculateFees();
-	$nodes['th_woocommerce_wc_order_created'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\OrderCreated();
-	$nodes['th_woocommerce_wc_order_updated'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\OrderUpdated();
 	$nodes['th_woocommerce_quantity_input_args'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\QuantityInputArgs();
 	$nodes['th_woocommerce_before_checkout_form'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\BeforeCheckoutForm();
 	$nodes['th_woocommerce_checkout_fields'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\CheckoutFieldsRendering();
@@ -25,6 +23,10 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 	$nodes['th_woocommerce_customer_created'] = new \HotSource\TriggerHappy\Nodes\Triggers\CustomerCreated();
 	$nodes['th_woocommerce_customer_updated'] = new \HotSource\TriggerHappy\Nodes\Triggers\CustomerUpdated();
 
+	// Order triggers
+	$nodes['th_woocommerce_wc_order_created'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\OrderCreated();
+	$nodes['th_woocommerce_wc_order_updated'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\OrderUpdated();
+	$nodes['th_woocommerce_wc_order_paid'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\OrderPaid();
 
 	return $nodes;
 }
