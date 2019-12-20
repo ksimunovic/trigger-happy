@@ -1,6 +1,6 @@
 <?php
 
-namespace HotSource\TriggerHappy\Nodes\Triggers;
+namespace HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers;
 
 use HotSource\TriggerHappy\NodeField;
 use HotSource\TriggerHappy\Nodes\CoreNode;

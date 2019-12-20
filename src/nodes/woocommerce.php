@@ -15,9 +15,11 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 	$nodes['th_woocommerce_insert_html_single_product'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Actions\InsertHtmlSingleProduct();
 
 	// Product triggers
-	$nodes['th_woocommerce_product_created'] = new \HotSource\TriggerHappy\Nodes\Triggers\ProductCreated();
-	$nodes['th_woocommerce_product_updated'] = new \HotSource\TriggerHappy\Nodes\Triggers\ProductUpdated();
-	$nodes['th_woocommerce_product_stock_updated'] = new \HotSource\TriggerHappy\Nodes\Triggers\ProductStockUpdated();
+	$nodes['th_woocommerce_product_created'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\ProductCreated();
+	$nodes['th_woocommerce_product_updated'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\ProductUpdated();
+	$nodes['th_woocommerce_product_stock_updated'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\ProductStockUpdated();
+	$nodes['th_woocommerce_product_add_to_cart'] = new \HotSource\TriggerHappy\Nodes\Plugins\WooCommerce\Triggers\ProductAddedToCart();
+
 
 	// Customer triggers
 	$nodes['th_woocommerce_customer_created'] = new \HotSource\TriggerHappy\Nodes\Triggers\CustomerCreated();
