@@ -26,9 +26,6 @@ class ProductStockUpdated  extends CoreTriggerNode {
 		return [
 			new NodeField( 'ID', 'number',
 				[ 'description' => 'The product ID', 'dir' => 'start' ]
-			),
-			new NodeField( 'post', 'wp_post',
-				[ 'description' => 'The updated product', 'dir' => 'start' ]
 			)
 		];
 	}
