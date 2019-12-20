@@ -20,6 +20,10 @@ function triggerhappy_load_woocommerce_nodes( $nodes ) {
 	$nodes['th_woocommerce_product_updated'] = new \HotSource\TriggerHappy\Nodes\Triggers\ProductUpdated();
 	$nodes['th_woocommerce_product_stock_updated'] = new \HotSource\TriggerHappy\Nodes\Triggers\ProductStockUpdated();
 
+	// Customer triggers
+	$nodes['th_woocommerce_customer_created'] = new \HotSource\TriggerHappy\Nodes\Triggers\CustomerCreated();
+
+
 	return $nodes;
 }
 
