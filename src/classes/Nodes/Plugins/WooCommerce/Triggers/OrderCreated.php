@@ -19,7 +19,7 @@ class OrderCreated extends CoreTriggerNode {
 		$this->fields = $this->generateFields();
 		$this->plugin = 'WooCommerce';
 		$this->callback = 'triggerhappy_action_hook';
-		$this->hook = 'woocommerce_thankyou';
+		$this->hook = 'woocommerce_create_order';
 	}
 
 	/**
