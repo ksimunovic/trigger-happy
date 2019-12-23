@@ -54,7 +54,6 @@ class Timer extends CoreTriggerNode {
 		}
 		);
 		add_action( $data['hook'], function () use ( $node, $data, $context ) {
-			echo "";
 			return $node->next( $context );
 		}
 		);
