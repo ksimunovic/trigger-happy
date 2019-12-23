@@ -13,41 +13,41 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes = [];
 
 	// WordPress
-	$nodes['th_core_timer'] = new HotSource\TriggerHappy\Nodes\Triggers\Timer();
-	$nodes['th_core_wp_login'] = new HotSource\TriggerHappy\Nodes\Actions\Login();
-	$nodes['th_core_wp_logout'] = new HotSource\TriggerHappy\Nodes\Actions\Logout();
-	$nodes['th_core_wp_redirect'] = new HotSource\TriggerHappy\Nodes\Actions\Redirect();
-	$nodes['th_core_send_email'] = new HotSource\TriggerHappy\Nodes\Actions\CoreSendEmail();
+	$nodes['th_core_timer']             = new HotSource\TriggerHappy\Nodes\Triggers\Timer();
+	$nodes['th_core_wp_login']          = new HotSource\TriggerHappy\Nodes\Actions\Login();
+	$nodes['th_core_wp_logout']         = new HotSource\TriggerHappy\Nodes\Actions\Logout();
+	$nodes['th_core_wp_redirect']       = new HotSource\TriggerHappy\Nodes\Actions\Redirect();
+	$nodes['th_core_send_email']        = new HotSource\TriggerHappy\Nodes\Actions\CoreSendEmail();
 	$nodes['th_core_add_nav_menu_item'] = new HotSource\TriggerHappy\Nodes\Actions\AddNavMenuItem();
 
 	// Users
-	$nodes['th_core_user_login'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogin();
-	$nodes['th_core_user_logout'] = new HotSource\TriggerHappy\Nodes\Triggers\UserLogout();
-	$nodes['th_core_user_updated'] = new HotSource\TriggerHappy\Nodes\Triggers\UserUpdated();
-	$nodes['th_core_user_register'] = new HotSource\TriggerHappy\Nodes\Triggers\UserRegister();
-	$nodes['th_core_filter_logged_in'] = new HotSource\TriggerHappy\Nodes\Conditions\LoggedIn();
+	$nodes['th_core_user_login']           = new HotSource\TriggerHappy\Nodes\Triggers\UserLogin();
+	$nodes['th_core_user_logout']          = new HotSource\TriggerHappy\Nodes\Triggers\UserLogout();
+	$nodes['th_core_user_updated']         = new HotSource\TriggerHappy\Nodes\Triggers\UserUpdated();
+	$nodes['th_core_user_register']        = new HotSource\TriggerHappy\Nodes\Triggers\UserRegister();
+	$nodes['th_core_filter_logged_in']     = new HotSource\TriggerHappy\Nodes\Conditions\LoggedIn();
 	$nodes['th_core_filter_not_logged_in'] = new HotSource\TriggerHappy\Nodes\Conditions\NotLoggedIn();
 
 	// Posts
-	$nodes['th_core_post_saved'] = new HotSource\TriggerHappy\Nodes\Triggers\PostSaved();
-	$nodes['th_core_post_published'] = new HotSource\TriggerHappy\Nodes\Triggers\PostPublished();
-	$nodes['th_core_create_post'] = new HotSource\TriggerHappy\Nodes\Actions\CoreCreatePost();
+	$nodes['th_core_post_saved']             = new HotSource\TriggerHappy\Nodes\Triggers\PostSaved();
+	$nodes['th_core_post_published']         = new HotSource\TriggerHappy\Nodes\Triggers\PostPublished();
+	$nodes['th_core_create_post']            = new HotSource\TriggerHappy\Nodes\Actions\CoreCreatePost();
 	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\Nodes\Actions\CorePostInsertHtml();
 
 	// Sidebar
 	$nodes['th_core_insert_html_sidebar'] = new HotSource\TriggerHappy\Nodes\Actions\CoreSidebarInsertHtml();
 
 	// Queries
-	$nodes['th_core_any_url_query'] = new HotSource\TriggerHappy\Nodes\Triggers\AnyUrlQuery();
-	$nodes['th_core_archive_query'] = new HotSource\TriggerHappy\Nodes\Triggers\ArchiveQuery();
-	$nodes['th_core_category_query'] = new HotSource\TriggerHappy\Nodes\Triggers\CategoryQuery();
-	$nodes['th_core_taxonomy_query'] = new HotSource\TriggerHappy\Nodes\Triggers\TaxonomyQuery();
-	$nodes['th_core_single_post'] = new HotSource\TriggerHappy\Nodes\Triggers\CoreSinglePostViewed();
+	$nodes['th_core_any_url_query']     = new HotSource\TriggerHappy\Nodes\Triggers\AnyUrlQuery();
+	$nodes['th_core_archive_query']     = new HotSource\TriggerHappy\Nodes\Triggers\ArchiveQuery();
+	$nodes['th_core_category_query']    = new HotSource\TriggerHappy\Nodes\Triggers\CategoryQuery();
+	$nodes['th_core_taxonomy_query']    = new HotSource\TriggerHappy\Nodes\Triggers\TaxonomyQuery();
+	$nodes['th_core_single_post']       = new HotSource\TriggerHappy\Nodes\Triggers\CoreSinglePostViewed();
 	$nodes['th_core_single_post_query'] = new HotSource\TriggerHappy\Nodes\Triggers\CoreSinglePostQuery();
-	$nodes['th_core_set_query_param'] = new HotSource\TriggerHappy\Nodes\Actions\SetQueryParameter();
+	$nodes['th_core_set_query_param']   = new HotSource\TriggerHappy\Nodes\Actions\SetQueryParameter();
 
 	// Comments
-	$nodes['th_core_comment_created'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentCreated();
+	$nodes['th_core_comment_created']        = new HotSource\TriggerHappy\Nodes\Triggers\CommentCreated();
 	$nodes['th_core_comment_status_changed'] = new HotSource\TriggerHappy\Nodes\Triggers\CommentStatus();
 
 	return $nodes;
@@ -118,7 +118,7 @@ function triggerhappy_load_core_schema() {
 		$req = new WP_REST_Request( 'GET', '/wp/v2/posts' );
 		$req->set_param( 'search', $search );
 		$response = rest_do_request( $req );
-		$data = ( $response->get_data() );
+		$data     = ( $response->get_data() );
 
 		return array_map(
 			function ( $d ) {
@@ -137,7 +137,7 @@ function triggerhappy_load_core_schema() {
 		$req = new WP_REST_Request( 'GET', '/wp/v2/comments' );
 		$req->set_param( 'search', $search );
 		$response = rest_do_request( $req );
-		$data = ( $response->get_data() );
+		$data     = ( $response->get_data() );
 
 		return array_map(
 			function ( $d ) {
@@ -152,7 +152,7 @@ function triggerhappy_load_core_schema() {
 
 	triggerhappy_register_value_type(
 		'wp_post_type', 'string', function ( $search ) {
-		$result = get_post_types();
+		$result     = get_post_types();
 		$post_types = [];
 		foreach ( $result as $post_type ) {
 			array_push( $post_types, [
@@ -165,7 +165,7 @@ function triggerhappy_load_core_schema() {
 
 	triggerhappy_register_value_type(
 		'wp_post_type', 'string', function () {
-		$result = get_post_types();
+		$result     = get_post_types();
 		$post_types = [];
 		foreach ( $result as $post_type ) {
 			array_push( $post_types, [
@@ -180,7 +180,7 @@ function triggerhappy_load_core_schema() {
 
 	triggerhappy_register_value_type(
 		'wp_post_status', 'string', function () {
-		$result = get_post_stati();
+		$result        = get_post_stati();
 		$post_statuses = [];
 		foreach ( $result as $poststatus ) {
 			array_push( $post_statuses, [
@@ -217,8 +217,8 @@ function triggerhappy_load_core_schema() {
 	triggerhappy_register_value_type(
 		'wp_nav_menu', 'number', function () {
 		$results = [];
-		$menus = get_terms( 'nav_menu' );
-		$menus = array_combine( wp_list_pluck( $menus, 'term_id' ), wp_list_pluck( $menus, 'name' ) );
+		$menus   = get_terms( 'nav_menu' );
+		$menus   = array_combine( wp_list_pluck( $menus, 'term_id' ), wp_list_pluck( $menus, 'name' ) );
 		foreach ( $menus as $id => $text ) {
 			array_push( $results, [ 'id' => $id, 'text' => $text ] );
 		}
@@ -243,7 +243,7 @@ function triggerhappy_load_core_schema() {
 		$req = new WP_REST_Request( 'GET', '/wp/v2/users' );
 		$req->set_param( 'search', $search );
 		$response = rest_do_request( $req );
-		$data = ( $response->get_data() );
+		$data     = ( $response->get_data() );
 
 		return array_map(
 			function ( $d ) {
@@ -623,7 +623,7 @@ function triggerhappy_resolve_field_wp_post__meta_data( $result, $obj, $fieldNam
 		return null;
 	}
 
-	$meta = get_post_meta( $obj->ID );
+	$meta          = get_post_meta( $obj->ID );
 	$formattedMeta = [];
 	foreach ( $meta as $i => $data ) {
 		$formattedMeta[ $i ] = $data[0];
@@ -642,4 +642,37 @@ function triggerhappy_assoc_to_choices( $results ) {
 	}
 
 	return $choices;
+}
+
+function triggerhappy_get_time_intervals() {
+	return [
+		'seconds' => __( 'Seconds', 'woocommerce' ),
+		'minutes' => __( 'Minutes', 'woocommerce' ),
+		'hours'   => __( 'Hours', 'woocommerce' ),
+		'days'    => __( 'Days', 'woocommerce' ),
+		'weeks'   => __( 'Weeks', 'woocommerce' ),
+		'months'  => __( 'Months', 'woocommerce' )
+	];
+}
+
+function triggerhappy_get_cron_interval_from_time_interval_and_value( $time_interval, $time_value ) {
+	switch ( $time_interval ) {
+		case 'seconds':
+			return $time_value;
+			break;
+		case 'minutes':
+			return $time_value * 60;
+			break;
+		case 'hours':
+			return $time_value * 3600;
+			break;
+		case 'days':
+			return $time_value * 3600 * 24;
+		case 'weeks':
+			return $time_value * 3600 * 24 * 7;
+			break;
+		case 'months':
+			return $time_value * 3600 * 24 * 30;
+			break;
+	}
 }

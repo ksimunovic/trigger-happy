@@ -50,6 +50,7 @@ class AddCoupon extends CoreActionNode {
 			'post_author'  => 1,
 			'post_type'    => 'shop_coupon',
 		];
+
 		$data['coupon_id'] = wp_insert_post( $coupon );
 		update_post_meta( $data['coupon_id'], 'discount_type', $data['discount_type'] );
 		update_post_meta( $data['coupon_id'], 'coupon_amount', $data['amount'] );
