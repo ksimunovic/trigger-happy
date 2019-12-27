@@ -52,10 +52,11 @@ class Timer extends CoreTriggerNode {
 		$data['cron_hook']  = 'triggerhappy_timer_trigger__' . $node->graph->id;
 		$data['recurrence'] = 'Every ' . $data['time_value'] . ' ' . $data['time_interval'] . ' (TriggerHappy)';
 		$data['slug']       = sanitize_title( $data['recurrence'] );
+		$data['interval'] = triggerhappy_get_cron_interval_from_time_interval_and_value( $data['time_interval'], $data['time_value'] );
 
 		add_filter( 'cron_schedules', function ( $schedules ) use ( $data ) {
 			$schedules[ $data['slug'] ] = [
-				'interval' => triggerhappy_get_cron_interval_from_time_interval_and_value( $data['time_interval'], $data['time_value'] ),
+				'interval' => $data['interval'],
 				'display'  => __( $data['recurrence'] ),
 			];
 
@@ -69,7 +70,7 @@ class Timer extends CoreTriggerNode {
 		);
 
 		if ( ! wp_next_scheduled( $data['cron_hook'] ) ) {
-			wp_schedule_event( time(), $data['slug'], $data['cron_hook'] );
+			wp_schedule_event( time() + $data['interval'], $data['slug'], $data['cron_hook'] );
 		}
 	}
 }
