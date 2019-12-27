@@ -6,7 +6,7 @@ require_once( dirname( __FILE__ ) . '/../classes/Psr4AutoloaderClass.php' );
 // Registering class autoloader
 $loader = new \HotSource\TriggerHappy\Psr4AutoloaderClass;
 $loader->register();
-$loader->addNamespace( 'HotSource\TriggerHappy', ABSPATH . '/wp-content/plugins/trigger-happy/src/classes' );
+$loader->addNamespace( 'HotSource\TriggerHappy', WP_PLUGIN_DIR . '/trigger-happy/src/classes' );
 
 function triggerhappy_load_core_nodes( $nodes ) {
 
