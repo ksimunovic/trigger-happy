@@ -33,6 +33,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 	$nodes['th_core_post_published']         = new HotSource\TriggerHappy\Nodes\Triggers\PostPublished();
 	$nodes['th_core_create_post']            = new HotSource\TriggerHappy\Nodes\Actions\CoreCreatePost();
 	$nodes['th_core_insert_html_after_post'] = new HotSource\TriggerHappy\Nodes\Actions\CorePostInsertHtml();
+	$nodes['th_core_post_tagged']            = new HotSource\TriggerHappy\Nodes\Triggers\PostTagged();
 
 	// Sidebar
 	$nodes['th_core_insert_html_sidebar'] = new HotSource\TriggerHappy\Nodes\Actions\CoreSidebarInsertHtml();
@@ -639,6 +640,17 @@ function triggerhappy_assoc_to_choices( $results ) {
 	$choices = [];
 	foreach ( $results as $key => $val ) {
 		array_push( $choices, [ 'id' => $key, 'text' => $val ] );
+	}
+
+	return $choices;
+}
+
+function triggerhappy_get_tags_to_choices() {
+	$tags    = get_tags();
+	$choices = [];
+
+	foreach ( $tags as $key => $value ) {
+		array_push( $choices, [ 'id' => $value->name, 'text' => $value->name ] );
 	}
 
 	return $choices;
