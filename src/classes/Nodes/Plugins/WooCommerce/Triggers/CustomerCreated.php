@@ -14,7 +14,7 @@ class CustomerCreated extends CoreTriggerNode {
 		$this->cat = 'Customers';
 		$this->nodeType = $this->getNodeType();
 		$this->fields = $this->generateFields();
-		$this->hook = 'woocommerce_new_customer_data';
+		$this->hook = 'user_register';
 		$this->callback = 'triggerhappy_action_hook';
 	}
 
@@ -40,6 +40,12 @@ class CustomerCreated extends CoreTriggerNode {
 	 * @return void|null
 	 */
 	public function runCallback( $node, $context, $data = null ) {
-		$this->filterHook( $node, $context );
+		add_action($this->hook, function ($user_id) use ($node, $data, $context) {
+			$user = get_user_by('id', $user_id);
+
+			if ( in_array( 'customer', (array) $user->roles ) ) {
+				return $node->next($context);
+			}
+		},10, 1);
 	}
 }
