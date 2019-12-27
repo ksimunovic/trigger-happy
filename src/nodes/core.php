@@ -649,6 +649,8 @@ function triggerhappy_get_tags_to_choices() {
 	$tags    = get_tags();
 	$choices = [];
 
+	array_push( $choices, ['id' => 'any_tag', 'text' => 'Any tag']);
+
 	foreach ( $tags as $key => $value ) {
 		array_push( $choices, [ 'id' => $value->name, 'text' => $value->name ] );
 	}

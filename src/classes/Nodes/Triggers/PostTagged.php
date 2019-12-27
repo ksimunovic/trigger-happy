@@ -18,6 +18,7 @@ class PostTagged extends CoreTriggerNode {
 		$this->cat         = 'Posts';
 		$this->nodeType    = $this->getNodeType();
 		$this->fields      = $this->generateFields();
+		$this->hook        = 'rest_after_insert_post';
 		$this->callback    = 'triggerhappy_action_hook';
 	}
 
@@ -42,20 +43,19 @@ class PostTagged extends CoreTriggerNode {
 	 * @return void|null
 	 */
 	public function runCallback( $node, $context, $data = null ) {
-		$data['hook'] = 'rest_after_insert_post';
-
-		add_action( $data['hook'], function ( $post_id ) use ( $node, $data, $context ) {
+		add_action( $this->hook, function ( $post_id ) use ( $node, $data, $context ) {
 			$tags_array = [];
 
-			$all_tags = get_the_tags($post_id);
+			$all_tags = get_the_tags( $post_id );
 
-			foreach ($all_tags as $tag) {
+			foreach ( $all_tags as $tag ) {
 				$tags_array[] = $tag->name;
 			}
 
-			if (in_array($data['tag_name'], $tags_array)) {
+			if ( ($data['tag_name'] === 'any_tag' && !empty($tags_array)) ||
+			     in_array( $data['tag_name'], $tags_array ) ) {
 				return $node->next( $context );
 			}
-		}, 10, 3);
+		}, 10, 3 );
 	}
 }
