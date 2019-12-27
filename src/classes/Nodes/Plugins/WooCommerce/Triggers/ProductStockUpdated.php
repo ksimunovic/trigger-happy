@@ -14,6 +14,7 @@ class ProductStockUpdated extends CoreTriggerNode {
 		$this->cat         = 'Products';
 		$this->nodeType    = $this->getNodeType();
 		$this->fields      = $this->generateFields();
+		$this->hook        = 'woocommerce_updated_product_stock';
 		$this->callback    = 'triggerhappy_action_hook';
 	}
 
@@ -37,13 +38,14 @@ class ProductStockUpdated extends CoreTriggerNode {
 	 * @return void|null
 	 */
 	public function runCallback( $node, $context, $data = null ) {
-		$data['hook'] = 'woocommerce_updated_product_stock';
-
-		add_action( $data['hook'], function ( $product_id ) use ( $node, $data, $context ) {
+		add_action( $this->hook, function ( $product_id ) use ( $node, $data, $context ) {
 			$product        = wc_get_product( $product_id );
 			$stock_quantity = $product->get_stock_quantity();
 
-			if ( $stock_quantity < $data['stock_level_limit'] ) {
+			if (
+				( $data['stock_level_limit'] === null && $stock_quantity === 0 ) ||
+				$stock_quantity < $data['stock_level_limit']
+			) {
 				return $node->next( $context );
 			}
 		}, 10, 1 );
