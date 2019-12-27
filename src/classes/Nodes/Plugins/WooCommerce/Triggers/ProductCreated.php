@@ -46,6 +46,6 @@ class ProductCreated extends CoreTriggerNode {
 	 * @return void|null
 	 */
 	public function runCallback( $node, $context, $data = null ) {
-		$this->filterHook( $node, $context );
+		$this->actionHook( $node, $context );
 	}
 }
