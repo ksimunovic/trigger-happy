@@ -15,6 +15,7 @@ class OrderStatusChanged extends CoreTriggerNode {
 		$this->nodeType    = $this->getNodeType();
 		$this->fields      = $this->generateFields();
 		$this->plugin      = 'woocommerce';
+		$this->hook        = 'woocommerce_order_status_changed';
 		$this->callback    = 'triggerhappy_action_hook';
 	}
 
@@ -34,15 +35,14 @@ class OrderStatusChanged extends CoreTriggerNode {
 	}
 
 	public function runCallback( $node, $context, $data = null ) {
-		$data['hook'] = 'woocommerce_order_status_changed';
-
-		add_action( $data['hook'], function () use ( $node, $data, $context ) {
-			echo "";
-
+		add_action( $this->hook, function ( $order_id, $status_from, $status_to ) use ( $node, $data, $context ) {
+			$wc_status_from = 'wc-' . $status_from;
+			$wc_status_to   = 'wc-' . $status_to;
 			if (
-				($data['from'] === $_POST['post_status'] && $data['to'] === $_POST['order_status']) ||
-				($data['from'] === null && $data['to'] === $_POST['order_status']) ||
-				($data['from'] === $_POST['post_status'] && $data['to'] === null)
+				( $data['from'] === null && $data['to'] === null ) ||
+				( $data['from'] === $wc_status_from && $data['to'] === $wc_status_to ) ||
+				( $data['from'] === null && $data['to'] === $wc_status_to ) ||
+				( $data['from'] === $wc_status_from && $data['to'] === null )
 			) {
 				return $node->next( $context );
 			}
