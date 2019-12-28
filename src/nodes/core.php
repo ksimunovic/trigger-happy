@@ -14,6 +14,7 @@ function triggerhappy_load_core_nodes( $nodes ) {
 
 	// WordPress
 	$nodes['th_core_timer']             = new HotSource\TriggerHappy\Nodes\Triggers\Timer();
+	$nodes['th_core_delay']             = new HotSource\TriggerHappy\Nodes\Actions\Delay();
 	$nodes['th_core_wp_login']          = new HotSource\TriggerHappy\Nodes\Actions\Login();
 	$nodes['th_core_wp_logout']         = new HotSource\TriggerHappy\Nodes\Actions\Logout();
 	$nodes['th_core_wp_redirect']       = new HotSource\TriggerHappy\Nodes\Actions\Redirect();
@@ -603,6 +604,10 @@ add_filter( 'triggerhappy_nodes', 'triggerhappy_load_core_nodes' );
 add_action( 'triggerhappy_schema', 'triggerhappy_load_core_schema' );
 add_filter( 'triggerhappy_resolve_field_wp_post__meta_data', 'triggerhappy_resolve_field_wp_post__meta_data', 10, 3 );
 
+add_action( 'triggerhappy_single_event', function ($node, $data, $context ) {
+	return $node->next( $context );
+},10, 3 );
+
 
 add_filter( 'triggerhappy_expression_call_getItem', function ( $result, $obj, $methodName, $args ) {
 	if ( count( $args ) == 0 ) {
@@ -649,7 +654,7 @@ function triggerhappy_get_tags_to_choices() {
 	$tags    = get_tags();
 	$choices = [];
 
-	array_push( $choices, ['id' => 'any_tag', 'text' => 'Any tag']);
+	array_push( $choices, [ 'id' => 'any_tag', 'text' => 'Any tag' ] );
 
 	foreach ( $tags as $key => $value ) {
 		array_push( $choices, [ 'id' => $value->name, 'text' => $value->name ] );

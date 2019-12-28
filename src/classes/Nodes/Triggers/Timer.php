@@ -9,8 +9,6 @@ use HotSource\TriggerHappy\Nodes\CoreNode;
 use HotSource\TriggerHappy\Nodes\CoreTriggerNode;
 
 class Timer extends CoreTriggerNode {
-	protected $creation_time;
-
 	/**
 	 * Timer constructor.
 	 */
