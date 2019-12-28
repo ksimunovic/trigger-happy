@@ -16,6 +16,7 @@ class ProductPriceChanged extends CoreTriggerNode {
 		$this->nodeType    = $this->getNodeType();
 		$this->fields      = $this->generateFields();
 		$this->callback    = 'triggerhappy_action_hook';
+		$this->hook        = 'woocommerce_product_object_updated_props';
 	}
 
 	/**
@@ -37,8 +38,6 @@ class ProductPriceChanged extends CoreTriggerNode {
 	 * @return void|null
 	 */
 	public function runCallback( $node, $context, $data = null ) {
-		$data['hook'] = 'woocommerce_product_object_updated_props';
-
 		add_action( $data['hook'], function ( $product, $updated_props ) use ( $node, $data, $context ) {
 			if ( ( in_array( 'regular_price', $updated_props, true ) ||
 			       in_array( 'sale_price', $updated_props, true ) ) ) {
